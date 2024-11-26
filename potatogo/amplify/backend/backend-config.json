@@ -1,0 +1,84 @@
+{
+  "api": {
+    "potatogoapi": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "menuHandler"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    }
+  },
+  "function": {
+    "menuHandler": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributeEnvMap": {
+            "Arn": "TABLE_ARN",
+            "Name": "TABLE_NAME"
+          },
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "storage",
+          "resourceName": "potatogoDB"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "testFunction": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_function_menuHandler_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "menuHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_menuHandler_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "menuHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_testFunction_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "testFunction"
+        }
+      ]
+    },
+    "AMPLIFY_function_testFunction_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "testFunction"
+        }
+      ]
+    }
+  },
+  "storage": {
+    "potatogoDB": {
+      "providerPlugin": "awscloudformation",
+      "service": "DynamoDB"
+    }
+  }
+}

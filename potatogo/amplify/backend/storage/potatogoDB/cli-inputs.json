@@ -1,0 +1,14 @@
+{
+  "resourceName": "potatogoDB",
+  "tableName": "menuTable",
+  "partitionKey": {
+    "fieldName": "id",
+    "fieldType": "string"
+  },
+  "sortKey": {
+    "fieldName": "name",
+    "fieldType": "string"
+  },
+  "gsi": [],
+  "triggerFunctions": []
+}

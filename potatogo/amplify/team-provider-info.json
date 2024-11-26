@@ -1,0 +1,33 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-potatogo-dev-1d07f-authRole",
+      "UnauthRoleArn": "arn:aws:iam::977099030879:role/amplify-potatogo-dev-1d07f-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::977099030879:role/amplify-potatogo-dev-1d07f-authRole",
+      "Region": "eu-north-1",
+      "DeploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
+      "UnauthRoleName": "amplify-potatogo-dev-1d07f-unauthRole",
+      "StackName": "amplify-potatogo-dev-1d07f",
+      "StackId": "arn:aws:cloudformation:eu-north-1:977099030879:stack/amplify-potatogo-dev-1d07f/93c0b900-abeb-11ef-8977-0abfb22434ab",
+      "AmplifyAppId": "dnapa02mbk050"
+    },
+    "categories": {
+      "function": {
+        "testFunction": {
+          "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
+          "s3Key": "amplify-builds/testFunction-43543172534736334e6f-build.zip"
+        },
+        "menuHandler": {
+          "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
+          "s3Key": "amplify-builds/menuHandler-4a6a375a376676336576-build.zip"
+        }
+      },
+      "storage": {
+        "potatogoDB": {}
+      },
+      "api": {
+        "potatogoapi": {}
+      }
+    }
+  }
+}

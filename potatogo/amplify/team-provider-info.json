@@ -15,13 +15,16 @@
       "function": {
         "testFunction": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
-          "s3Key": "amplify-builds/testFunction-43543172534736334e6f-build.zip"
+          "s3Key": "amplify-builds/testFunction-466731533074677a4251-build.zip"
         },
         "menuHandler": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
-          "s3Key": "amplify-builds/menuHandler-4a6a375a376676336576-build.zip"
+          "s3Key": "amplify-builds/menuHandler-49386569357130337875-build.zip"
         },
-        "loginHandler": {}
+        "loginHandler": {
+          "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
+          "s3Key": "amplify-builds/loginHandler-4b774366667950576d79-build.zip"
+        }
       },
       "storage": {
         "potatogoDB": {}

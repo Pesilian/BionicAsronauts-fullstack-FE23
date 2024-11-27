@@ -47,6 +47,22 @@
     }
   },
   "parameters": {
+    "AMPLIFY_function_loginHandler_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "loginHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_loginHandler_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "loginHandler"
+        }
+      ]
+    },
     "AMPLIFY_function_menuHandler_deploymentBucketName": {
       "usedBy": [
         {

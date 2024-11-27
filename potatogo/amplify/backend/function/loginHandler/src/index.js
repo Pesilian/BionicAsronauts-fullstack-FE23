@@ -38,9 +38,7 @@ exports.handler = async (event) => {
       };
     }
 
-    const isPasswordValid = await bcrypt.compare(password, Item.Password);
-
-    if (!isPasswordValid) {
+    if (password !== Item.Password) {
       return {
         statusCode: 401,
         body: JSON.stringify({ error: "Invalid password" }),

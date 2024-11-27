@@ -9,6 +9,14 @@
           ],
           "category": "function",
           "resourceName": "menuHandler"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "loginHandler"
         }
       ],
       "providerPlugin": "awscloudformation",
@@ -16,6 +24,11 @@
     }
   },
   "function": {
+    "loginHandler": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "menuHandler": {
       "build": true,
       "dependsOn": [
@@ -42,6 +55,22 @@
     }
   },
   "parameters": {
+    "AMPLIFY_function_loginHandler_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "loginHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_loginHandler_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "loginHandler"
+        }
+      ]
+    },
     "AMPLIFY_function_menuHandler_deploymentBucketName": {
       "usedBy": [
         {

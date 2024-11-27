@@ -20,7 +20,8 @@
         "menuHandler": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
           "s3Key": "amplify-builds/menuHandler-4a6a375a376676336576-build.zip"
-        }
+        },
+        "loginHandler": {}
       },
       "storage": {
         "potatogoDB": {}

@@ -16,6 +16,11 @@
     }
   },
   "function": {
+    "loginHandler": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "menuHandler": {
       "build": true,
       "dependsOn": [

@@ -48,6 +48,11 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "registerHandler": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "testFunction": {
       "build": true,
       "providerPlugin": "awscloudformation",
@@ -84,6 +89,22 @@
         {
           "category": "function",
           "resourceName": "menuHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_registerHandler_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "registerHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_registerHandler_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "registerHandler"
         }
       ]
     },

@@ -7,6 +7,27 @@
       "permissions": {
         "setting": "open"
       }
+    },
+    "/login": {
+      "name": "/login",
+      "lambdaFunction": "loginHandler",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/order": {
+      "name": "/order",
+      "lambdaFunction": "orderHandler",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/cart": {
+      "name": "/cart",
+      "lambdaFunction": "cartHandler",
+      "permissions": {
+        "setting": "open"
+      }
     }
   }
 }

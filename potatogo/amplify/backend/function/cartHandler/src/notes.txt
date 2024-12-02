@@ -1,0 +1,84 @@
+const AWS = require('aws-sdk');
+const dynamoDB = new AWS.DynamoDB.DocumentClient({ region: 'eu-north-1' });
+
+exports.createguestOrder = async event => {
+  try {
+    const body = JSON.parse(event.body || '{}');
+    const cartID = body.cartID;
+
+    console.log('Received Cart ID:', cartID);
+
+    if (!cartID) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ message: 'Cart ID is required' }),
+      };
+    }
+
+    const queryParams = {
+      TableName: 'Pota-To-Go-cart',
+      KeyConditionExpression: 'cartID = :cartID',
+      ExpressionAttributeValues: {
+        ':cartID': cartID,
+      },
+    };
+
+    const result = await dynamoDB.query(queryParams).promise();
+
+    console.log(
+      'DynamoDB Query Result:',
+      JSON.stringify(result.Items, null, 2)
+    );
+
+    if (!result.Items || result.Items.length === 0) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ message: 'Cart not found' }),
+      };
+    }
+
+    const cart = result.Items.map(item => ({
+      cartID: item.cartID,
+      orderItems: item.orderItems,
+    }));
+
+    const newOrderID = Math.floor(Math.random() * 1000000).toString();
+
+    const newOrder = {
+      orderId: newOrderID,
+      orderItems: cart,
+      createdAt: new Date().toISOString(),
+    };
+
+    const putParams = {
+      TableName: 'Pota-To-Go-orders',
+      Item: {
+        orderId: newOrder.orderId,
+        items: JSON.stringify(newOrder.orderItems),
+        createdAt: newOrder.createdAt,
+      },
+    };
+
+    await dynamoDB.put(putParams).promise();
+
+    return {
+      statusCode: 201,
+      body: JSON.stringify({
+        message: 'Order created successfully',
+        orderId: newOrder.orderId,
+        items: newOrder.orderItems,
+        createdAt: newOrder.createdAt,
+      }),
+    };
+  } catch (error) {
+    console.error('Error occurred:', error);
+
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: 'Failed to process request',
+        error: error.message,
+      }),
+    };
+  }
+};

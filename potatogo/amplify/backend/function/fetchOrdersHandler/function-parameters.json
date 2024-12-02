@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "storage": {
+      "potatogoDB": [
+        "read"
+      ]
+    },
+    "api": {
+      "potatogoapi": [
+        "read"
+      ]
+    }
+  },
+  "lambdaLayers": [],
+  "environmentVariableList": [
+    {
+      "cloudFormationParameterName": "a",
+      "environmentVariableName": "a"
+    }
+  ]
+}

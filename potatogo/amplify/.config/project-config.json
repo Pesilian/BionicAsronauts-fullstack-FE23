@@ -1,18 +1,17 @@
 {
-  "whyContinueWithGen1": "Prefer not to answer",
+  "providers": [
+    "awscloudformation"
+  ],
   "projectName": "potatogo",
   "version": "3.1",
   "frontend": "javascript",
   "javascript": {
     "framework": "react",
     "config": {
-      "SourceDir": "src",
-      "DistributionDir": "build",
-      "BuildCommand": "npm.cmd run-script build",
-      "StartCommand": "npm.cmd run-script start"
+      "SourceDir": "/Users/tor_skola/Desktop/BionicAsronauts-fullstack-FE23/potatogo/src",
+      "DistributionDir": "/Users/tor_skola/Desktop/BionicAsronauts-fullstack-FE23/potatogo/build",
+      "BuildCommand": "npm run-script build",
+      "StartCommand": "npm run-script start"
     }
-  },
-  "providers": [
-    "awscloudformation"
-  ]
+  }
 }

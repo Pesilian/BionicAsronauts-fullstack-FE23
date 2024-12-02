@@ -9,6 +9,30 @@
           ],
           "category": "function",
           "resourceName": "menuHandler"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "loginHandler"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "orderHandler"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "cartHandler"
         }
       ],
       "providerPlugin": "awscloudformation",
@@ -16,6 +40,40 @@
     }
   },
   "function": {
+    "cartHandler": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "fetchOrdersHandler": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn",
+            "StreamArn"
+          ],
+          "category": "storage",
+          "resourceName": "potatogoDB"
+        },
+        {
+          "attributes": [
+            "ApiName",
+            "ApiId"
+          ],
+          "category": "api",
+          "resourceName": "potatogoapi"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "loginHandler": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "menuHandler": {
       "build": true,
       "dependsOn": [
@@ -35,6 +93,11 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "orderHandler": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "testFunction": {
       "build": true,
       "providerPlugin": "awscloudformation",
@@ -42,6 +105,62 @@
     }
   },
   "parameters": {
+    "AMPLIFY_function_cartHandler_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "cartHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_cartHandler_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "cartHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_fetchOrdersHandler_a": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "fetchOrdersHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_fetchOrdersHandler_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "fetchOrdersHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_fetchOrdersHandler_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "fetchOrdersHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_loginHandler_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "loginHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_loginHandler_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "loginHandler"
+        }
+      ]
+    },
     "AMPLIFY_function_menuHandler_deploymentBucketName": {
       "usedBy": [
         {
@@ -55,6 +174,22 @@
         {
           "category": "function",
           "resourceName": "menuHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_orderHandler_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "orderHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_orderHandler_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "orderHandler"
         }
       ]
     },

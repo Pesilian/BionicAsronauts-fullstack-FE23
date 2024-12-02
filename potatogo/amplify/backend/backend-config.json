@@ -8,7 +8,7 @@
             "Arn"
           ],
           "category": "function",
-          "resourceName": "menuHandler"
+          "resourceName": "getMenu"
         },
         {
           "attributes": [
@@ -41,6 +41,11 @@
   },
   "function": {
     "cartHandler": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "getMenu": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"

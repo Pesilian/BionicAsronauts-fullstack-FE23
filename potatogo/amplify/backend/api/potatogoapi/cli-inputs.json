@@ -3,7 +3,7 @@
   "paths": {
     "/menu": {
       "name": "/menu",
-      "lambdaFunction": "menuHandler",
+      "lambdaFunction": "getMenu",
       "permissions": {
         "setting": "open"
       }

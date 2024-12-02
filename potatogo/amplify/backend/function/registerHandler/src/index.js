@@ -22,13 +22,17 @@ exports.handler = async (event) => {
 
     const getParams = {
       TableName: USERS_TABLE,
-      Key: { Nickname: nickname }, // Kontrollera efter nickname
+      IndexName: "Nickname-index", // Använd GSI här
+      KeyConditionExpression: "Nickname = :nickname",
+      ExpressionAttributeValues: {
+        ":nickname": nickname,
+      },
     };
 
-    const { Item } = await dynamoDB.get(getParams).promise();
+    const { Item } = await dynamoDB.query(getParams).promise();
 
     // Låt inte flera användare ha samma nickname
-    if (Item) {
+    if (Item && Item.length > 0) {
       return {
         statusCode: 409,
         body: JSON.stringify({

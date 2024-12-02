@@ -2,7 +2,7 @@ const AWS = require("aws-sdk");
 const bcrypt = require("bcryptjs");
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
-const USERS_TABLE = "Pota-To-Go_users"; // Uppdatera med din tabell
+const USERS_TABLE = "Pota-To-Go_users";
 
 exports.handler = async (event) => {
   try {

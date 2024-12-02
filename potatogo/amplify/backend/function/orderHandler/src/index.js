@@ -1,5 +1,9 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, QueryCommand, PutCommand } = require('@aws-sdk/lib-dynamodb');
+const {
+  DynamoDBDocumentClient,
+  QueryCommand,
+  PutCommand,
+} = require('@aws-sdk/lib-dynamodb');
 
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
@@ -9,11 +13,6 @@ exports.createguestOrder = async event => {
     const cartId = body.cartId;
 
     console.log('Received Cart Id:', cartId);
-
-    
-    
-
-   
 
     console.log('Using Cart Id:', cartId);
 
@@ -31,12 +30,15 @@ exports.createguestOrder = async event => {
       TableName: 'Pota-To-Go-cart',
       KeyConditionExpression: 'cartId = :cartId',
       ExpressionAttributeValues: {
-        ':cartId': cartId, 
+        ':cartId': cartId,
       },
     };
     const result = await dynamoDB.send(new QueryCommand(queryParams));
 
-    console.log('DynamoDB Query Result:', JSON.stringify(result.Items, null, 2));
+    console.log(
+      'DynamoDB Query Result:',
+      JSON.stringify(result.Items, null, 2)
+    );
 
     if (!result.Items || result.Items.length === 0) {
       return {
@@ -49,10 +51,10 @@ exports.createguestOrder = async event => {
     }
 
     const cart = result.Items[0]; // Tar det första objektet i arrayen
-    if (!cart || !cart.cartItems) {
+    if (!cart || !cart.items) {
       return {
         statusCode: 500,
-        body: JSON.stringify({ message: 'Cart does not contain cartItems' }),
+        body: JSON.stringify({ message: 'Cart does not contain items' }),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -63,7 +65,7 @@ exports.createguestOrder = async event => {
 
     const newOrder = {
       orderId: newOrderId,
-      cartItems: cart.cartItems,
+      items: cart.items,
       createdAt: new Date().toISOString(),
     };
 
@@ -71,7 +73,7 @@ exports.createguestOrder = async event => {
       TableName: 'Pota-To-Go-orders',
       Item: {
         orderId: newOrder.orderId,
-        items: JSON.stringify(newOrder.cartItems),
+        items: JSON.stringify(newOrder.items),
         createdAt: newOrder.createdAt,
       },
     };
@@ -83,7 +85,7 @@ exports.createguestOrder = async event => {
       body: JSON.stringify({
         message: 'Order created successfully',
         orderId: newOrder.orderId,
-        items: newOrder.cartItems,
+        items: newOrder.items,
         createdAt: newOrder.createdAt,
       }),
       headers: {

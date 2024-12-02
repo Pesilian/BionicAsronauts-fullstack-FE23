@@ -27,11 +27,11 @@
         },
         "orderHandler": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
-          "s3Key": "amplify-builds/orderHandler-3050646d4271357a6648-build.zip"
+          "s3Key": "amplify-builds/orderHandler-63576355656856494666-build.zip"
         },
         "cartHandler": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
-          "s3Key": "amplify-builds/cartHandler-796b626d616577776b56-build.zip"
+          "s3Key": "amplify-builds/cartHandler-6f346c516f5572504572-build.zip"
         }
       },
       "storage": {

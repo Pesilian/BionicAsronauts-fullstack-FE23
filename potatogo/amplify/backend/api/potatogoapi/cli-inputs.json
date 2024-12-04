@@ -35,6 +35,13 @@
       "permissions": {
         "setting": "open"
       }
+    },
+    "/specials": {
+      "name": "/specials",
+      "lambdaFunction": "postSpecials",
+      "permissions": {
+        "setting": "open"
+      }
     }
   }
 }

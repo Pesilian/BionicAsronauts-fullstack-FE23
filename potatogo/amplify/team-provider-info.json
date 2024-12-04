@@ -40,7 +40,9 @@
         "getMenu": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
           "s3Key": "amplify-builds/getMenu-32755a77584d582f6867-build.zip"
-        }
+        },
+        "postSpecials": {},
+        "getSpecials": {}
       },
       "storage": {
         "potatogoDB": {}

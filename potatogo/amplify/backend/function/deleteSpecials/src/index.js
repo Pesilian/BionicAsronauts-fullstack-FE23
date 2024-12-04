@@ -1,17 +1,55 @@
+const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
+const {
+  DynamoDBDocumentClient,
+  DeleteCommand,
+} = require('@aws-sdk/lib-dynamodb');
 
+const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-/**
- * @type {import('@types/aws-lambda').APIGatewayProxyHandler}
- */
-exports.handler = async (event) => {
-    console.log(`EVENT: ${JSON.stringify(event)}`);
-    return {
-        statusCode: 200,
-    //  Uncomment below to enable CORS requests
-    //  headers: {
-    //      "Access-Control-Allow-Origin": "*",
-    //      "Access-Control-Allow-Headers": "*"
-    //  },
-        body: JSON.stringify('Hello from Lambda!'),
+exports.deleteSpecials = async event => {
+  try {
+    const { specialsName } = event;
+
+    if (!specialsName) {
+      return {
+        statusCode: 400,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: 'specialsName is required' }),
+      };
+    }
+
+    const deleteParams = {
+      TableName: 'Pota-To-Go-specials',
+      Key: {
+        specialsName: specialsName,
+      },
     };
+
+    await dynamoDB.send(new DeleteCommand(deleteParams));
+
+    return {
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: `Special with specialsName '${specialsName}' deleted successfully.`,
+      }),
+    };
+  } catch (error) {
+    console.error('Error occurred:', error);
+
+    return {
+      statusCode: 500,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: 'Failed to process request',
+        error: error.message,
+      }),
+    };
+  }
 };

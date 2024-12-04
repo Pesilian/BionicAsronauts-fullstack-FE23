@@ -6,33 +6,53 @@ interface MenuItem {
   menuId: string;
 }
 
+interface Special {
+  specialsName: string;
+  price: string;
+}
+
 const MenuList: React.FC = () => {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [specials, setSpecials] = useState<Special[]>([]); // För specials
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Hämta både menyalternativ och specials
   useEffect(() => {
-    const fetchMenuItems = async () => {
+    const fetchData = async () => {
       setIsLoading(true);
       setError(null);
+
       try {
-        const response = await axios.get<{
+        // Hämta menyalternativ
+        const menuResponse = await axios.get<{
+          statusCode: number;
+          headers: any;
+          body: string;
+        }>('https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/menu');
+
+        const menuData = JSON.parse(menuResponse.data.body);
+        if (menuData && menuData.menuItems) {
+          setMenuItems(menuData.menuItems);
+        } else {
+          setError('Ingen menydata tillgänglig.');
+        }
+
+        // Hämta specials
+        const specialsResponse = await axios.get<{
           statusCode: number;
           headers: any;
           body: string;
         }>(
-          'https://rbbc71unf6.execute-api.eu-north-1.amazonaws.com/default/testmenu'
-        );
+          'https://c7d8k8kv2g.execute-api.eu-north-1.amazonaws.com/default/linasTest'
+        ); // Lägg till rätt endpoint för specials
 
-        console.log('API Response:', response.data);
-
-        const parsedData = JSON.parse(response.data.body);
-
-        if (parsedData && parsedData.menuItems) {
-          setMenuItems(parsedData.menuItems);
+        const specialsData = JSON.parse(specialsResponse.data.body);
+        if (specialsData && specialsData.specials) {
+          setSpecials(specialsData.specials);
         } else {
-          setError('Ingen menydata tillgänglig.');
+          setError('Ingen specialsdata tillgänglig.');
         }
       } catch (error: unknown) {
         if (axios.isAxiosError(error)) {
@@ -40,15 +60,13 @@ const MenuList: React.FC = () => {
         } else {
           console.error('Unknown error:', error);
         }
-        setError(
-          'Misslyckades med att hämta menyalternativ. Försök igen senare.'
-        );
+        setError('Misslyckades med att hämta data. Försök igen senare.');
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchMenuItems();
+    fetchData();
   }, []);
 
   const handleCheckboxChange = (itemId: string) => {
@@ -61,6 +79,20 @@ const MenuList: React.FC = () => {
 
   return (
     <div>
+      <h2>Specials</h2>
+      {specials.length > 0 ? (
+        <div>
+          {specials.map((special, index) => (
+            <div key={index}>
+              <h3>{special.specialsName}</h3>
+              <p>Price: {special.price}</p>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p>Inga specials tillgängliga för tillfället.</p>
+      )}
+
       <h2>Menyalternativ</h2>
 
       {error && <div style={{ color: 'red' }}>{error}</div>}

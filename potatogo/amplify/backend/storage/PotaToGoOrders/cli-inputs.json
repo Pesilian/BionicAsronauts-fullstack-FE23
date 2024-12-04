@@ -1,0 +1,22 @@
+{
+  "resourceName": "PotaToGoOrders",
+  "tableName": "Pota-To-Go-orders",
+  "partitionKey": {
+    "fieldName": "id",
+    "fieldType": "string"
+  },
+  "sortKey": {
+    "fieldName": "customerName",
+    "fieldType": "string"
+  },
+  "gsi": [
+    {
+      "name": "status",
+      "partitionKey": {
+        "fieldName": "status",
+        "fieldType": "string"
+      }
+    }
+  ],
+  "triggerFunctions": []
+}

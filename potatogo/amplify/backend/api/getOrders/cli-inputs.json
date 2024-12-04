@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "paths": {
+    "/getOrders": {
+      "name": "/getOrders",
+      "lambdaFunction": "fetchOrdersHandler",
+      "permissions": {
+        "setting": "open"
+      }
+    }
+  }
+}

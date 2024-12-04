@@ -3,6 +3,6 @@ export interface Order {
   customerName: string;
   items: string[];
   status: "Pending" | "In Progress" | "Done"; // Strict union type
-  total: number;
+  totalCost: number;
   createdAt: string;
 }

@@ -1,6 +1,6 @@
 export type AmplifyDependentResourcesAttributes = {
   "api": {
-    "potatogoapi": {
+    "getOrders": {
       "ApiId": "string",
       "ApiName": "string",
       "RootUrl": "string"
@@ -11,6 +11,19 @@ export type AmplifyDependentResourcesAttributes = {
       "Arn": "string",
       "LambdaExecutionRole": "string",
       "LambdaExecutionRoleArn": "string",
+      "Name": "string",
+      "Region": "string"
+    },
+    "fetchOrdersHandler": {
+      "Arn": "string",
+      "LambdaExecutionRole": "string",
+      "LambdaExecutionRoleArn": "string",
+      "Name": "string",
+      "Region": "string"
+    },
+    "getOrdersHandler": {
+      "Arn": "string",
+      "LambdaExecutionRole": "string",
       "Name": "string",
       "Region": "string"
     },
@@ -44,6 +57,16 @@ export type AmplifyDependentResourcesAttributes = {
     }
   },
   "storage": {
+    "PotaToGoOrders": {
+      "Arn": "string",
+      "Name": "string",
+      "PartitionKeyName": "string",
+      "PartitionKeyType": "string",
+      "Region": "string",
+      "SortKeyName": "string",
+      "SortKeyType": "string",
+      "StreamArn": "string"
+    },
     "potatogoDB": {
       "Arn": "string",
       "Name": "string",

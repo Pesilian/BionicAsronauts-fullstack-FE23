@@ -1,6 +1,6 @@
 {
   "api": {
-    "potatogoapi": {
+    "OrdersApi": {
       "dependsOn": [
         {
           "attributes": [
@@ -8,31 +8,21 @@
             "Arn"
           ],
           "category": "function",
-          "resourceName": "menuHandler"
-        },
+          "resourceName": "ordersLambda"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    },
+    "getOrders": {
+      "dependsOn": [
         {
           "attributes": [
             "Name",
             "Arn"
           ],
           "category": "function",
-          "resourceName": "loginHandler"
-        },
-        {
-          "attributes": [
-            "Name",
-            "Arn"
-          ],
-          "category": "function",
-          "resourceName": "orderHandler"
-        },
-        {
-          "attributes": [
-            "Name",
-            "Arn"
-          ],
-          "category": "function",
-          "resourceName": "cartHandler"
+          "resourceName": "fetchOrdersHandler"
         }
       ],
       "providerPlugin": "awscloudformation",
@@ -55,15 +45,23 @@
             "StreamArn"
           ],
           "category": "storage",
-          "resourceName": "potatogoDB"
-        },
+          "resourceName": "PotaToGoOrders"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "getOrdersHandler": {
+      "build": true,
+      "dependsOn": [
         {
           "attributes": [
-            "ApiName",
-            "ApiId"
+            "Name",
+            "Arn",
+            "StreamArn"
           ],
-          "category": "api",
-          "resourceName": "potatogoapi"
+          "category": "storage",
+          "resourceName": "PotaToGoOrders"
         }
       ],
       "providerPlugin": "awscloudformation",
@@ -98,6 +96,42 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "ordersLambda": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributeEnvMap": {
+            "Arn": "TABLE_ARN",
+            "Name": "TABLE_NAME"
+          },
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "storage",
+          "resourceName": "PotaToGoOrders"
+        },
+        {
+          "attributes": [
+            "ApiName",
+            "ApiId"
+          ],
+          "category": "api",
+          "resourceName": "getOrders"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn",
+            "StreamArn"
+          ],
+          "category": "storage",
+          "resourceName": "PotaToGoOrders"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "testFunction": {
       "build": true,
       "providerPlugin": "awscloudformation",
@@ -118,14 +152,6 @@
         {
           "category": "function",
           "resourceName": "cartHandler"
-        }
-      ]
-    },
-    "AMPLIFY_function_fetchOrdersHandler_a": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "fetchOrdersHandler"
         }
       ]
     },
@@ -211,6 +237,10 @@
     }
   },
   "storage": {
+    "PotaToGoOrders": {
+      "providerPlugin": "awscloudformation",
+      "service": "DynamoDB"
+    },
     "potatogoDB": {
       "providerPlugin": "awscloudformation",
       "service": "DynamoDB"

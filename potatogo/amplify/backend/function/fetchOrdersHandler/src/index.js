@@ -1,12 +1,12 @@
 /* Amplify Params - DO NOT EDIT
 	ENV
 	REGION
-	STORAGE_POTATOGODB_ARN
-	STORAGE_POTATOGODB_NAME
-	STORAGE_POTATOGODB_STREAMARN
+	STORAGE_POTATOGOORDERS_ARN
+	STORAGE_POTATOGOORDERS_NAME
+	STORAGE_POTATOGOORDERS_STREAMARN
 Amplify Params - DO NOT EDIT */
 
-const AWS = require('aws-sdk');
+const AWS = require("aws-sdk");
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
 /**
@@ -18,6 +18,7 @@ exports.handler = async (event) => {
     try {
         // Retrieve the table name from environment variables
         const tableName = process.env.STORAGE_POTATOGODB_NAME;
+        console.log("Table name:", tableName);
 
         if (!tableName) {
             throw new Error("Table name is not set in environment variables.");

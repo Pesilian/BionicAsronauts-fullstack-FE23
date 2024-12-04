@@ -1,54 +1,31 @@
-import { get } from "@aws-amplify/api";
-import { Amplify } from "aws-amplify";
+import { ApiError, get } from "@aws-amplify/api";
 import { Order } from "../types/order";
 
-// Fetch orders with optional headers for authentication
+/**
+ * Fetch all orders from the backend.
+ *
+ * @returns {Promise<Order[]>} A promise that resolves to an array of orders.
+ * @throws Will throw an error if the API call fails.
+ */
 export const fetchOrders = async (): Promise<Order[]> => {
   try {
-    const response = await get({
-      path: "/order",
-      apiName: "potatogoapi", // Match your API name in aws-exports.js or amplifyconfiguration.json
+    const restOperation = get({
+      apiName: "getOrders", // Replace with your API name
+      path: "/getOrders", // Replace with your endpoint path
     });
 
-    // Explicitly assert the type to Order[]
-    return response as unknown as Order[];
+    const { body } = await restOperation.response;
+
+    // Parse the response body as JSON and assert its type to Order[]
+    const orders = (await body.json()) as unknown as Order[];
+    return orders;
   } catch (error) {
-    console.error("Error fetching orders:", error);
+    if (error instanceof ApiError && error.response) {
+      const { statusCode, body } = error.response;
+      console.error(`[fetchOrders]: Received ${statusCode} with payload: ${body}`);
+    } else {
+      console.error("[fetchOrders]: An unknown error occurred:", error);
+    }
     throw error;
   }
 };
-
-
-
-
-// export const updateOrderStatus = async (
-//   orderId: string,
-//   status: "Pending" | "In Progress" | "Done"
-// ): Promise<void> => {
-//   try {
-//     await put({
-//       path: `/orders/${orderId}`,
-//       apiName: "potatogoapi",
-//       body: { status }, // Request payload
-//     });
-//   } catch (error) {
-//     console.error(`Error updating order ${orderId}:`, error);
-//     throw error;
-//   }
-// };
-
-
-
-
-// export const cancelOrder = async (orderId: string): Promise<void> => {
-//   try {
-//     await del({
-//       path: `/orders/${orderId}`,
-//       apiName: "potatogoapi",
-//     });
-//   } catch (error) {
-//     console.error(`Error canceling order ${orderId}:`, error);
-//     throw error;
-//   }
-// };
-

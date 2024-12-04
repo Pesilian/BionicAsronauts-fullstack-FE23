@@ -8,8 +8,8 @@
   "javascript": {
     "framework": "react",
     "config": {
-      "SourceDir": "/Users/tor_skola/Desktop/BionicAsronauts-fullstack-FE23/potatogo/src",
-      "DistributionDir": "/Users/tor_skola/Desktop/BionicAsronauts-fullstack-FE23/potatogo/build",
+      "SourceDir": "src",
+      "DistributionDir": "build",
       "BuildCommand": "npm run-script build",
       "StartCommand": "npm run-script start"
     }

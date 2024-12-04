@@ -6,24 +6,26 @@ const {
 
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-exports.deleteSpecials = async event => {
+exports.deleteMenuItem = async event => {
   try {
-    const { specialsName } = event;
+    const body = event;
+    const { menuItem, category } = body;
 
-    if (!specialsName) {
+    if (!menuItem || !category) {
       return {
         statusCode: 400,
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: 'specialsName is required' }),
+        body: JSON.stringify({ message: 'Menu item and category is required' }),
       };
     }
 
     const deleteParams = {
-      TableName: 'Pota-To-Go-specials',
+      TableName: 'Pota-To-Go-menu',
       Key: {
-        specialsName: specialsName,
+        menuItem: menuItem,
+        category: category,
       },
     };
 
@@ -35,7 +37,7 @@ exports.deleteSpecials = async event => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        message: `Special with specialsName '${specialsName}' deleted successfully.`,
+        message: `Menu item: '${menuItem}' deleted successfully.`,
       }),
     };
   } catch (error) {

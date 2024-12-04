@@ -24,6 +24,16 @@ exports.getMenu = async event => {
       };
     }
 
+    // Gruppér items efter kategori
+    const groupedItems = result.Items.reduce((acc, item) => {
+      const category = item.category || 'Uncategorized'; // Default till 'Uncategorized' om ingen kategori finns
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push(item);
+      return acc;
+    }, {});
+
     return {
       statusCode: 200,
       headers: {
@@ -31,7 +41,7 @@ exports.getMenu = async event => {
       },
       body: JSON.stringify({
         message: 'Menu fetched successfully',
-        menuItems: result.Items,
+        menuItems: groupedItems,
       }),
     };
   } catch (error) {

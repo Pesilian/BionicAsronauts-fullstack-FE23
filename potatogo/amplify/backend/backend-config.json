@@ -78,6 +78,16 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "deleteCartItem": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "deleteMenuItem": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "deleteSpecials": {
       "build": true,
       "providerPlugin": "awscloudformation",
@@ -131,6 +141,21 @@
       "service": "Lambda"
     },
     "testFunction": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "updateCart": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "updateMenu": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "updateSpecials": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"

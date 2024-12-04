@@ -1,5 +1,5 @@
 import React from 'react';
-import MenuList from '../src/components/menu';
+import MenuList from '../components/menu';
 
 import './App.css';
 

@@ -11,7 +11,6 @@ exports.createguestOrder = async event => {
   console.log('Full event:', JSON.stringify(event, null, 2));
 
   try {
-    // Hämta cartId direkt från event
     const cartId = event.cartId;
 
     console.log('Parsed Cart Id:', cartId);
@@ -48,7 +47,7 @@ exports.createguestOrder = async event => {
       };
     }
 
-    const cart = result.Items[0]; // Tar det första objektet i arrayen
+    const cart = result.Items[0];
     if (!cart || !cart.items) {
       return {
         statusCode: 500,

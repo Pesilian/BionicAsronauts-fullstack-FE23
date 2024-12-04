@@ -1,92 +1,91 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-// Typ för ett menyalternativ (menyobjekt)
 interface MenuItem {
-  menuItem: string; // Namnet på menyalternativet
-  menuId: string; // ID för menyalternativet
+  menuItem: string;
+  menuId: string;
 }
 
 const MenuList: React.FC = () => {
-  // Typisera state för menuItems och selectedItems
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const [selectedItems, setSelectedItems] = useState<string[]>([]); // Anta att selectedItems är en lista med ID:n för de valda artiklarna
-  const [error, setError] = useState<string | null>(null); // För att hantera felmeddelanden
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Hämta menyalternativen från backend (DynamoDB)
   useEffect(() => {
     const fetchMenuItems = async () => {
+      setIsLoading(true);
+      setError(null);
       try {
-        const response = await axios.get<{ menuItems: MenuItem[] }>(
+        const response = await axios.get<{
+          statusCode: number;
+          headers: any;
+          body: string;
+        }>(
           'https://rbbc71unf6.execute-api.eu-north-1.amazonaws.com/default/testmenu'
         );
-        setMenuItems(response.data.menuItems); // Förutsatt att svaren innehåller en lista med MenuItem-objekt
-      } catch (error) {
-        console.error('Error fetching menu items:', error);
+
+        console.log('API Response:', response.data);
+
+        const parsedData = JSON.parse(response.data.body);
+
+        if (parsedData && parsedData.menuItems) {
+          setMenuItems(parsedData.menuItems);
+        } else {
+          setError('Ingen menydata tillgänglig.');
+        }
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+          console.error('Axios error:', error.message);
+        } else {
+          console.error('Unknown error:', error);
+        }
         setError(
           'Misslyckades med att hämta menyalternativ. Försök igen senare.'
         );
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchMenuItems();
   }, []);
 
-  // Funktion för att hantera val av artiklar med checkboxes
   const handleCheckboxChange = (itemId: string) => {
-    setSelectedItems(
-      prevItems =>
-        prevItems.includes(itemId)
-          ? prevItems.filter(id => id !== itemId) // Ta bort item om det redan finns
-          : [...prevItems, itemId] // Lägg till item om det inte finns
+    setSelectedItems(prevItems =>
+      prevItems.includes(itemId)
+        ? prevItems.filter(id => id !== itemId)
+        : [...prevItems, itemId]
     );
-  };
-
-  // Skicka de valda artiklarna till backend för att uppdatera kundkorgen
-  const handleOrder = async () => {
-    try {
-      const cartId = 'your-cart-id'; // Kan genereras eller hämtas dynamiskt
-      const response = await axios.post(
-        'https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/testorders/cart',
-        {
-          cartId,
-          menuItems: selectedItems, // Skicka de valda artiklarna
-        }
-      );
-      console.log('Order placed:', response.data);
-      // Eventuellt visa ett bekräftelsemeddelande för användaren
-    } catch (error) {
-      console.error('Error placing order:', error);
-      setError('Det gick inte att skicka beställningen. Försök igen.');
-    }
   };
 
   return (
     <div>
-      <h2>Select Items</h2>
-      {error && <div style={{ color: 'red' }}>{error}</div>}{' '}
-      {/* Visa eventuella felmeddelanden */}
-      {menuItems.length === 0 ? (
+      <h2>Menyalternativ</h2>
+
+      {error && <div style={{ color: 'red' }}>{error}</div>}
+
+      {isLoading && <p>Laddar...</p>}
+
+      {menuItems.length === 0 && !isLoading ? (
         <p>Inga menyalternativ tillgängliga för tillfället.</p>
       ) : (
         <form>
           {menuItems.map(item => (
             <div key={item.menuId}>
               <label>
+                {item.menuItem}{' '}
                 <input
                   type="checkbox"
                   value={item.menuId}
+                  checked={selectedItems.includes(item.menuId)}
                   onChange={() => handleCheckboxChange(item.menuId)}
                 />
-                {item.menuItem}
               </label>
             </div>
           ))}
         </form>
       )}
-      <button onClick={handleOrder} disabled={selectedItems.length === 0}>
-        Skicka beställning
-      </button>
     </div>
   );
 };

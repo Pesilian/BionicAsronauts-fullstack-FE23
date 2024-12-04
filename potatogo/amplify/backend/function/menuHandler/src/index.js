@@ -6,7 +6,7 @@ const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 exports.addToMenu = async event => {
   try {
     const body = JSON.parse(event.body || '{}');
-    const menuItem = body.menuItem;
+    const menuItem = event;
 
     if (!menuItem) {
       return {

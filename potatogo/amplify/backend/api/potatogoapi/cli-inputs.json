@@ -28,6 +28,13 @@
       "permissions": {
         "setting": "open"
       }
+    },
+    "/login": {
+      "name": "/login",
+      "lambdaFunction": "loginHandler",
+      "permissions": {
+        "setting": "open"
+      }
     }
   }
 }

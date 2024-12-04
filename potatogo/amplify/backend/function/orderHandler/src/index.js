@@ -8,21 +8,19 @@ const {
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
 exports.createguestOrder = async event => {
+  console.log('Full event:', JSON.stringify(event, null, 2));
+
   try {
-    const body = JSON.parse(event.body || '{}');
-    const cartId = body.cartId;
+    // Hämta cartId direkt från event
+    const cartId = event.cartId;
 
-    console.log('Received Cart Id:', cartId);
-
-    console.log('Using Cart Id:', cartId);
+    console.log('Parsed Cart Id:', cartId);
 
     if (!cartId) {
       return {
         statusCode: 400,
         body: JSON.stringify({ message: 'Cart Id is required' }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
       };
     }
 
@@ -81,7 +79,7 @@ exports.createguestOrder = async event => {
     await dynamoDB.send(new PutCommand(putParams));
 
     return {
-      statusCode: 201,
+      statusCode: 200,
       body: JSON.stringify({
         message: 'Order created successfully',
         orderId: newOrder.orderId,

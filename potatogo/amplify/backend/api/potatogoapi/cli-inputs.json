@@ -29,9 +29,9 @@
         "setting": "open"
       }
     },
-    "/login": {
-      "name": "/login",
-      "lambdaFunction": "loginHandler",
+    "/register": {
+      "name": "/register",
+      "lambdaFunction": "registerHandler",
       "permissions": {
         "setting": "open"
       }

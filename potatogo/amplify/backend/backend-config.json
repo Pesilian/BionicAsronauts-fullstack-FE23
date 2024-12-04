@@ -134,6 +134,22 @@
         }
       ]
     },
+    "AMPLIFY_function_getSpecials_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getSpecials"
+        }
+      ]
+    },
+    "AMPLIFY_function_getSpecials_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getSpecials"
+        }
+      ]
+    },
     "AMPLIFY_function_loginHandler_deploymentBucketName": {
       "usedBy": [
         {
@@ -179,6 +195,22 @@
         {
           "category": "function",
           "resourceName": "orderHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_postSpecials_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "postSpecials"
+        }
+      ]
+    },
+    "AMPLIFY_function_postSpecials_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "postSpecials"
         }
       ]
     },

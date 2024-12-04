@@ -6,7 +6,7 @@ const {
 
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-exports.getMenu = async event => {
+exports.getSpecials = async event => {
   try {
     const scanParams = {
       TableName: 'Pota-To-Go-specials',

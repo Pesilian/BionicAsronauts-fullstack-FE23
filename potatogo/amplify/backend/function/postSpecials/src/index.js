@@ -3,7 +3,7 @@ const { DynamoDBDocumentClient, PutCommand } = require('@aws-sdk/lib-dynamodb');
 
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-export const addToSpecials = async event => {
+module.exports.addToSpecials = async event => {
   try {
     const { name, items, price } = event;
 

@@ -18,14 +18,12 @@ const MenuList: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Hämta både menyalternativ och specials
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       setError(null);
 
       try {
-        // Hämta menyalternativ
         const menuResponse = await axios.get<{
           statusCode: number;
           headers: any;
@@ -39,14 +37,13 @@ const MenuList: React.FC = () => {
           setError('Ingen menydata tillgänglig.');
         }
 
-        // Hämta specials
         const specialsResponse = await axios.get<{
           statusCode: number;
           headers: any;
           body: string;
         }>(
           'https://c7d8k8kv2g.execute-api.eu-north-1.amazonaws.com/default/linasTest'
-        ); // Lägg till rätt endpoint för specials
+        );
 
         const specialsData = JSON.parse(specialsResponse.data.body);
         if (specialsData && specialsData.specials) {
@@ -81,14 +78,15 @@ const MenuList: React.FC = () => {
     <div>
       <h2>Specials</h2>
       {specials.length > 0 ? (
-        <div>
+        <form>
           {specials.map((special, index) => (
             <div key={index}>
               <h3>{special.specialsName}</h3>
               <p>Price: {special.price}</p>
+              <input type="checkbox" />
             </div>
           ))}
-        </div>
+        </form>
       ) : (
         <p>Inga specials tillgängliga för tillfället.</p>
       )}

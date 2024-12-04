@@ -43,11 +43,11 @@
         },
         "postSpecials": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
-          "s3Key": "amplify-builds/postSpecials-6a736570595873344761-build.zip"
+          "s3Key": "amplify-builds/postSpecials-646b41554b5677413459-build.zip"
         },
         "getSpecials": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
-          "s3Key": "amplify-builds/getSpecials-73755162387957615966-build.zip"
+          "s3Key": "amplify-builds/getSpecials-385259624a6c4f617a2b-build.zip"
         }
       },
       "storage": {

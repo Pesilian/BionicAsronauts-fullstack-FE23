@@ -61,6 +61,11 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "getStock": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "loginHandler": {
       "build": true,
       "providerPlugin": "awscloudformation",

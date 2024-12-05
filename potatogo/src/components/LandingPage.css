@@ -1,0 +1,123 @@
+/* GENERAL LAYOUT */
+.landing-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  background-color: #F4F3E5; 
+  font-family: 'Roboto Serif', serif;
+  color: #000000;
+}
+
+/* HEADER SECTION */
+.header {
+  display: flex;
+  justify-content: center; 
+  align-items: center; 
+  position: relative; 
+  width: 100%; 
+  padding: 40px 0; 
+}
+
+.header-left {
+  text-align: center; 
+  margin-top: 20px; 
+}
+
+.main-title {
+  font-family: 'Monoton', cursive;
+  font-size: 96px;
+  font-weight: 400;
+  margin: 0;
+  line-height: 0.9; 
+}
+
+.subtitle {
+  font-family: 'Roboto Serif', serif;
+  font-size: 20px;
+  font-weight: 400;
+  margin: 0; 
+  line-height: 1; 
+}
+
+.header-right {
+  position: absolute;
+  right: 160px;
+  display: flex;
+  top: 70px;
+  gap: 90px;
+  align-items: center;
+}
+
+.nav-item {
+  font-family: 'Inter', sans-serif; 
+  font-size: 16px; 
+  font-weight: 400; 
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.nav-item:hover {
+  color: #555;
+}
+
+/* CONTENT SECTION */
+.content-section {
+  display: flex;
+  justify-content: space-between; 
+  align-items: center; 
+  width: 90%; 
+  margin: 40px auto; 
+}
+
+.main-text {
+  font-family: 'Roboto Serif', serif;
+  font-size: 70px;
+  font-weight: 800;
+  line-height: 70px;
+  text-align: left;
+  text-underline-position: from-font;
+  text-decoration-skip-ink: none;
+  margin-bottom: 20px; 
+  margin-left: 140px;
+}
+
+.secondary-text {
+  font-family: 'Inter', sans-serif; 
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 29px;
+  text-align: left;
+  margin-left: 140px;
+}
+
+.order-text {
+  font-family: 'Roboto Serif', serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  letter-spacing: -0.019em;
+  text-align: left;
+  text-decoration-line: underline;
+  color: #000000; 
+  margin-top: 70px; 
+  margin-left: 140px;
+}
+
+/* IMAGE SECTION */
+.image-content {
+  flex: 1; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-content img {
+  width: 631px; 
+  height: auto; 
+  object-fit: contain; 
+}

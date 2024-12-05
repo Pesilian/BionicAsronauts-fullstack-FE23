@@ -72,6 +72,25 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "deleteStock": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributeEnvMap": {
+            "Arn": "TABLE_ARN",
+            "Name": "TABLE_NAME"
+          },
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "storage",
+          "resourceName": "potatogoDB"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "getSpecials": {
       "build": true,
       "providerPlugin": "awscloudformation",

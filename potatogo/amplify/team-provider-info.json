@@ -50,7 +50,8 @@
           "s3Key": "amplify-builds/getSpecials-385259624a6c4f617a2b-build.zip"
         },
         "getStock": {},
-        "addStock": {}
+        "addStock": {},
+        "deleteStock": {}
       },
       "storage": {
         "potatogoDB": {}

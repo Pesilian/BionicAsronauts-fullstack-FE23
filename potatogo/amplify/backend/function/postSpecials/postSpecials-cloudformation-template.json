@@ -47,12 +47,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "registerHandler",
+            "postSpecials",
             {
               "Fn::Join": [
                 "",
                 [
-                  "registerHandler",
+                  "postSpecials",
                   "-",
                   {
                     "Ref": "env"
@@ -89,12 +89,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "potatogoLambdaRole59ed76bb",
+            "potatogoLambdaRole89fc8b0d",
             {
               "Fn::Join": [
                 "",
                 [
-                  "potatogoLambdaRole59ed76bb",
+                  "potatogoLambdaRole89fc8b0d",
                   "-",
                   {
                     "Ref": "env"

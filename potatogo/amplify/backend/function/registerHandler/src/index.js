@@ -1,42 +1,45 @@
-const AWS = require("aws-sdk");
-const dynamoDB = new AWS.DynamoDB.DocumentClient({ region: "eu-north-1" });
+const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
+const {
+  DynamoDBDocumentClient,
+  GetCommand,
+  PutCommand,
+} = require('@aws-sdk/lib-dynamodb');
 
-const USERS_TABLE = "Pota-To-Go_users";
+const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-exports.handler = async (event) => {
+const USERS_TABLE = 'Pota-To-Go-users';
+
+exports.handler = async event => {
   try {
-    // Kontrollera om body är en sträng eller objekt
-    const body =
-      typeof event.body === "string" ? JSON.parse(event.body) : event.body;
+    console.log('Received event:', JSON.stringify(event, null, 2));
 
-    const { nickname, name, password, address, phone } = body || {};
+    const { nickname, name, password, address, phone } = event;
 
     if (!nickname || !name || !password || !address || !phone) {
       return {
         statusCode: 400,
         body: JSON.stringify({
-          message: "Nickname, name, password, address, and phone are required",
+          message: 'Nickname, name, password, address, and phone are required',
         }),
       };
     }
 
     const getParams = {
       TableName: USERS_TABLE,
-      IndexName: "Nickname-index", // Använd GSI här
-      KeyConditionExpression: "Nickname = :nickname",
-      ExpressionAttributeValues: {
-        ":nickname": nickname,
+      Key: {
+        nickname: nickname,
       },
     };
 
-    const { Item } = await dynamoDB.query(getParams).promise();
+    const existingUser = await dynamoDB.send(new GetCommand(getParams));
 
-    // Låt inte flera användare ha samma nickname
-    if (Item && Item.length > 0) {
+    console.log('Existing user:', existingUser);
+
+    if (existingUser.Item) {
       return {
         statusCode: 409,
         body: JSON.stringify({
-          message: "User with this nickname already exists",
+          message: 'User with this nickname already exists',
         }),
       };
     }
@@ -44,27 +47,29 @@ exports.handler = async (event) => {
     const putParams = {
       TableName: USERS_TABLE,
       Item: {
-        Name: name,
-        Nickname: nickname,
-        Password: password,
-        Address: address,
-        Phone: phone,
-        Role: null, // Vi sätter roll senare
+        nickname: nickname,
+        name: name,
+        password: password,
+        address: address,
+        phone: phone,
+        role: null,
       },
     };
 
-    await dynamoDB.put(putParams).promise();
+    await dynamoDB.send(new PutCommand(putParams));
+
+    console.log('User successfully added:', putParams.Item);
 
     return {
-      statusCode: 201,
-      body: JSON.stringify({ message: "User registered successfully" }),
+      statusCode: 200,
+      body: JSON.stringify({ message: 'User registered successfully' }),
     };
   } catch (error) {
-    console.error("Error registering user:", error);
+    console.error('Error registering user:', error);
     return {
       statusCode: 500,
       body: JSON.stringify({
-        message: "Failed to register user",
+        message: 'Failed to register user',
         error: error.message,
       }),
     };

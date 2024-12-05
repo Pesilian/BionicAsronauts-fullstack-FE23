@@ -3,29 +3,33 @@ const { DynamoDBDocumentClient, PutCommand } = require('@aws-sdk/lib-dynamodb');
 
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-exports.addToMenu = async event => {
+module.exports.addToSpecials = async event => {
   try {
-    // Här använder vi hela eventet, utan att behöva använda body
-    const menuItem = event.menuItem; // direkt från event
+    const { name, items, price } = event;
 
-    if (!menuItem) {
+    console.log(event);
+
+    if (!name || !items || !price) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ message: 'Menu item is required' }),
+        body: JSON.stringify({
+          message: 'Name, items, and price are required',
+        }),
         headers: {
           'Content-Type': 'application/json',
         },
       };
     }
 
-    const menuId =
-      event.menuId || Math.floor(Math.random() * 1000000).toString();
+    const specialsId = Math.floor(Math.random() * 1000000).toString();
 
     const putParams = {
-      TableName: 'Pota-To-Go-menu',
+      TableName: 'Pota-To-Go-specials',
       Item: {
-        menuId,
-        menuItem, // Lägg till menuItem direkt här
+        specialsName: name,
+        specialsId,
+        items,
+        price,
         updatedAt: new Date().toISOString(),
       },
     };
@@ -35,9 +39,9 @@ exports.addToMenu = async event => {
     return {
       statusCode: 200,
       body: JSON.stringify({
-        message: 'Menu item added successfully',
-        menuId,
-        menuItem,
+        message: 'Special added successfully',
+        specialsName: name,
+        specialsId,
       }),
       headers: {
         'Content-Type': 'application/json',

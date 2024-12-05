@@ -56,6 +56,22 @@
     }
   },
   "function": {
+    "addStock": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn",
+            "StreamArn"
+          ],
+          "category": "storage",
+          "resourceName": "potatogoDB"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "getSpecials": {
       "build": true,
       "providerPlugin": "awscloudformation",

@@ -51,7 +51,8 @@
         },
         "getStock": {},
         "addStock": {},
-        "deleteStock": {}
+        "deleteStock": {},
+        "updateStock": {}
       },
       "storage": {
         "potatogoDB": {}

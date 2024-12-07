@@ -1,17 +1,17 @@
-const AWS = require("aws-sdk");
-const bcrypt = require("bcryptjs");
+const AWS = require('aws-sdk');
+const bcrypt = require('bcryptjs');
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
-const USERS_TABLE = "Pota-To-Go_users"; // Uppdatera med din tabell
+const USERS_TABLE = 'Pota-To-Go_users';
 
-exports.handler = async (event) => {
+exports.handler = async event => {
   try {
     const { httpMethod, body } = event;
 
-    if (httpMethod !== "POST") {
+    if (httpMethod !== 'POST') {
       return {
         statusCode: 405,
-        body: JSON.stringify({ error: "Method Not Allowed" }),
+        body: JSON.stringify({ error: 'Method Not Allowed' }),
       };
     }
 
@@ -20,7 +20,7 @@ exports.handler = async (event) => {
     if (!name || !password) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "Name and password are required" }),
+        body: JSON.stringify({ error: 'Name and password are required' }),
       };
     }
 
@@ -34,20 +34,20 @@ exports.handler = async (event) => {
     if (!Item) {
       return {
         statusCode: 404,
-        body: JSON.stringify({ error: "User not found" }),
+        body: JSON.stringify({ error: 'User not found' }),
       };
     }
 
     if (password !== Item.Password) {
       return {
         statusCode: 401,
-        body: JSON.stringify({ error: "Invalid password" }),
+        body: JSON.stringify({ error: 'Invalid password' }),
       };
     }
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: "Login successful", role: Item.Role }),
+      body: JSON.stringify({ message: 'Login successful', role: Item.Role }),
     };
   } catch (error) {
     return {

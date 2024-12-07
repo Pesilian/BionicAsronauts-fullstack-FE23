@@ -1,6 +1,6 @@
 export type AmplifyDependentResourcesAttributes = {
   "api": {
-    "getOrders": {
+    "potatogoapi": {
       "ApiId": "string",
       "ApiName": "string",
       "RootUrl": "string"
@@ -14,16 +14,17 @@ export type AmplifyDependentResourcesAttributes = {
       "Name": "string",
       "Region": "string"
     },
-    "fetchOrdersHandler": {
+    "getMenu": {
       "Arn": "string",
       "LambdaExecutionRole": "string",
       "LambdaExecutionRoleArn": "string",
       "Name": "string",
       "Region": "string"
     },
-    "getOrdersHandler": {
+    "getSpecials": {
       "Arn": "string",
       "LambdaExecutionRole": "string",
+      "LambdaExecutionRoleArn": "string",
       "Name": "string",
       "Region": "string"
     },
@@ -48,6 +49,20 @@ export type AmplifyDependentResourcesAttributes = {
       "Name": "string",
       "Region": "string"
     },
+    "postSpecials": {
+      "Arn": "string",
+      "LambdaExecutionRole": "string",
+      "LambdaExecutionRoleArn": "string",
+      "Name": "string",
+      "Region": "string"
+    },
+    "registerHandler": {
+      "Arn": "string",
+      "LambdaExecutionRole": "string",
+      "LambdaExecutionRoleArn": "string",
+      "Name": "string",
+      "Region": "string"
+    },
     "testFunction": {
       "Arn": "string",
       "LambdaExecutionRole": "string",
@@ -57,16 +72,6 @@ export type AmplifyDependentResourcesAttributes = {
     }
   },
   "storage": {
-    "PotaToGoOrders": {
-      "Arn": "string",
-      "Name": "string",
-      "PartitionKeyName": "string",
-      "PartitionKeyType": "string",
-      "Region": "string",
-      "SortKeyName": "string",
-      "SortKeyType": "string",
-      "StreamArn": "string"
-    },
     "potatogoDB": {
       "Arn": "string",
       "Name": "string",

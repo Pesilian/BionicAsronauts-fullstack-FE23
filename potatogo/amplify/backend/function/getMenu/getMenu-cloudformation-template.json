@@ -47,12 +47,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "cartHandler",
+            "getMenu",
             {
               "Fn::Join": [
                 "",
                 [
-                  "cartHandler",
+                  "getMenu",
                   "-",
                   {
                     "Ref": "env"
@@ -89,12 +89,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "potatogoLambdaRole0742fe59",
+            "potatogoLambdaRole69dc8bf1",
             {
               "Fn::Join": [
                 "",
                 [
-                  "potatogoLambdaRole0742fe59",
+                  "potatogoLambdaRole69dc8bf1",
                   "-",
                   {
                     "Ref": "env"

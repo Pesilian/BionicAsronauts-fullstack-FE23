@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "paths": {
+    "/menu": {
+      "name": "/menu",
+      "lambdaFunction": "getMenu",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/login": {
+      "name": "/login",
+      "lambdaFunction": "loginHandler",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/order": {
+      "name": "/order",
+      "lambdaFunction": "orderHandler",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/cart": {
+      "name": "/cart",
+      "lambdaFunction": "cartHandler",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/register": {
+      "name": "/register",
+      "lambdaFunction": "registerHandler",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/specials": {
+      "name": "/specials",
+      "lambdaFunction": "postSpecials",
+      "permissions": {
+        "setting": "open"
+      }
+    }
+  }
+}

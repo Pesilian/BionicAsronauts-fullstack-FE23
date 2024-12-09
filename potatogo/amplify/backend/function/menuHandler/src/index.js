@@ -6,7 +6,7 @@ const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 exports.addToMenu = async event => {
   try {
     const body = event;
-    const { menuItem, category, menuId, price } = body;
+    const { menuItem, category, price } = body;
 
     if (!menuItem || !category || !price) {
       return {
@@ -20,13 +20,9 @@ exports.addToMenu = async event => {
       };
     }
 
-    const generatedMenuId =
-      menuId || Math.floor(Math.random() * 1000000).toString();
-
     const putParams = {
       TableName: 'Pota-To-Go-menu',
       Item: {
-        menuId: generatedMenuId,
         menuItem,
         category,
         price,
@@ -40,10 +36,9 @@ exports.addToMenu = async event => {
       statusCode: 200,
       body: JSON.stringify({
         message: 'Menu item added successfully',
-        menuId: generatedMenuId,
+        menuItem,
         category,
         price,
-        menuItem,
       }),
       headers: {
         'Content-Type': 'application/json',

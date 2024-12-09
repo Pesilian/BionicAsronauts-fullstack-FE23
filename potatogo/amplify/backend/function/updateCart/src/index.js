@@ -1,80 +1,109 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const {
   DynamoDBDocumentClient,
-  UpdateCommand,
+  GetCommand,
+  PutCommand,
 } = require('@aws-sdk/lib-dynamodb');
 
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-exports.updateSpecials = async event => {
+exports.updateCart = async event => {
   try {
-    const body = event;
+    const body = event; // Data från förfrågan
+    const cartId = body.cartId;
+    const newItem = body.newItem; // Det nya objektet som ska läggas till
 
-    const { specialsName, items, price } = body;
-
-    if (!specialsName || (!items && !price)) {
+    if (!cartId || !newItem) {
       return {
         statusCode: 400,
+        body: JSON.stringify({
+          message: 'cartId and newItem are required',
+        }),
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          message: 'specialsName and changes (items or price) are required',
-        }),
       };
     }
 
-    let updateExpression = 'set';
-    const expressionAttributeValues = {};
-    const expressionAttributeNames = {};
+    // Hämta befintlig kundvagn
+    const getCartParams = {
+      TableName: 'Pota-To-Go-cart',
+      Key: { cartId },
+    };
+    const existingCart = await dynamoDB.send(new GetCommand(getCartParams));
 
-    if (items) {
-      updateExpression += ' #items = :items';
-      expressionAttributeValues[':items'] = items;
-      expressionAttributeNames['#items'] = 'items';
+    if (!existingCart.Item) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({
+          message: 'Cart not found',
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      };
     }
 
-    if (price) {
-      if (items) updateExpression += ',';
-      updateExpression += ' price = :price';
-      expressionAttributeValues[':price'] = price;
+    // Hämta befintliga items och det totala priset
+    const existingItems = existingCart.Item;
+    const existingTotalPrice = existingCart.Item.totalPrice || 0;
+
+    // Hitta nästa lediga item-nummer
+    let nextItemNumber = 1;
+    while (existingItems[`item${nextItemNumber}`]) {
+      nextItemNumber++;
     }
 
-    const updateParams = {
-      TableName: 'Pota-To-Go-specials',
-      Key: {
-        specialsName: specialsName,
+    // Lägg till det nya itemet med rätt nummer
+    const updatedItems = {
+      ...existingItems,
+      [`item${nextItemNumber}`]: {
+        potatoe: newItem.potatoe,
+        toppings: newItem.toppings,
+        price: newItem.price,
       },
-      UpdateExpression: updateExpression,
-      ExpressionAttributeValues: expressionAttributeValues,
-      ExpressionAttributeNames: expressionAttributeNames,
-      ReturnValues: 'ALL_NEW',
     };
 
-    const result = await dynamoDB.send(new UpdateCommand(updateParams));
+    // Uppdatera det totala priset
+    const updatedTotalPrice = existingTotalPrice + newItem.price;
+
+    // Uppdatera kundvagnen i DynamoDB
+    const putParams = {
+      TableName: 'Pota-To-Go-cart',
+      Item: {
+        cartId,
+        ...updatedItems, // Lägg till de uppdaterade itemen med nya attribut
+        totalPrice: updatedTotalPrice,
+        updatedAt: new Date().toISOString(),
+      },
+    };
+
+    await dynamoDB.send(new PutCommand(putParams));
 
     return {
       statusCode: 200,
+      body: JSON.stringify({
+        message: 'Item added successfully',
+        cartId,
+        updatedItems,
+        totalPrice: updatedTotalPrice,
+      }),
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        message: `Special with specialsName '${specialsName}' updated successfully.`,
-        updatedSpecial: result.Attributes,
-      }),
     };
   } catch (error) {
     console.error('Error occurred:', error);
 
     return {
       statusCode: 500,
+      body: JSON.stringify({
+        message: 'Failed to update cart',
+        error: error.message,
+      }),
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        message: 'Failed to process request',
-        error: error.message,
-      }),
     };
   }
 };

@@ -13,9 +13,13 @@
     },
     "categories": {
       "function": {
-        "fetchOrdersHandler": {
+        "getOrdersHandler": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
-          "s3Key": "amplify-builds/fetchOrdersHandler-39764b6576364c2f444c-build.zip"
+          "s3Key": "amplify-builds/getOrdersHandler-51634f42534f2f415649-build.zip"
+        },
+        "getSpecials": {
+          "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
+          "s3Key": "amplify-builds/getSpecials-385259624a6c4f617a2b-build.zip"
         },
         "loginHandler": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
@@ -25,76 +29,20 @@
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
           "s3Key": "amplify-builds/menuHandler-44554d4972672b507268-build.zip"
         },
-        "testFunction": {
+        "postSpecials": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
-          "s3Key": "amplify-builds/testFunction-466731533074677a4251-build.zip"
+          "s3Key": "amplify-builds/postSpecials-646b41554b5677413459-build.zip"
         },
         "registerHandler": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
           "s3Key": "amplify-builds/registerHandler-7056646251375131454a-build.zip"
         },
-        "postSpecials": {
+        "testFunction": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
-          "s3Key": "amplify-builds/postSpecials-646b41554b5677413459-build.zip"
-        },
-        "getSpecials": {
-          "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
-          "s3Key": "amplify-builds/getSpecials-385259624a6c4f617a2b-build.zip"
-        },
-        "potatogoDB": {},
-        "putOrdersHandler": {},
-        "deleteOrderHandler": {},
-        "getPendingOrdersHandler": {},
-        "getOrdersInProgressHandler": {},
-        "getDoneOrdersHandler": {},
-        "getOrdersHandler": {
-          "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
-          "s3Key": "amplify-builds/getOrdersHandler-51634f42534f2f415649-build.zip",
-          "storagePotatogodbName": "Pota-To-Go-orders",
-          "storagePotatogodbArn": "arn:aws:dynamodb:eu-north-1:977099030879:table/Pota-To-Go-orders"
-        },
-        "orderHandler": {
-          "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
-          "s3Key": "amplify-builds/orderHandler-5a424c56676165355338-build.zip"
-        },
-        "cartHandler": {
-          "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
-          "s3Key": "amplify-builds/cartHandler-696d6a6b6969726b5733-build.zip"
-        },
-        "getMenu": {
-          "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
-          "s3Key": "amplify-builds/getMenu-32755a77584d582f6867-build.zip"
-        },
-        "deleteOrdersHandler": {}
+          "s3Key": "amplify-builds/testFunction-466731533074677a4251-build.zip"
+        }
       },
       "storage": {
-        "potatogoDB": {}
-      },
-      "api": {
-        "potatogoapi": {}
-      }
-    }
-  },
-  "tor": {
-    "awscloudformation": {
-      "AuthRoleName": "amplify-potatogo-tor-cab0a-authRole",
-      "UnauthRoleArn": "arn:aws:iam::977099030879:role/amplify-potatogo-tor-cab0a-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::977099030879:role/amplify-potatogo-tor-cab0a-authRole",
-      "Region": "eu-north-1",
-      "DeploymentBucketName": "amplify-potatogo-tor-cab0a-deployment",
-      "UnauthRoleName": "amplify-potatogo-tor-cab0a-unauthRole",
-      "StackName": "amplify-potatogo-tor-cab0a",
-      "StackId": "arn:aws:cloudformation:eu-north-1:977099030879:stack/amplify-potatogo-tor-cab0a/8d499f50-b4d9-11ef-9bd4-0a67b1f58465",
-      "AmplifyAppId": "dnapa02mbk050"
-    },
-    "categories": {
-      "function": {
-        "getSpecials": {},
-        "loginHandler": {},
-        "menuHandler": {},
-        "postSpecials": {},
-        "registerHandler": {},
-        "testFunction": {},
         "potatogoDB": {}
       }
     }

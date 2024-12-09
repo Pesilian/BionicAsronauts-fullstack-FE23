@@ -166,6 +166,22 @@
         }
       ]
     },
+    "AMPLIFY_function_getOrdersHandler_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getOrdersHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_getOrdersHandler_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getOrdersHandler"
+        }
+      ]
+    },
     "AMPLIFY_function_getSpecials_deploymentBucketName": {
       "usedBy": [
         {

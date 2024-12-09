@@ -42,6 +42,15 @@
           "s3Key": "amplify-builds/getSpecials-385259624a6c4f617a2b-build.zip"
         },
         "potatogoDB": {},
+        "putOrdersHandler": {},
+        "deleteOrderHandler": {},
+        "getPendingOrdersHandler": {},
+        "getOrdersInProgressHandler": {},
+        "getDoneOrdersHandler": {},
+        "getOrdersHandler": {
+          "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
+          "s3Key": "amplify-builds/getOrdersHandler-51634f42534f2f415649-build.zip"
+        },
         "orderHandler": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
           "s3Key": "amplify-builds/orderHandler-5a424c56676165355338-build.zip"
@@ -53,16 +62,13 @@
         "getMenu": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
           "s3Key": "amplify-builds/getMenu-32755a77584d582f6867-build.zip"
-        },
-        "putOrdersHandler": {},
-        "deleteOrderHandler": {},
-        "getPendingOrdersHandler": {},
-        "getOrdersInProgressHandler": {},
-        "getDoneOrdersHandler": {},
-        "getOrdersHandler": {}
+        }
       },
       "storage": {
         "potatogoDB": {}
+      },
+      "api": {
+        "potatogoapi": {}
       }
     }
   },

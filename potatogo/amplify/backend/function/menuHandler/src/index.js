@@ -5,27 +5,30 @@ const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
 exports.addToMenu = async event => {
   try {
-    // Här använder vi hela eventet, utan att behöva använda body
-    const menuItem = event.menuItem; // direkt från event
+    const body = event;
+    const { menuItem, category, menuId } = body;
 
-    if (!menuItem) {
+    if (!menuItem || !category) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ message: 'Menu item is required' }),
+        body: JSON.stringify({
+          message: 'Menu item and category are required',
+        }),
         headers: {
           'Content-Type': 'application/json',
         },
       };
     }
 
-    const menuId =
-      event.menuId || Math.floor(Math.random() * 1000000).toString();
+    const generatedMenuId =
+      menuId || Math.floor(Math.random() * 1000000).toString();
 
     const putParams = {
       TableName: 'Pota-To-Go-menu',
       Item: {
-        menuId,
-        menuItem, // Lägg till menuItem direkt här
+        menuId: generatedMenuId,
+        menuItem,
+        category,
         updatedAt: new Date().toISOString(),
       },
     };
@@ -36,7 +39,8 @@ exports.addToMenu = async event => {
       statusCode: 200,
       body: JSON.stringify({
         message: 'Menu item added successfully',
-        menuId,
+        menuId: generatedMenuId,
+        category,
         menuItem,
       }),
       headers: {

@@ -31,7 +31,7 @@ exports.updateSpecials = async event => {
     if (items) {
       updateExpression += ' #items = :items';
       expressionAttributeValues[':items'] = items;
-      expressionAttributeNames['#items'] = 'items';
+      expressionAttributeNames['#items'] = 'items'; // Mappar alias till det reserverade nyckelordet
     }
 
     if (price) {
@@ -47,7 +47,7 @@ exports.updateSpecials = async event => {
       },
       UpdateExpression: updateExpression,
       ExpressionAttributeValues: expressionAttributeValues,
-      ExpressionAttributeNames: expressionAttributeNames,
+      ExpressionAttributeNames: expressionAttributeNames, // Lägg till detta
       ReturnValues: 'ALL_NEW',
     };
 

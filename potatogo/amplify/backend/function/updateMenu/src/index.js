@@ -10,16 +10,16 @@ exports.updateMenuItem = async event => {
   try {
     const body = event;
 
-    const { menuId, menuItems, price } = body;
+    const { menuId, menuItem, price } = body;
 
-    if (!specialsName || (!items && !price)) {
+    if (!menuId || (!menuItem && !price)) {
       return {
         statusCode: 400,
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          message: 'specialsName and changes (items or price) are required',
+          message: 'MenuId and changes (item or price) are required',
         }),
       };
     }
@@ -28,22 +28,22 @@ exports.updateMenuItem = async event => {
     const expressionAttributeValues = {};
     const expressionAttributeNames = {};
 
-    if (items) {
-      updateExpression += ' #items = :items';
-      expressionAttributeValues[':items'] = items;
-      expressionAttributeNames['#items'] = 'items';
+    if (menuItem) {
+      updateExpression += ' #menuItem = :menuItem';
+      expressionAttributeValues[':menuItem'] = menuItem;
+      expressionAttributeNames['#menuItem'] = 'menuItem';
     }
 
     if (price) {
-      if (items) updateExpression += ',';
+      if (menuItem) updateExpression += ',';
       updateExpression += ' price = :price';
       expressionAttributeValues[':price'] = price;
     }
 
     const updateParams = {
-      TableName: 'Pota-To-Go-specials',
+      TableName: 'Pota-To-Go-menu',
       Key: {
-        specialsName: specialsName,
+        menuId: menuId,
       },
       UpdateExpression: updateExpression,
       ExpressionAttributeValues: expressionAttributeValues,
@@ -59,8 +59,8 @@ exports.updateMenuItem = async event => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        message: `Special with specialsName '${specialsName}' updated successfully.`,
-        updatedSpecial: result.Attributes,
+        message: `Menu item with menuId '${menuId}' updated successfully.`,
+        updatedmenu: result.Attributes,
       }),
     };
   } catch (error) {

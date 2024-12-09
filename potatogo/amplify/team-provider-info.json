@@ -48,7 +48,11 @@
         "getSpecials": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
           "s3Key": "amplify-builds/getSpecials-385259624a6c4f617a2b-build.zip"
-        }
+        },
+        "getStock": {},
+        "addStock": {},
+        "deleteStock": {},
+        "updateStock": {}
       },
       "storage": {
         "potatogoDB": {}

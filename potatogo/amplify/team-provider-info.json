@@ -49,7 +49,9 @@
         "getDoneOrdersHandler": {},
         "getOrdersHandler": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
-          "s3Key": "amplify-builds/getOrdersHandler-51634f42534f2f415649-build.zip"
+          "s3Key": "amplify-builds/getOrdersHandler-51634f42534f2f415649-build.zip",
+          "storagePotatogodbName": "Pota-To-Go-orders",
+          "storagePotatogodbArn": "arn:aws:dynamodb:eu-north-1:977099030879:table/Pota-To-Go-orders"
         },
         "orderHandler": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
@@ -62,7 +64,8 @@
         "getMenu": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
           "s3Key": "amplify-builds/getMenu-32755a77584d582f6867-build.zip"
-        }
+        },
+        "deleteOrdersHandler": {}
       },
       "storage": {
         "potatogoDB": {}

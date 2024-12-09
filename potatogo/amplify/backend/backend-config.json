@@ -56,6 +56,22 @@
     }
   },
   "function": {
+    "deleteOrdersHandler": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn",
+            "StreamArn"
+          ],
+          "category": "storage",
+          "resourceName": "potatogoDB"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "getOrdersHandler": {
       "build": true,
       "dependsOn": [
@@ -103,6 +119,22 @@
     },
     "postSpecials": {
       "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "putOrdersHandler": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn",
+            "StreamArn"
+          ],
+          "category": "storage",
+          "resourceName": "potatogoDB"
+        }
+      ],
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
@@ -175,6 +207,22 @@
       ]
     },
     "AMPLIFY_function_getOrdersHandler_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getOrdersHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_getOrdersHandler_storagePotatogodbArn": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getOrdersHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_getOrdersHandler_storagePotatogodbName": {
       "usedBy": [
         {
           "category": "function",

@@ -6,13 +6,13 @@ const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 exports.addToMenu = async event => {
   try {
     const body = event;
-    const { menuItem, category, menuId } = body;
+    const { menuItem, category, menuId, price } = body;
 
-    if (!menuItem || !category) {
+    if (!menuItem || !category || !price) {
       return {
         statusCode: 400,
         body: JSON.stringify({
-          message: 'Menu item and category are required',
+          message: 'Menu item, category and price are required',
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -29,7 +29,8 @@ exports.addToMenu = async event => {
         menuId: generatedMenuId,
         menuItem,
         category,
-        updatedAt: new Date().toISOString(),
+        price,
+        createdAt: new Date().toISOString(),
       },
     };
 
@@ -41,6 +42,7 @@ exports.addToMenu = async event => {
         message: 'Menu item added successfully',
         menuId: generatedMenuId,
         category,
+        price,
         menuItem,
       }),
       headers: {

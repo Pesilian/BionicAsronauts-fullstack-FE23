@@ -6,11 +6,11 @@ const {
 
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-exports.updateSpecials = async event => {
+exports.updateMenuItem = async event => {
   try {
     const body = event;
 
-    const { specialsName, items, price } = body;
+    const { menuId, menuItems, price } = body;
 
     if (!specialsName || (!items && !price)) {
       return {

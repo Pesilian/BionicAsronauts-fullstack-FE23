@@ -39,17 +39,16 @@ exports.addToCart = async event => {
     let existingTotalPrice = 0;
 
     if (existingCart.Item) {
-      existingItems = existingCart.Item; // Vi kommer att uppdatera dessa nycklar direkt
+      existingItems = existingCart.Item;
       existingTotalPrice = existingCart.Item.totalPrice || 0;
     }
 
-    // Validera och beräkna pris för nya items
     let newItemsTotalPrice = 0;
     let updatedItems = { ...existingItems };
 
     for (let i = 0; i < menuItems.length; i++) {
       const item = menuItems[i];
-      const itemKey = `item${i + 1}`; // Dynamisk nyckel: item1, item2, item3, ...
+      const itemKey = `item${i + 1}`;
 
       if (!item.potatoe || typeof item.price !== 'number') {
         return {
@@ -63,7 +62,6 @@ exports.addToCart = async event => {
         };
       }
 
-      // Lägg till objektet med dynamisk nyckel
       updatedItems[itemKey] = {
         potatoe: item.potatoe,
         toppings: item.toppings || [],
@@ -75,13 +73,12 @@ exports.addToCart = async event => {
 
     const totalPrice = existingTotalPrice + newItemsTotalPrice;
 
-    // Uppdatera kundvagnen
     const putParams = {
       TableName: 'Pota-To-Go-cart',
       Item: {
         cartId,
-        ...updatedItems, // Sprid de dynamiska item-nycklarna
-        totalPrice, // Totalpris för hela kundvagnen
+        ...updatedItems,
+        totalPrice,
         updatedAt: new Date().toISOString(),
       },
     };
@@ -93,7 +90,7 @@ exports.addToCart = async event => {
       body: JSON.stringify({
         message: 'Cart updated successfully',
         cartId,
-        items: updatedItems, // Returnera de nya item objekten
+        items: updatedItems,
         totalPrice,
       }),
       headers: {

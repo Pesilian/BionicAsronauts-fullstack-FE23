@@ -1,25 +1,29 @@
-const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
+const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
 const {
   DynamoDBDocumentClient,
   GetCommand,
   PutCommand,
-} = require('@aws-sdk/lib-dynamodb');
+} = require("@aws-sdk/lib-dynamodb");
 
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-const USERS_TABLE = 'Pota-To-Go-users';
+const USERS_TABLE = "Pota-To-Go-users";
 
-exports.handler = async event => {
+exports.handler = async (event) => {
   try {
-    console.log('Received event:', JSON.stringify(event, null, 2));
+    console.log("Received event:", JSON.stringify(event, null, 2));
 
-    const { nickname, name, password, address, phone } = event;
+    // Ensure the body is parsed correctly
+    const { nickname, name, password, address, phone } = JSON.parse(event.body);
+
+    // Log the parsed body to verify
+    console.log("Parsed body:", { nickname, name, password, address, phone });
 
     if (!nickname || !name || !password || !address || !phone) {
       return {
         statusCode: 400,
         body: JSON.stringify({
-          message: 'Nickname, name, password, address, and phone are required',
+          message: "Nickname, name, password, address, and phone are required",
         }),
       };
     }
@@ -33,13 +37,13 @@ exports.handler = async event => {
 
     const existingUser = await dynamoDB.send(new GetCommand(getParams));
 
-    console.log('Existing user:', existingUser);
+    console.log("Existing user:", existingUser);
 
     if (existingUser.Item) {
       return {
         statusCode: 409,
         body: JSON.stringify({
-          message: 'User with this nickname already exists',
+          message: "User with this nickname already exists",
         }),
       };
     }
@@ -58,18 +62,18 @@ exports.handler = async event => {
 
     await dynamoDB.send(new PutCommand(putParams));
 
-    console.log('User successfully added:', putParams.Item);
+    console.log("User successfully added:", putParams.Item);
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: 'User registered successfully' }),
+      body: JSON.stringify({ message: "User registered successfully" }),
     };
   } catch (error) {
-    console.error('Error registering user:', error);
+    console.error("Error registering user:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({
-        message: 'Failed to register user',
+        message: "Failed to register user",
         error: error.message,
       }),
     };

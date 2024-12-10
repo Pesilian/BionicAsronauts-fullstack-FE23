@@ -24,7 +24,7 @@ exports.handler = async (event) => {
     // Fetch by Order ID
     if (orderId) {
       const queryParams = {
-        TableName: process.env.Pota-To-Go-orders,
+        TableName: 'Pota-To-Go-orders', // Use hardcoded or environment variable
         KeyConditionExpression: 'orderId = :orderId',
         ExpressionAttributeValues: {
           ':orderId': orderId,
@@ -39,9 +39,9 @@ exports.handler = async (event) => {
       };
     }
 
-    // Build Scan Parameters
-    let filterExpression = [];
-    let expressionAttributeValues = {};
+    // Build Scan Parameters for customerName/status filters
+    const filterExpression = [];
+    const expressionAttributeValues = {};
 
     if (status) {
       filterExpression.push('status = :status');
@@ -53,33 +53,22 @@ exports.handler = async (event) => {
       expressionAttributeValues[':customerName'] = customerName;
     }
 
-    const finalFilterExpression =
-      filterExpression.length > 0 ? filterExpression.join(' AND ') : undefined;
-
     const scanParams = {
-      TableName: process.env.Pota-To-Go-orders,
-      FilterExpression: finalFilterExpression,
-      ExpressionAttributeValues:
-        Object.keys(expressionAttributeValues).length > 0
-          ? expressionAttributeValues
-          : undefined,
-      ExclusiveStartKey: lastEvaluatedKey
-        ? JSON.parse(lastEvaluatedKey)
-        : undefined,
-      Limit: status === 'done' ? 10 : undefined, // Limit only for 'done' orders
+      TableName: 'Pota-To-Go-orders', // Use hardcoded or environment variable
+      FilterExpression: filterExpression.length > 0 ? filterExpression.join(' AND ') : undefined,
+      ExpressionAttributeValues: Object.keys(expressionAttributeValues).length > 0 ? expressionAttributeValues : undefined,
+      ExclusiveStartKey: lastEvaluatedKey ? JSON.parse(lastEvaluatedKey) : undefined, // Pagination
+      Limit: 10, // Items per page
     };
 
     console.log('Scan Parameters:', scanParams);
 
-    // Execute Scan
     const result = await dynamoDB.send(new ScanCommand(scanParams));
     return {
       statusCode: 200,
       body: JSON.stringify({
         items: result.Items,
-        lastEvaluatedKey: result.LastEvaluatedKey
-          ? JSON.stringify(result.LastEvaluatedKey)
-          : null,
+        lastEvaluatedKey: result.LastEvaluatedKey ? JSON.stringify(result.LastEvaluatedKey) : null,
       }),
       headers: { 'Content-Type': 'application/json' },
     };

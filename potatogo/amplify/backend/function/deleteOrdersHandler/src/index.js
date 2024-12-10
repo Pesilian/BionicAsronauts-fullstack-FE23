@@ -12,37 +12,41 @@ const {
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
 exports.handler = async (event) => {
-  console.log('Event:', JSON.stringify(event, null, 2));
-  try {
-    const body = JSON.parse(event.body);
-    const { orderId } = body;
+  console.log("Event:", JSON.stringify(event, null, 2));
 
-    if (!orderId) {
+  try {
+    // Extract the `id` from the pathParameters
+    const { id } = event.pathParameters;
+
+    if (!id) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ message: 'OrderId is required' }),
-        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: "Order ID is required" }),
+        headers: { "Content-Type": "application/json" },
       };
     }
 
     const params = {
       TableName: 'Pota-To-Go-orders',
-      Key: { orderId },
+      Key: { orderId: id },
     };
 
     await dynamoDB.send(new DeleteCommand(params));
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: 'Order deleted successfully' }),
-      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: `Order ${id} deleted successfully` }),
+      headers: { "Content-Type": "application/json" },
     };
   } catch (error) {
-    console.error('Error deleting order:', error);
+    console.error("Error deleting order:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: 'Failed to delete order', error: error.message }),
-      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: "Failed to delete order",
+        error: error.message,
+      }),
+      headers: { "Content-Type": "application/json" },
     };
   }
 };

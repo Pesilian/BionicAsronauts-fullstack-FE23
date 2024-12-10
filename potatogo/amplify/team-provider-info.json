@@ -23,11 +23,11 @@
         },
         "loginHandler": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
-          "s3Key": "amplify-builds/loginHandler-6d597852305469577370-build.zip"
+          "s3Key": "amplify-builds/loginHandler-6e4b4c6a746e75427049-build.zip"
         },
         "registerHandler": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
-          "s3Key": "amplify-builds/registerHandler-7056646251375131454a-build.zip"
+          "s3Key": "amplify-builds/registerHandler-454c456766417a525431-build.zip"
         },
         "orderHandler": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
@@ -49,10 +49,22 @@
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
           "s3Key": "amplify-builds/getSpecials-385259624a6c4f617a2b-build.zip"
         },
-        "getStock": {},
-        "addStock": {},
-        "deleteStock": {},
-        "updateStock": {}
+        "getStock": {
+          "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
+          "s3Key": "amplify-builds/getStock-504a74674c4348766153-build.zip"
+        },
+        "addStock": {
+          "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
+          "s3Key": "amplify-builds/addStock-53617a6d6d734b544368-build.zip"
+        },
+        "deleteStock": {
+          "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
+          "s3Key": "amplify-builds/deleteStock-326b5367516a6543586d-build.zip"
+        },
+        "updateStock": {
+          "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
+          "s3Key": "amplify-builds/updateStock-614a687443314d31796c-build.zip"
+        }
       },
       "storage": {
         "potatogoDB": {}

@@ -161,6 +161,22 @@
     }
   },
   "parameters": {
+    "AMPLIFY_function_addStock_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "addStock"
+        }
+      ]
+    },
+    "AMPLIFY_function_addStock_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "addStock"
+        }
+      ]
+    },
     "AMPLIFY_function_cartHandler_deploymentBucketName": {
       "usedBy": [
         {
@@ -174,6 +190,22 @@
         {
           "category": "function",
           "resourceName": "cartHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_deleteStock_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "deleteStock"
+        }
+      ]
+    },
+    "AMPLIFY_function_deleteStock_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "deleteStock"
         }
       ]
     },
@@ -206,6 +238,22 @@
         {
           "category": "function",
           "resourceName": "getSpecials"
+        }
+      ]
+    },
+    "AMPLIFY_function_getStock_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getStock"
+        }
+      ]
+    },
+    "AMPLIFY_function_getStock_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getStock"
         }
       ]
     },
@@ -302,6 +350,22 @@
         {
           "category": "function",
           "resourceName": "testFunction"
+        }
+      ]
+    },
+    "AMPLIFY_function_updateStock_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "updateStock"
+        }
+      ]
+    },
+    "AMPLIFY_function_updateStock_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "updateStock"
         }
       ]
     }

@@ -1,11 +1,4 @@
 {
-  "permissions": {
-    "storage": {
-      "potatogoDB": [
-        "read",
-        "delete"
-      ]
-    }
-  },
+  "permissions": {},
   "lambdaLayers": []
 }

@@ -1,9 +1,6 @@
 /* Amplify Params - DO NOT EDIT
 	ENV
 	REGION
-	STORAGE_POTATOGODB_ARN
-	STORAGE_POTATOGODB_NAME
-	STORAGE_POTATOGODB_STREAMARN
 Amplify Params - DO NOT EDIT */
 
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');

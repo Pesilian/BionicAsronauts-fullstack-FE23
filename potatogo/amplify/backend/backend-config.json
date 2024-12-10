@@ -58,6 +58,7 @@
   "function": {
     "deleteOrdersHandler": {
       "build": true,
+      "dependsOn": [],
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
@@ -113,6 +114,7 @@
     },
     "putOrdersHandler": {
       "build": true,
+      "dependsOn": [],
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
@@ -141,6 +143,22 @@
         {
           "category": "function",
           "resourceName": "cartHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_deleteOrdersHandler_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "deleteOrdersHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_deleteOrdersHandler_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "deleteOrdersHandler"
         }
       ]
     },
@@ -253,6 +271,22 @@
         {
           "category": "function",
           "resourceName": "postSpecials"
+        }
+      ]
+    },
+    "AMPLIFY_function_putOrdersHandler_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "putOrdersHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_putOrdersHandler_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "putOrdersHandler"
         }
       ]
     },

@@ -7,6 +7,20 @@ export type AmplifyDependentResourcesAttributes = {
     }
   },
   "function": {
+    "cartHandler": {
+      "Arn": "string",
+      "LambdaExecutionRole": "string",
+      "LambdaExecutionRoleArn": "string",
+      "Name": "string",
+      "Region": "string"
+    },
+    "getMenu": {
+      "Arn": "string",
+      "LambdaExecutionRole": "string",
+      "LambdaExecutionRoleArn": "string",
+      "Name": "string",
+      "Region": "string"
+    },
     "getOrdersHandler": {
       "Arn": "string",
       "LambdaExecutionRole": "string",
@@ -29,6 +43,13 @@ export type AmplifyDependentResourcesAttributes = {
       "Region": "string"
     },
     "menuHandler": {
+      "Arn": "string",
+      "LambdaExecutionRole": "string",
+      "LambdaExecutionRoleArn": "string",
+      "Name": "string",
+      "Region": "string"
+    },
+    "orderHandler": {
       "Arn": "string",
       "LambdaExecutionRole": "string",
       "LambdaExecutionRoleArn": "string",

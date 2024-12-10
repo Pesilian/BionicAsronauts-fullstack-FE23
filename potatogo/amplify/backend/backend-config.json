@@ -56,6 +56,11 @@
     }
   },
   "function": {
+    "deleteOrdersHandler": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "getOrdersHandler": {
       "build": true,
       "dependsOn": [
@@ -106,6 +111,11 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "putOrdersHandler": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "registerHandler": {
       "build": true,
       "providerPlugin": "awscloudformation",
@@ -118,6 +128,38 @@
     }
   },
   "parameters": {
+    "AMPLIFY_function_cartHandler_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "cartHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_cartHandler_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "cartHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_getMenu_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getMenu"
+        }
+      ]
+    },
+    "AMPLIFY_function_getMenu_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getMenu"
+        }
+      ]
+    },
     "AMPLIFY_function_getOrdersHandler_deploymentBucketName": {
       "usedBy": [
         {
@@ -179,6 +221,22 @@
         {
           "category": "function",
           "resourceName": "menuHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_orderHandler_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "orderHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_orderHandler_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "orderHandler"
         }
       ]
     },

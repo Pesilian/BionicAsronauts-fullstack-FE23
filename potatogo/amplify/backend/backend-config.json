@@ -72,6 +72,11 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "deleteOrdersHandler": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "deleteStock": {
       "build": true,
       "dependsOn": [
@@ -88,6 +93,11 @@
           "resourceName": "potatogoDB"
         }
       ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "getOrdersHandler": {
+      "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
@@ -126,6 +136,11 @@
       "service": "Lambda"
     },
     "postSpecials": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "putOrdersHandler": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"

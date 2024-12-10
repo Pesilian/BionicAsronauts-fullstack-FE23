@@ -15,18 +15,6 @@
     },
     "s3Key": {
       "Type": "String"
-    },
-    "storagepotatogoDBName": {
-      "Type": "String",
-      "Default": "storagepotatogoDBName"
-    },
-    "storagepotatogoDBArn": {
-      "Type": "String",
-      "Default": "storagepotatogoDBArn"
-    },
-    "storagepotatogoDBStreamArn": {
-      "Type": "String",
-      "Default": "storagepotatogoDBStreamArn"
     }
   },
   "Conditions": {
@@ -81,15 +69,6 @@
             },
             "REGION": {
               "Ref": "AWS::Region"
-            },
-            "STORAGE_POTATOGODB_NAME": {
-              "Ref": "storagepotatogoDBName"
-            },
-            "STORAGE_POTATOGODB_ARN": {
-              "Ref": "storagepotatogoDBArn"
-            },
-            "STORAGE_POTATOGODB_STREAMARN": {
-              "Ref": "storagepotatogoDBStreamArn"
             }
           }
         },
@@ -181,53 +160,6 @@
                   }
                 ]
               }
-            }
-          ]
-        }
-      }
-    },
-    "AmplifyResourcesPolicy": {
-      "DependsOn": [
-        "LambdaExecutionRole"
-      ],
-      "Type": "AWS::IAM::Policy",
-      "Properties": {
-        "PolicyName": "amplify-lambda-execution-policy",
-        "Roles": [
-          {
-            "Ref": "LambdaExecutionRole"
-          }
-        ],
-        "PolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Action": [
-                "dynamodb:Get*",
-                "dynamodb:BatchGetItem",
-                "dynamodb:List*",
-                "dynamodb:Describe*",
-                "dynamodb:Scan",
-                "dynamodb:Query",
-                "dynamodb:PartiQLSelect"
-              ],
-              "Resource": [
-                {
-                  "Ref": "storagepotatogoDBArn"
-                },
-                {
-                  "Fn::Join": [
-                    "/",
-                    [
-                      {
-                        "Ref": "storagepotatogoDBArn"
-                      },
-                      "index/*"
-                    ]
-                  ]
-                }
-              ]
             }
           ]
         }

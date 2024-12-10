@@ -74,6 +74,7 @@
     },
     "deleteOrdersHandler": {
       "build": true,
+      "dependsOn": [],
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
@@ -98,6 +99,7 @@
     },
     "getOrdersHandler": {
       "build": true,
+      "dependsOn": [],
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
@@ -142,6 +144,7 @@
     },
     "putOrdersHandler": {
       "build": true,
+      "dependsOn": [],
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },

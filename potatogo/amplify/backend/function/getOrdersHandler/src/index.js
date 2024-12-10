@@ -1,9 +1,6 @@
 /* Amplify Params - DO NOT EDIT
 	ENV
 	REGION
-	STORAGE_POTATOGODB_ARN
-	STORAGE_POTATOGODB_NAME
-	STORAGE_POTATOGODB_STREAMARN
 Amplify Params - DO NOT EDIT */
 
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
@@ -27,7 +24,7 @@ exports.handler = async (event) => {
     // Fetch by Order ID
     if (orderId) {
       const queryParams = {
-        TableName: process.env.STORAGE_POTATOGODB_NAME,
+        TableName: process.env.Pota-To-Go-orders,
         KeyConditionExpression: 'orderId = :orderId',
         ExpressionAttributeValues: {
           ':orderId': orderId,
@@ -60,7 +57,7 @@ exports.handler = async (event) => {
       filterExpression.length > 0 ? filterExpression.join(' AND ') : undefined;
 
     const scanParams = {
-      TableName: process.env.STORAGE_POTATOGODB_NAME,
+      TableName: process.env.Pota-To-Go-orders,
       FilterExpression: finalFilterExpression,
       ExpressionAttributeValues:
         Object.keys(expressionAttributeValues).length > 0

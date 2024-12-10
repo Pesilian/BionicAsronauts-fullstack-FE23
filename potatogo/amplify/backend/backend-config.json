@@ -56,13 +56,7 @@
     }
   },
   "function": {
-    "deleteOrdersHandler": {
-      "build": true,
-      "dependsOn": [],
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda"
-    },
-    "getOrdersHandler": {
+    "addStock": {
       "build": true,
       "dependsOn": [
         {
@@ -78,7 +72,31 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "deleteStock": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributeEnvMap": {
+            "Arn": "TABLE_ARN",
+            "Name": "TABLE_NAME"
+          },
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "storage",
+          "resourceName": "potatogoDB"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "getSpecials": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "getStock": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
@@ -112,12 +130,6 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
-    "putOrdersHandler": {
-      "build": true,
-      "dependsOn": [],
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda"
-    },
     "registerHandler": {
       "build": true,
       "providerPlugin": "awscloudformation",
@@ -127,9 +139,44 @@
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
+    },
+    "updateStock": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributeEnvMap": {
+            "Arn": "TABLE_ARN",
+            "Name": "TABLE_NAME"
+          },
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "storage",
+          "resourceName": "potatogoDB"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
     }
   },
   "parameters": {
+    "AMPLIFY_function_addStock_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "addStock"
+        }
+      ]
+    },
+    "AMPLIFY_function_addStock_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "addStock"
+        }
+      ]
+    },
     "AMPLIFY_function_cartHandler_deploymentBucketName": {
       "usedBy": [
         {
@@ -159,6 +206,22 @@
         {
           "category": "function",
           "resourceName": "deleteOrdersHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_deleteStock_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "deleteStock"
+        }
+      ]
+    },
+    "AMPLIFY_function_deleteStock_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "deleteStock"
         }
       ]
     },
@@ -207,6 +270,22 @@
         {
           "category": "function",
           "resourceName": "getSpecials"
+        }
+      ]
+    },
+    "AMPLIFY_function_getStock_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getStock"
+        }
+      ]
+    },
+    "AMPLIFY_function_getStock_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getStock"
         }
       ]
     },
@@ -319,6 +398,22 @@
         {
           "category": "function",
           "resourceName": "testFunction"
+        }
+      ]
+    },
+    "AMPLIFY_function_updateStock_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "updateStock"
+        }
+      ]
+    },
+    "AMPLIFY_function_updateStock_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "updateStock"
         }
       ]
     }

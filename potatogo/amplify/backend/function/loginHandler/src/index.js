@@ -1,17 +1,16 @@
-const AWS = require('aws-sdk');
-const bcrypt = require('bcryptjs');
+const AWS = require("aws-sdk");
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
-const USERS_TABLE = 'Pota-To-Go_users';
+const USERS_TABLE = "Pota-To-Go_users";
 
-exports.handler = async event => {
+exports.handler = async (event) => {
   try {
     const { httpMethod, body } = event;
 
-    if (httpMethod !== 'POST') {
+    if (httpMethod !== "POST") {
       return {
         statusCode: 405,
-        body: JSON.stringify({ error: 'Method Not Allowed' }),
+        body: JSON.stringify({ error: "Method Not Allowed" }),
       };
     }
 
@@ -20,13 +19,13 @@ exports.handler = async event => {
     if (!name || !password) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: 'Name and password are required' }),
+        body: JSON.stringify({ error: "Name and password are required" }),
       };
     }
 
     const params = {
       TableName: USERS_TABLE,
-      Key: { Name: name },
+      Key: { nickname: name },
     };
 
     const { Item } = await dynamoDB.get(params).promise();
@@ -34,22 +33,23 @@ exports.handler = async event => {
     if (!Item) {
       return {
         statusCode: 404,
-        body: JSON.stringify({ error: 'User not found' }),
+        body: JSON.stringify({ error: "User not found" }),
       };
     }
 
-    if (password !== Item.Password) {
+    if (password !== Item.password) {
       return {
         statusCode: 401,
-        body: JSON.stringify({ error: 'Invalid password' }),
+        body: JSON.stringify({ error: "Invalid password" }),
       };
     }
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: 'Login successful', role: Item.Role }),
+      body: JSON.stringify({ message: "Login successful", role: Item.role }),
     };
   } catch (error) {
+    console.error(error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: error.message }),

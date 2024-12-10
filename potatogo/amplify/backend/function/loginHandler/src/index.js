@@ -1,31 +1,48 @@
 const AWS = require("aws-sdk");
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
-const USERS_TABLE = "Pota-To-Go_users";
+const USERS_TABLE = "Pota-To-Go-users";
 
 exports.handler = async (event) => {
   try {
     const { httpMethod, body } = event;
 
+    const headers = {
+      "Access-Control-Allow-Origin": "http://localhost:3000",
+      "Access-Control-Allow-Methods": "OPTIONS,POST",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      "Access-Control-Allow-Credentials": "true",
+    };
+
+    if (httpMethod === "OPTIONS") {
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ message: "CORS preflight successful" }),
+      };
+    }
+
     if (httpMethod !== "POST") {
       return {
         statusCode: 405,
+        headers,
         body: JSON.stringify({ error: "Method Not Allowed" }),
       };
     }
 
-    const { name, password } = JSON.parse(body);
+    const { nickname, password } = JSON.parse(body);
 
-    if (!name || !password) {
+    if (!nickname || !password) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "Name and password are required" }),
+        headers,
+        body: JSON.stringify({ error: "Nickname and password are required" }),
       };
     }
 
     const params = {
       TableName: USERS_TABLE,
-      Key: { nickname: name },
+      Key: { nickname },
     };
 
     const { Item } = await dynamoDB.get(params).promise();
@@ -33,6 +50,7 @@ exports.handler = async (event) => {
     if (!Item) {
       return {
         statusCode: 404,
+        headers,
         body: JSON.stringify({ error: "User not found" }),
       };
     }
@@ -40,18 +58,20 @@ exports.handler = async (event) => {
     if (password !== Item.password) {
       return {
         statusCode: 401,
+        headers,
         body: JSON.stringify({ error: "Invalid password" }),
       };
     }
 
     return {
       statusCode: 200,
+      headers,
       body: JSON.stringify({ message: "Login successful", role: Item.role }),
     };
   } catch (error) {
-    console.error(error);
     return {
       statusCode: 500,
+      headers,
       body: JSON.stringify({ error: error.message }),
     };
   }

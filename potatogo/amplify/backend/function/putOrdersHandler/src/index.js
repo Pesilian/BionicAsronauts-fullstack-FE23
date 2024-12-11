@@ -73,7 +73,10 @@ exports.handler = async (event) => {
       };
     }
 
-    // Step 3: Build update expression and changes feedback
+    // Step 3: Compare old and new items
+    const addedItems = orderItems.filter(item => !currentItems.includes(item));
+    const removedItems = currentItems.filter(item => !orderItems.includes(item));
+
     const changes = [];
     const expressionAttributeValues = {};
 
@@ -89,6 +92,14 @@ exports.handler = async (event) => {
       updateExpression += ' orderItems = :orderItems';
       expressionAttributeValues[':orderItems'] = orderItems;
       changes.push(`Items updated`);
+      
+      if (addedItems.length > 0) {
+        changes.push(`Added: ${JSON.stringify(addedItems)}`);
+      }
+
+      if (removedItems.length > 0) {
+        changes.push(`Removed: ${JSON.stringify(removedItems)}`);
+      }
     }
 
     console.log('Update Expression:', updateExpression);

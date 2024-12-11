@@ -91,21 +91,17 @@ exports.handler = async (event) => {
       if (Object.keys(expressionAttributeValues).length > 0) updateExpression += ',';
       updateExpression += ' orderItems = :orderItems';
       expressionAttributeValues[':orderItems'] = orderItems;
-      changes.push(`Items updated`);
-      
-      if (addedItems.length > 0) {
-        changes.push(`Added: ${JSON.stringify(addedItems)}`);
-      }
-
-      if (removedItems.length > 0) {
-        changes.push(`Removed: ${JSON.stringify(removedItems)}`);
-      }
+      changes.push('Items updated');
     }
+
+    // Step 4: Generate the added and removed items response
+    const addedItemsResponse = addedItems.length > 0 ? `Added: ${JSON.stringify(addedItems)}` : null;
+    const removedItemsResponse = removedItems.length > 0 ? `Removed: ${JSON.stringify(removedItems)}` : null;
 
     console.log('Update Expression:', updateExpression);
     console.log('Expression Attribute Values:', expressionAttributeValues);
 
-    if (changes.length === 0) {
+    if (changes.length === 0 && !addedItemsResponse && !removedItemsResponse) {
       console.log('No changes detected in the update');
       return {
         statusCode: 200,
@@ -114,7 +110,7 @@ exports.handler = async (event) => {
       };
     }
 
-    // Step 4: Update the order
+    // Step 5: Update the order
     const updateParams = {
       TableName: 'Pota-To-Go-orders',
       Key: { orderId },
@@ -126,12 +122,14 @@ exports.handler = async (event) => {
     await dynamoDB.send(new UpdateCommand(updateParams));
     console.log(`Order ${orderId} updated successfully`);
 
-    // Step 5: Return success response with changes
+    // Step 6: Return success response with detailed changes
     return {
       statusCode: 200,
       body: JSON.stringify({
         message: `Order ${orderId} updated successfully`,
-        changes,
+        changes: changes,
+        addedItems: addedItemsResponse,
+        removedItems: removedItemsResponse
       }),
       headers: { 'Content-Type': 'application/json' },
     };

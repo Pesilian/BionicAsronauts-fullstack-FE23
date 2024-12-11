@@ -55,11 +55,11 @@
         },
         "deleteOrdersHandler": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
-          "s3Key": "amplify-builds/deleteOrdersHandler-632f36616f567a524f4c-build.zip"
+          "s3Key": "amplify-builds/deleteOrdersHandler-6241776368696c394c4e-build.zip"
         },
         "putOrdersHandler": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
-          "s3Key": "amplify-builds/putOrdersHandler-516654643337494c792f-build.zip"
+          "s3Key": "amplify-builds/putOrdersHandler-4962392b626a45343565-build.zip"
         },
         "getStock": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",

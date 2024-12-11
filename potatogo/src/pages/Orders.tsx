@@ -9,8 +9,8 @@ const Orders: React.FC = () => {
   useEffect(() => {
     const loadOrders = async () => {
       try {
-        const fetchedOrders = await fetchOrders();
-        setOrders(fetchedOrders);
+        const { items } = await fetchOrders(); // Extract items
+        setOrders(items); // Set only the array of orders
       } catch (error) {
         console.error("Error loading orders:", error);
       }

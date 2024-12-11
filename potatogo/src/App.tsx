@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { Amplify } from 'aws-amplify';
 import awsconfig from './aws-exports'; // Import Amplify configuration
 import { Order } from './types/order'; // Import the Order type from the types folder
+import awsmobile from "./aws-exports";
 
-Amplify.configure(awsconfig); // Ensure Amplify is configured
+Amplify.configure(awsmobile); // Ensure Amplify is configured
 
 function App() {
   const [orders, setOrders] = useState<Order[]>([]); // Use the Order type for orders state

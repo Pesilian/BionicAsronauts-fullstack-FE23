@@ -1,31 +1,30 @@
-import { ApiError, get } from "@aws-amplify/api";
+import { get } from "@aws-amplify/api";
 import { Order } from "../types/order";
 
-/**
- * Fetch all orders from the backend.
- *
- * @returns {Promise<Order[]>} A promise that resolves to an array of orders.
- * @throws Will throw an error if the API call fails.
- */
-export const fetchOrders = async (): Promise<Order[]> => {
+export const fetchOrders = async (
+  criteria: { [key: string]: string } = {},
+  lastEvaluatedKey?: string
+): Promise<{ items: Order[]; lastEvaluatedKey?: string }> => {
   try {
-    const restOperation = get({
-      apiName: "getOrders", // Replace with your API name
-      path: "/getOrders", // Replace with your endpoint path
+    const queryParams = new URLSearchParams(criteria);
+    if (lastEvaluatedKey) {
+      queryParams.append("lastEvaluatedKey", lastEvaluatedKey);
+    }
+
+    const response = await get({
+      path: `/order?${queryParams.toString()}`,
+      apiName: "potatogoapi", // Replace with your actual API name
     });
 
-    const { body } = await restOperation.response;
+    // Ensure the response is correctly typed
+    const { items, lastEvaluatedKey: nextKey } = response as unknown as {
+      items: Order[];
+      lastEvaluatedKey?: string;
+    };
 
-    // Parse the response body as JSON and assert its type to Order[]
-    const orders = (await body.json()) as unknown as Order[];
-    return orders;
+    return { items, lastEvaluatedKey: nextKey };
   } catch (error) {
-    if (error instanceof ApiError && error.response) {
-      const { statusCode, body } = error.response;
-      console.error(`[fetchOrders]: Received ${statusCode} with payload: ${body}`);
-    } else {
-      console.error("[fetchOrders]: An unknown error occurred:", error);
-    }
+    console.error(`[fetchOrders]: An error occurred while fetching orders with criteria (${JSON.stringify(criteria)}):`, error);
     throw error;
   }
 };

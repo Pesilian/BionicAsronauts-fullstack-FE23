@@ -12,15 +12,13 @@ const {
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
 exports.handler = async (event) => {
-  console.log("Received Event:", JSON.stringify(event, null, 2));
+  console.log("Event:", JSON.stringify(event, null, 2));
 
   try {
     // Extract the `id` from the pathParameters
     const { id } = event.pathParameters;
-    console.log("Extracted Order ID:", id);
 
     if (!id) {
-      console.warn("No Order ID provided in pathParameters");
       return {
         statusCode: 400,
         body: JSON.stringify({ message: "Order ID is required" }),
@@ -32,10 +30,8 @@ exports.handler = async (event) => {
       TableName: 'Pota-To-Go-orders',
       Key: { orderId: id },
     };
-    console.log("Delete Command Parameters:", JSON.stringify(params, null, 2));
 
-    const result = await dynamoDB.send(new DeleteCommand(params));
-    console.log("Delete Command Result:", JSON.stringify(result, null, 2));
+    await dynamoDB.send(new DeleteCommand(params));
 
     return {
       statusCode: 200,

@@ -72,9 +72,24 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "deleteCartItem": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "deleteMenuItem": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "deleteOrdersHandler": {
       "build": true,
       "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "deleteSpecials": {
+      "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
@@ -158,6 +173,21 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "updateCart": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "updateMenu": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "updateSpecials": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "updateStock": {
       "build": true,
       "dependsOn": [
@@ -211,6 +241,38 @@
         }
       ]
     },
+    "AMPLIFY_function_deleteCartItem_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "deleteCartItem"
+        }
+      ]
+    },
+    "AMPLIFY_function_deleteCartItem_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "deleteCartItem"
+        }
+      ]
+    },
+    "AMPLIFY_function_deleteMenuItem_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "deleteMenuItem"
+        }
+      ]
+    },
+    "AMPLIFY_function_deleteMenuItem_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "deleteMenuItem"
+        }
+      ]
+    },
     "AMPLIFY_function_deleteOrdersHandler_deploymentBucketName": {
       "usedBy": [
         {
@@ -224,6 +286,22 @@
         {
           "category": "function",
           "resourceName": "deleteOrdersHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_deleteSpecials_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "deleteSpecials"
+        }
+      ]
+    },
+    "AMPLIFY_function_deleteSpecials_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "deleteSpecials"
         }
       ]
     },
@@ -416,6 +494,22 @@
         {
           "category": "function",
           "resourceName": "testFunction"
+        }
+      ]
+    },
+    "AMPLIFY_function_updateCart_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "updateCart"
+        }
+      ]
+    },
+    "AMPLIFY_function_updateCart_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "updateCart"
         }
       ]
     },

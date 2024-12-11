@@ -9,77 +9,71 @@ const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
 exports.addToCart = async event => {
   try {
-    const body = event; // Använd JSON från event
-    const menuItems = body.menuItems;
+    const body =
+      typeof event.body === 'string' ? JSON.parse(event.body) : event;
 
-    if (!menuItems || menuItems.length === 0) {
+    let { cartId, items, specials, price } = body;
+
+    if (!items && !specials) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ message: 'At least one menu item is required' }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        body: JSON.stringify({
+          message: 'Either items or specials must be provided.',
+        }),
+        headers: { 'Content-Type': 'application/json' },
       };
     }
 
-    let cartId = body.cartId;
-
-    // Om inget cartId finns, generera ett nytt
-    if (!cartId) {
-      cartId = Math.floor(Math.random() * 1000000).toString();
+    if (!price) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({
+          message: 'Price must be provided.',
+        }),
+        headers: { 'Content-Type': 'application/json' },
+      };
     }
 
-    // Kontrollera om cart redan finns
+    if (!cartId) {
+      cartId = Math.floor(Math.random() * 1000000).toString(); // Generate a random cart ID
+    }
+
     const getCartParams = {
       TableName: 'Pota-To-Go-cart',
       Key: { cartId },
     };
     const existingCart = await dynamoDB.send(new GetCommand(getCartParams));
-    let existingItems = {};
-    let existingTotalPrice = 0;
+    const existingData = existingCart.Item || {};
 
-    if (existingCart.Item) {
-      existingItems = existingCart.Item;
-      existingTotalPrice = existingCart.Item.totalPrice || 0;
+    let updatedCart = { ...existingData };
+    const currentItemsCount = Object.keys(existingData).filter(key =>
+      key.startsWith('item')
+    ).length;
+    const currentSpecialsCount = Object.keys(existingData).filter(key =>
+      key.startsWith('specials')
+    ).length;
+
+    // Uppdatera kundvagnen med nya items eller specials
+    if (items) {
+      const newItemKey = `item${currentItemsCount + 1}`;
+      updatedCart[newItemKey] = items;
     }
 
-    let newItemsTotalPrice = 0;
-    let updatedItems = { ...existingItems };
-
-    for (let i = 0; i < menuItems.length; i++) {
-      const item = menuItems[i];
-      const itemKey = `item${i + 1}`;
-
-      if (!item.potatoe || typeof item.price !== 'number') {
-        return {
-          statusCode: 400,
-          body: JSON.stringify({
-            message: `Each item must include 'potatoe' and a numeric 'price'`,
-          }),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        };
-      }
-
-      updatedItems[itemKey] = {
-        potatoe: item.potatoe,
-        toppings: item.toppings || [],
-        price: item.price,
-      };
-
-      newItemsTotalPrice += item.price;
+    if (specials) {
+      const newSpecialsKey = `specials${currentSpecialsCount + 1}`;
+      updatedCart[newSpecialsKey] = specials;
     }
 
-    const totalPrice = existingTotalPrice + newItemsTotalPrice;
+    // Uppdatera totalpris
+    updatedCart.totalPrice = (existingData.totalPrice || 0) + price;
+    updatedCart.updatedAt = new Date().toISOString();
 
+    // Spara uppdaterad kundvagn i DynamoDB
     const putParams = {
       TableName: 'Pota-To-Go-cart',
       Item: {
         cartId,
-        ...updatedItems,
-        totalPrice,
-        updatedAt: new Date().toISOString(),
+        ...updatedCart,
       },
     };
 
@@ -90,12 +84,9 @@ exports.addToCart = async event => {
       body: JSON.stringify({
         message: 'Cart updated successfully',
         cartId,
-        items: updatedItems,
-        totalPrice,
+        updatedCart,
       }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
     };
   } catch (error) {
     console.error('Error occurred:', error);
@@ -106,9 +97,7 @@ exports.addToCart = async event => {
         message: 'Failed to process request',
         error: error.message,
       }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
     };
   }
 };

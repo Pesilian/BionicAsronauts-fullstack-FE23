@@ -4,19 +4,20 @@ import axios from 'axios';
 interface MenuItem {
   menuItem: string;
   category: string;
+  price?: number;
 }
 
 interface Special {
   specialsName: string;
-  item1: string;
-  totalPrice: number;
+  price: number;
 }
 
 const MenuList: React.FC = () => {
   const [menuItems, setMenuItems] = useState<Record<string, MenuItem[]>>({});
   const [specials, setSpecials] = useState<Special[]>([]);
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
-  const [cart, setCart] = useState<MenuItem[]>([]);
+  const [selectedItems, setSelectedItems] = useState<(MenuItem | Special)[]>(
+    []
+  );
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -53,45 +54,48 @@ const MenuList: React.FC = () => {
     fetchData();
   }, []);
 
-  const handleCheckboxChange = (menuItem: string) => {
-    setSelectedItems(prevItems =>
-      prevItems.includes(menuItem)
-        ? prevItems.filter(item => item !== menuItem)
-        : [...prevItems, menuItem]
-    );
+  const handleCheckboxChange = (
+    item: MenuItem | Special,
+    isChecked: boolean
+  ) => {
+    if (isChecked) {
+      setSelectedItems(prevItems => [...prevItems, item]);
+    } else {
+      setSelectedItems(prevItems =>
+        prevItems.filter(selectedItem => selectedItem !== item)
+      );
+    }
   };
 
-  const handleAddToCart = () => {
-    const selectedItemsDetails = Object.values(menuItems)
-      .flat()
-      .filter(item => selectedItems.includes(item.menuItem));
-
-    setCart(prevCart => [...prevCart, ...selectedItemsDetails]);
-    setSelectedItems([]);
-  };
-
-  const sendCartToAPI = async () => {
+  const handleAddAllToCart = async () => {
     try {
-      const payload = {
-        cartId: null,
-        menuItems: cart.map(item => ({
-          potatoe: item.menuItem,
-          category: item.category,
-          price: 20,
-        })),
-      };
+      const payload = selectedItems.map(item => {
+        if (isSpecial(item)) {
+          return { specials: item.specialsName, price: item.price };
+        } else {
+          return {
+            items: { [item.category]: item.menuItem },
+            price: item.price,
+          };
+        }
+      });
 
       const response = await axios.post(
         'https://din-api-url.amazonaws.com/default/addToCart',
         payload
       );
 
-      console.log('Lyckades skicka kundvagn:', response.data);
-      alert('Kundvagnen har skickats!');
+      console.log('Lyckades skicka:', response.data);
+      alert('Alla valda objekt har lagts till i kundvagnen!');
+      setSelectedItems([]);
     } catch (error) {
-      console.error('Kunde inte skicka kundvagn:', error);
-      alert('Ett fel inträffade när kundvagnen skulle skickas.');
+      console.error('Kunde inte lägga till i kundvagnen:', error);
+      alert('Ett fel inträffade vid tillägg.');
     }
+  };
+
+  const isSpecial = (item: MenuItem | Special): item is Special => {
+    return (item as Special).specialsName !== undefined;
   };
 
   return (
@@ -100,9 +104,12 @@ const MenuList: React.FC = () => {
       {specials.length > 0 ? (
         specials.map((special, index) => (
           <div key={index}>
+            <input
+              type="checkbox"
+              onChange={e => handleCheckboxChange(special, e.target.checked)}
+            />
             <h3>{special.specialsName}</h3>
-            <p>Price: {special.totalPrice}</p>
-            <input type="checkbox" />
+            <p>Price: {special.price} SEK</p>
           </div>
         ))
       ) : (
@@ -117,35 +124,26 @@ const MenuList: React.FC = () => {
           <div key={category}>
             <h3>{category}</h3>
             {items.map(item => (
-              <label key={item.menuItem}>
-                {item.menuItem}
+              <div key={item.menuItem}>
                 <input
                   type="checkbox"
-                  value={item.menuItem}
-                  checked={selectedItems.includes(item.menuItem)}
-                  onChange={() => handleCheckboxChange(item.menuItem)}
+                  onChange={e => handleCheckboxChange(item, e.target.checked)}
                 />
-              </label>
+                {item.menuItem} -{' '}
+                {item.price ? `${item.price} SEK` : 'Pris ej tillgängligt'}
+              </div>
             ))}
           </div>
         ))
       )}
 
-      <button onClick={handleAddToCart}>Lägg i kundvagn</button>
-      <button onClick={sendCartToAPI}>Skicka kundvagn</button>
-
-      <h3>Kundvagn</h3>
-      {cart.length > 0 ? (
-        <ul>
-          {cart.map((item, index) => (
-            <li key={index}>
-              {item.menuItem} - {item.category}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>Din kundvagn är tom.</p>
+      {selectedItems.length > 0 && (
+        <button onClick={handleAddAllToCart}>
+          Lägg alla valda i kundvagnen
+        </button>
       )}
+
+      {error && <p style={{ color: 'red' }}>{error}</p>}
     </div>
   );
 };

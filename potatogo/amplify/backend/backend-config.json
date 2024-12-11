@@ -72,6 +72,12 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "deleteOrdersHandler": {
+      "build": true,
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "deleteStock": {
       "build": true,
       "dependsOn": [
@@ -88,6 +94,12 @@
           "resourceName": "potatogoDB"
         }
       ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "getOrdersHandler": {
+      "build": true,
+      "dependsOn": [],
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
@@ -127,6 +139,12 @@
     },
     "postSpecials": {
       "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "putOrdersHandler": {
+      "build": true,
+      "dependsOn": [],
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
@@ -193,6 +211,22 @@
         }
       ]
     },
+    "AMPLIFY_function_deleteOrdersHandler_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "deleteOrdersHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_deleteOrdersHandler_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "deleteOrdersHandler"
+        }
+      ]
+    },
     "AMPLIFY_function_deleteStock_deploymentBucketName": {
       "usedBy": [
         {
@@ -222,6 +256,22 @@
         {
           "category": "function",
           "resourceName": "getMenu"
+        }
+      ]
+    },
+    "AMPLIFY_function_getOrdersHandler_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getOrdersHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_getOrdersHandler_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getOrdersHandler"
         }
       ]
     },
@@ -318,6 +368,22 @@
         {
           "category": "function",
           "resourceName": "postSpecials"
+        }
+      ]
+    },
+    "AMPLIFY_function_putOrdersHandler_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "putOrdersHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_putOrdersHandler_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "putOrdersHandler"
         }
       ]
     },

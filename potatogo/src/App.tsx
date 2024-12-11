@@ -5,7 +5,7 @@ import LandingPage from './components/LandingPage';
 import './App.css';
 
 function App() {
-  const [showLandingPage, setShowLandingPage] = useState(true);
+  const [showLandingPage,] = useState(true);
 
   return (
     <div className="App">
@@ -15,9 +15,6 @@ function App() {
         ) : (
           <MenuList />
         )}
-        <button onClick={() => setShowLandingPage(!showLandingPage)}>
-          {showLandingPage ? 'Go to Menu' : 'Back to Landing Page'}
-        </button>
       </header>
     </div>
   );

@@ -1,38 +1,33 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const {
   DynamoDBDocumentClient,
-  ScanCommand,
+  DeleteCommand,
 } = require('@aws-sdk/lib-dynamodb');
 
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-exports.getMenu = async event => {
+exports.deleteSpecials = async event => {
   try {
-    const scanParams = {
-      TableName: 'Pota-To-Go-menu',
-    };
+    const { specialsName } = event;
 
-    const result = await dynamoDB.send(new ScanCommand(scanParams));
-
-    if (result.Items.length === 0) {
+    if (!specialsName) {
       return {
-        statusCode: 404,
+        statusCode: 400,
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: 'No menu items found' }),
+        body: JSON.stringify({ message: 'specialsName is required' }),
       };
     }
 
-    // Gruppér items efter kategori
-    const groupedItems = result.Items.reduce((acc, item) => {
-      const category = item.category || 'Uncategorized'; // Default till 'Uncategorized' om ingen kategori finns
-      if (!acc[category]) {
-        acc[category] = [];
-      }
-      acc[category].push(item);
-      return acc;
-    }, {});
+    const deleteParams = {
+      TableName: 'Pota-To-Go-specials',
+      Key: {
+        specialsName: specialsName,
+      },
+    };
+
+    await dynamoDB.send(new DeleteCommand(deleteParams));
 
     return {
       statusCode: 200,
@@ -40,8 +35,7 @@ exports.getMenu = async event => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        message: 'Menu fetched successfully',
-        menuItems: groupedItems,
+        message: `Special with specialsName '${specialsName}' deleted successfully.`,
       }),
     };
   } catch (error) {

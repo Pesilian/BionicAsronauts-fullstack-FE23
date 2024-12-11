@@ -17,9 +17,9 @@ exports.handler = async (event) => {
 
   try {
     const queryParams = event.queryStringParameters || {};
-    const { orderId, status, customerName, lastEvaluatedKey } = queryParams;
+    const { orderId, orderStatus, customerName, lastEvaluatedKey } = queryParams;
 
-    console.log('Query Parameters:', { orderId, status, customerName, lastEvaluatedKey });
+    console.log('Query Parameters:', { orderId, orderStatus, customerName, lastEvaluatedKey });
 
     // Fetch by Order ID
     if (orderId) {
@@ -39,13 +39,15 @@ exports.handler = async (event) => {
       };
     }
 
-    // Build Scan Parameters for customerName/status filters
+    // Build Scan Parameters for customerName/orderStatus filters
     const filterExpression = [];
     const expressionAttributeValues = {};
+    const expressionAttributeNames = {};
 
-    if (status) {
-      filterExpression.push('status = :status');
-      expressionAttributeValues[':status'] = status;
+    if (orderStatus) {
+      filterExpression.push('#orderStatusAlias = :orderStatus');
+      expressionAttributeValues[':orderStatus'] = orderStatus;
+      expressionAttributeNames['#orderStatusAlias'] = 'orderStatus';
     }
 
     if (customerName) {
@@ -57,6 +59,7 @@ exports.handler = async (event) => {
       TableName: 'Pota-To-Go-orders', // Use hardcoded or environment variable
       FilterExpression: filterExpression.length > 0 ? filterExpression.join(' AND ') : undefined,
       ExpressionAttributeValues: Object.keys(expressionAttributeValues).length > 0 ? expressionAttributeValues : undefined,
+      ExpressionAttributeNames: Object.keys(expressionAttributeNames).length > 0 ? expressionAttributeNames : undefined,
       ExclusiveStartKey: lastEvaluatedKey ? JSON.parse(lastEvaluatedKey) : undefined, // Pagination
       Limit: 10, // Items per page
     };

@@ -3,23 +3,17 @@ const { DynamoDBDocumentClient, PutCommand } = require('@aws-sdk/lib-dynamodb');
 
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-exports.addToSpecials = async event => {
+module.exports.addToSpecials = async event => {
   try {
-    const body = event;
-    const menuItems = body.menuItems;
-    const specialsName = body.specialsName;
-    const totalPrice = body.totalPrice; // Ta emot totalPrice i body
+    const { name, items, price } = event;
 
-    if (
-      !specialsName ||
-      !menuItems ||
-      menuItems.length === 0 ||
-      totalPrice === undefined
-    ) {
+    console.log(event);
+
+    if (!name || !items || !price) {
       return {
         statusCode: 400,
         body: JSON.stringify({
-          message: 'Specialsname, menu items and totalPrice are required',
+          message: 'Name, items, and price are required',
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -27,39 +21,27 @@ exports.addToSpecials = async event => {
       };
     }
 
-    // Initiera objekt för att lagra uppdaterade items
-    let updatedItems = {};
+    const specialsId = Math.floor(Math.random() * 1000000).toString();
 
-    // Iterera genom menyn och lägg till varje item
-    menuItems.forEach((item, index) => {
-      const itemKey = `item${index + 1}`; // Dynamiskt sätt en nyckel för varje item, t.ex. item1, item2, etc.
-      updatedItems[itemKey] = {
-        potatoe: item.potatoe,
-        toppings: item.toppings || [], // Om toppings inte finns, sätt en tom array
-        price: item.price,
-      };
-    });
-
-    // Uppdatera specialen med de nya items och totalPrice
     const putParams = {
       TableName: 'Pota-To-Go-specials',
       Item: {
-        specialsName,
-        ...updatedItems, // Sprid de dynamiska item-nycklarna
-        totalPrice, // Ta emot och använd totalPrice från body
-        updatedAt: new Date().toISOString(), // Tidsstämpel
+        specialsName: name,
+        specialsId,
+        items,
+        price,
+        updatedAt: new Date().toISOString(),
       },
     };
 
     await dynamoDB.send(new PutCommand(putParams));
 
     return {
-      statusCode: 201,
+      statusCode: 200,
       body: JSON.stringify({
-        message: 'Specials posted successfully',
-        specialsName,
-        items: updatedItems, // Returnera de nya item objekten
-        totalPrice,
+        message: 'Special added successfully',
+        specialsName: name,
+        specialsId,
       }),
       headers: {
         'Content-Type': 'application/json',

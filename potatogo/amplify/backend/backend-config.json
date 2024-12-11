@@ -3,50 +3,32 @@
     "potatogoapi": {
       "dependsOn": [
         {
-          "attributes": [
-            "Name",
-            "Arn"
-          ],
+          "attributes": ["Name", "Arn"],
           "category": "function",
           "resourceName": "getMenu"
         },
         {
-          "attributes": [
-            "Name",
-            "Arn"
-          ],
+          "attributes": ["Name", "Arn"],
           "category": "function",
           "resourceName": "loginHandler"
         },
         {
-          "attributes": [
-            "Name",
-            "Arn"
-          ],
+          "attributes": ["Name", "Arn"],
           "category": "function",
           "resourceName": "orderHandler"
         },
         {
-          "attributes": [
-            "Name",
-            "Arn"
-          ],
+          "attributes": ["Name", "Arn"],
           "category": "function",
           "resourceName": "cartHandler"
         },
         {
-          "attributes": [
-            "Name",
-            "Arn"
-          ],
+          "attributes": ["Name", "Arn"],
           "category": "function",
           "resourceName": "registerHandler"
         },
         {
-          "attributes": [
-            "Name",
-            "Arn"
-          ],
+          "attributes": ["Name", "Arn"],
           "category": "function",
           "resourceName": "postSpecials"
         }
@@ -60,11 +42,7 @@
       "build": true,
       "dependsOn": [
         {
-          "attributes": [
-            "Name",
-            "Arn",
-            "StreamArn"
-          ],
+          "attributes": ["Name", "Arn", "StreamArn"],
           "category": "storage",
           "resourceName": "potatogoDB"
         }
@@ -86,10 +64,7 @@
             "Arn": "TABLE_ARN",
             "Name": "TABLE_NAME"
           },
-          "attributes": [
-            "Name",
-            "Arn"
-          ],
+          "attributes": ["Name", "Arn"],
           "category": "storage",
           "resourceName": "potatogoDB"
         }
@@ -100,6 +75,21 @@
     "getOrdersHandler": {
       "build": true,
       "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "deleteCartItem": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "deleteMenuItem": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "deleteSpecials": {
+      "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
@@ -126,10 +116,7 @@
             "Arn": "TABLE_ARN",
             "Name": "TABLE_NAME"
           },
-          "attributes": [
-            "Name",
-            "Arn"
-          ],
+          "attributes": ["Name", "Arn"],
           "category": "storage",
           "resourceName": "potatogoDB"
         }
@@ -158,6 +145,21 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "updateCart": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "updateMenu": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "updateSpecials": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "updateStock": {
       "build": true,
       "dependsOn": [
@@ -166,10 +168,7 @@
             "Arn": "TABLE_ARN",
             "Name": "TABLE_NAME"
           },
-          "attributes": [
-            "Name",
-            "Arn"
-          ],
+          "attributes": ["Name", "Arn"],
           "category": "storage",
           "resourceName": "potatogoDB"
         }

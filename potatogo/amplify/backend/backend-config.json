@@ -3,32 +3,50 @@
     "potatogoapi": {
       "dependsOn": [
         {
-          "attributes": ["Name", "Arn"],
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
           "category": "function",
           "resourceName": "getMenu"
         },
         {
-          "attributes": ["Name", "Arn"],
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
           "category": "function",
           "resourceName": "loginHandler"
         },
         {
-          "attributes": ["Name", "Arn"],
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
           "category": "function",
           "resourceName": "orderHandler"
         },
         {
-          "attributes": ["Name", "Arn"],
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
           "category": "function",
           "resourceName": "cartHandler"
         },
         {
-          "attributes": ["Name", "Arn"],
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
           "category": "function",
           "resourceName": "registerHandler"
         },
         {
-          "attributes": ["Name", "Arn"],
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
           "category": "function",
           "resourceName": "postSpecials"
         }
@@ -38,6 +56,22 @@
     }
   },
   "function": {
+    "addStock": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn",
+            "StreamArn"
+          ],
+          "category": "storage",
+          "resourceName": "potatogoDB"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "deleteCartItem": {
       "build": true,
       "providerPlugin": "awscloudformation",
@@ -50,18 +84,6 @@
     },
     "deleteSpecials": {
       "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda"
-    },
-    "addStock": {
-      "build": true,
-      "dependsOn": [
-        {
-          "attributes": ["Name", "Arn", "StreamArn"],
-          "category": "storage",
-          "resourceName": "potatogoDB"
-        }
-      ],
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
@@ -79,7 +101,10 @@
             "Arn": "TABLE_ARN",
             "Name": "TABLE_NAME"
           },
-          "attributes": ["Name", "Arn"],
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
           "category": "storage",
           "resourceName": "potatogoDB"
         }
@@ -116,7 +141,10 @@
             "Arn": "TABLE_ARN",
             "Name": "TABLE_NAME"
           },
-          "attributes": ["Name", "Arn"],
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
           "category": "storage",
           "resourceName": "potatogoDB"
         }
@@ -145,21 +173,6 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
-    "updateCart": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda"
-    },
-    "updateMenu": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda"
-    },
-    "updateSpecials": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda"
-    },
     "updateStock": {
       "build": true,
       "dependsOn": [
@@ -168,7 +181,10 @@
             "Arn": "TABLE_ARN",
             "Name": "TABLE_NAME"
           },
-          "attributes": ["Name", "Arn"],
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
           "category": "storage",
           "resourceName": "potatogoDB"
         }
@@ -431,6 +447,292 @@
         {
           "category": "function",
           "resourceName": "updateStock"
+        }
+      ]
+    }
+  },
+  "storage": {
+    "potatogoDB": {
+      "providerPlugin": "awscloudformation",
+      "service": "DynamoDB"
+    }
+  }
+}
+{
+  "api": {
+    "potatogoapi": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "getMenu"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "loginHandler"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "orderHandler"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "cartHandler"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "registerHandler"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "postSpecials"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    }
+  },
+  "function": {
+    "deleteCartItem": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "deleteMenuItem": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "deleteSpecials": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "getSpecials": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "loginHandler": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "menuHandler": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributeEnvMap": {
+            "Arn": "TABLE_ARN",
+            "Name": "TABLE_NAME"
+          },
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "storage",
+          "resourceName": "potatogoDB"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "postSpecials": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "registerHandler": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "testFunction": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "updateCart": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "updateMenu": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "updateSpecials": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_function_cartHandler_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "cartHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_cartHandler_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "cartHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_getMenu_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getMenu"
+        }
+      ]
+    },
+    "AMPLIFY_function_getMenu_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getMenu"
+        }
+      ]
+    },
+    "AMPLIFY_function_getSpecials_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getSpecials"
+        }
+      ]
+    },
+    "AMPLIFY_function_getSpecials_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getSpecials"
+        }
+      ]
+    },
+    "AMPLIFY_function_loginHandler_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "loginHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_loginHandler_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "loginHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_menuHandler_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "menuHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_menuHandler_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "menuHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_orderHandler_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "orderHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_orderHandler_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "orderHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_postSpecials_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "postSpecials"
+        }
+      ]
+    },
+    "AMPLIFY_function_postSpecials_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "postSpecials"
+        }
+      ]
+    },
+    "AMPLIFY_function_registerHandler_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "registerHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_registerHandler_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "registerHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_testFunction_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "testFunction"
+        }
+      ]
+    },
+    "AMPLIFY_function_testFunction_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "testFunction"
         }
       ]
     }

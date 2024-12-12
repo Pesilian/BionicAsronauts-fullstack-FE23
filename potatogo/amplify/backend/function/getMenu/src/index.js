@@ -24,8 +24,9 @@ exports.getMenu = async event => {
       };
     }
 
+    // Gruppér items efter kategori
     const groupedItems = result.Items.reduce((acc, item) => {
-      const category = item.category || 'Uncategorized';
+      const category = item.category || 'Uncategorized'; // Default till 'Uncategorized' om ingen kategori finns
       if (!acc[category]) {
         acc[category] = [];
       }

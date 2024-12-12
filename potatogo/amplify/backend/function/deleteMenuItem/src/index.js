@@ -1,9 +1,12 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, PutCommand } = require('@aws-sdk/lib-dynamodb');
+const {
+  DynamoDBDocumentClient,
+  DeleteCommand,
+} = require('@aws-sdk/lib-dynamodb');
 
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-exports.addToMenu = async event => {
+exports.deleteMenuItem = async event => {
   try {
     const body = event;
     const { menuItem, category } = body;
@@ -11,49 +14,44 @@ exports.addToMenu = async event => {
     if (!menuItem || !category) {
       return {
         statusCode: 400,
-        body: JSON.stringify({
-          message: 'Menu item and category are required',
-        }),
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ message: 'Menu item and category is required' }),
       };
     }
 
-    const putParams = {
+    const deleteParams = {
       TableName: 'Pota-To-Go-menu',
-      Item: {
-        menuItem,
-        category,
-        createdAt: new Date().toISOString(),
+      Key: {
+        menuItem: menuItem,
+        category: category,
       },
     };
 
-    await dynamoDB.send(new PutCommand(putParams));
+    await dynamoDB.send(new DeleteCommand(deleteParams));
 
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        message: 'Menu item added successfully',
-        menuItem,
-        category,
-      }),
       headers: {
         'Content-Type': 'application/json',
       },
+      body: JSON.stringify({
+        message: `Menu item: '${menuItem}' deleted successfully.`,
+      }),
     };
   } catch (error) {
     console.error('Error occurred:', error);
 
     return {
       statusCode: 500,
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
         message: 'Failed to process request',
         error: error.message,
       }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
     };
   }
 };

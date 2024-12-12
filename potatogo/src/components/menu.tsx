@@ -28,7 +28,7 @@ const MenuList: React.FC = () => {
 
       try {
         const menuResponse = await axios.get(
-          'https://c7d8k8kv2g.execute-api.eu-north-1.amazonaws.com/default/linasTest'
+          'https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/menu'
         );
 
         const menuData = JSON.parse(menuResponse.data.body);
@@ -37,7 +37,7 @@ const MenuList: React.FC = () => {
         }
 
         const specialsResponse = await axios.get(
-          'https://c7d8k8kv2g.execute-api.eu-north-1.amazonaws.com/default/linasTest'
+          'https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/specials'
         );
 
         const specialsData = JSON.parse(specialsResponse.data.body);
@@ -69,19 +69,31 @@ const MenuList: React.FC = () => {
 
   const handleAddAllToCart = async () => {
     try {
-      const payload = selectedItems.map(item => {
-        if (isSpecial(item)) {
-          return { specials: item.specialsName, price: item.price };
-        } else {
-          return {
-            items: { [item.category]: item.menuItem },
-            price: item.price,
-          };
-        }
-      });
+      const payload: any = {};
+
+      if (selectedItems.length === 1 && isSpecial(selectedItems[0])) {
+        const special = selectedItems[0] as Special;
+        payload.menuItems = {
+          Specials: special.specialsName,
+        };
+      } else {
+        payload.menuItems = {
+          cartItems: selectedItems
+            .map(item => {
+              if (isSpecial(item)) {
+                return item.specialsName;
+              } else {
+                return item.menuItem;
+              }
+            })
+            .filter((value, index, self) => self.indexOf(value) === index),
+        };
+      }
+
+      console.log('Payload to be sent:', JSON.stringify(payload, null, 2));
 
       const response = await axios.post(
-        'https://din-api-url.amazonaws.com/default/addToCart',
+        'https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/cart',
         payload
       );
 

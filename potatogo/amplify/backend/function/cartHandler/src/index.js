@@ -9,51 +9,63 @@ const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
 exports.addToCart = async event => {
   try {
-    const body = JSON.parse(event.body || '{}');
-    const menuItems = body.menuItems;
+    const body =
+      typeof event.body === 'string' ? JSON.parse(event.body) : event;
 
-    if (!menuItems || menuItems.length === 0) {
+    let { cartId, menuItems, customerName } = body;
+
+    customerName = customerName || 'Guest';
+    console.log('Parsed Customer Name:', customerName);
+
+    if (!menuItems) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ message: 'At least one menu item is required' }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        body: JSON.stringify({
+          message: 'menuItems must be provided.',
+        }),
+        headers: { 'Content-Type': 'application/json' },
       };
     }
 
-    const cartId = body.cartId;
-    let cart = null;
-
-    if (cartId) {
-      const getParams = {
-        TableName: 'Pota-To-Go-cart',
-        Key: { cartId },
-      };
-      const cartResult = await dynamoDB.send(new GetCommand(getParams));
-
-      if (cartResult.Item) {
-        cart = cartResult.Item;
-      }
+    if (!cartId) {
+      cartId = Math.floor(Math.random() * 1000000).toString();
     }
 
-    let newCartId;
-    let newCartItems = cart ? cart.items : [];
+    const getCartParams = {
+      TableName: 'Pota-To-Go-cart',
+      Key: { cartId },
+    };
+    const existingCart = await dynamoDB.send(new GetCommand(getCartParams));
+    const existingData = existingCart.Item || {};
 
-    if (cart) {
-      newCartItems = [...newCartItems, ...menuItems];
-      newCartId = cart.cartId;
-    } else {
-      newCartId = Math.floor(Math.random() * 1000000).toString();
-      newCartItems = menuItems;
+    let updatedCart = { ...existingData, customerName };
+    const currentItemsCount = Object.keys(existingData).filter(key =>
+      key.startsWith('cartItem')
+    ).length;
+    const currentSpecialsCount = Object.keys(existingData).filter(key =>
+      key.startsWith('specials')
+    ).length;
+
+    console.log('Menu Items:', menuItems);
+
+    if (menuItems.cartItems) {
+      const newItemKey = `cartItem${currentItemsCount + 1}`;
+      updatedCart[newItemKey] = menuItems.cartItems;
     }
+
+    if (menuItems.Specials) {
+      console.log('Adding Specials:', menuItems.Specials);
+      const newSpecialsKey = `specials${currentSpecialsCount + 1}`;
+      updatedCart[newSpecialsKey] = menuItems.Specials;
+    }
+
+    updatedCart.updatedAt = new Date().toISOString();
 
     const putParams = {
       TableName: 'Pota-To-Go-cart',
       Item: {
-        cartId: newCartId,
-        items: newCartItems,
-        createdAt: new Date().toISOString(),
+        cartId,
+        ...updatedCart,
       },
     };
 
@@ -63,12 +75,10 @@ exports.addToCart = async event => {
       statusCode: 201,
       body: JSON.stringify({
         message: 'Cart updated successfully',
-        cartId: newCartId,
-        items: newCartItems,
+        cartId,
+        updatedCart,
       }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
     };
   } catch (error) {
     console.error('Error occurred:', error);
@@ -79,9 +89,7 @@ exports.addToCart = async event => {
         message: 'Failed to process request',
         error: error.message,
       }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
     };
   }
 };

@@ -1,18 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './menu.css';
 
 interface MenuItem {
   menuItem: string;
   category: string;
-  price?: number;
 }
 
 interface Special {
   specialsName: string;
-  price: number;
+  description: string;
 }
 
-const MenuList: React.FC = () => {
+interface MenuPopupProps {
+  onClose: () => void;
+}
+
+const MenuPopup: React.FC<MenuPopupProps> = ({ onClose }) => {
   const [menuItems, setMenuItems] = useState<Record<string, MenuItem[]>>({});
   const [specials, setSpecials] = useState<Special[]>([]);
   const [selectedItems, setSelectedItems] = useState<(MenuItem | Special)[]>(
@@ -20,6 +24,27 @@ const MenuList: React.FC = () => {
   );
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const categoryOrder = [
+    'Potatoes',
+    'Butter',
+    'Protein',
+    'Toppings',
+    'Cheese',
+    'Sauce',
+    'Drinks',
+  ];
+
+  const sortedCategories = Object.entries(menuItems).sort(
+    ([categoryA], [categoryB]) => {
+      const indexA = categoryOrder.indexOf(categoryA);
+      const indexB = categoryOrder.indexOf(categoryB);
+      return (
+        (indexA === -1 ? Infinity : indexA) -
+        (indexB === -1 ? Infinity : indexB)
+      );
+    }
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -98,7 +123,7 @@ const MenuList: React.FC = () => {
       );
 
       console.log('Lyckades skicka:', response.data);
-      alert('Alla valda objekt har lagts till i kundvagnen!');
+
       setSelectedItems([]);
     } catch (error) {
       console.error('Kunde inte lägga till i kundvagnen:', error);
@@ -110,54 +135,65 @@ const MenuList: React.FC = () => {
     return (item as Special).specialsName !== undefined;
   };
 
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
-    <div>
-      <h2>Specials</h2>
-      {specials.length > 0 ? (
-        specials.map((special, index) => (
-          <div key={index}>
-            <input
-              type="checkbox"
-              onChange={e => handleCheckboxChange(special, e.target.checked)}
-            />
-            <h3>{special.specialsName}</h3>
-            <p>Price: {special.price} SEK</p>
-          </div>
-        ))
-      ) : (
-        <p>Inga specials tillgängliga för tillfället.</p>
-      )}
+    <div className="menu-popup-overlay" onClick={handleOverlayClick}>
+      <div className="menu-popup-content" onClick={e => e.stopPropagation()}>
+        <h2 className="menu-popup-header">Our specials</h2>
+        <p className="menu-popup-price">Price incl drink: 80:-</p>
+        {specials.length > 0 ? (
+          specials.map((special, index) => (
+            <div className="menu-popup-itemContainer" key={index}>
+              <p className="menu-popup-item">{special.specialsName}</p>
+              <input
+                className="menu-popup-checkbox"
+                type="checkbox"
+                checked={selectedItems.includes(special)}
+                onChange={e => handleCheckboxChange(special, e.target.checked)}
+              />
+            </div>
+          ))
+        ) : (
+          <p>No specials available</p>
+        )}
 
-      <h2>Menyalternativ</h2>
-      {isLoading ? (
-        <p>Laddar...</p>
-      ) : (
-        Object.entries(menuItems).map(([category, items]) => (
-          <div key={category}>
-            <h3>{category}</h3>
-            {items.map(item => (
-              <div key={item.menuItem}>
-                <input
-                  type="checkbox"
-                  onChange={e => handleCheckboxChange(item, e.target.checked)}
-                />
-                {item.menuItem} -{' '}
-                {item.price ? `${item.price} SEK` : 'Pris ej tillgängligt'}
-              </div>
-            ))}
-          </div>
-        ))
-      )}
+        <h2 className="menu-popup-header">Or choose your own creation:</h2>
 
-      {selectedItems.length > 0 && (
-        <button onClick={handleAddAllToCart}>
-          Lägg alla valda i kundvagnen
-        </button>
-      )}
+        <p className="menu-popup-price">Price incl drink 85:-</p>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+        {isLoading ? (
+          <p>Loading</p>
+        ) : (
+          sortedCategories.map(([category, items]) => (
+            <div key={category}>
+              <h3 className="menu-popup-itemHeader">{category}</h3>
+              {items.map((item: MenuItem) => (
+                <div className="menu-popup-itemContainer" key={item.menuItem}>
+                  <p className="menu-popup-item">{item.menuItem}</p>
+                  <input
+                    className="menu-popup-checkbox"
+                    type="checkbox"
+                    checked={selectedItems.includes(item)}
+                    onChange={e => handleCheckboxChange(item, e.target.checked)}
+                  />
+                </div>
+              ))}
+            </div>
+          ))
+        )}
+
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+      </div>
+
+      <button className="addToCartBtn" onClick={handleAddAllToCart}>
+        Add to cart
+      </button>
     </div>
   );
 };
-
-export default MenuList;
+export default MenuPopup;

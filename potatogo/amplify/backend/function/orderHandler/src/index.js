@@ -7,11 +7,10 @@ const {
 
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-exports.createguestOrder = async (event) => {
+exports.createOrderFunction = async (event) => {
   console.log('Full event:', JSON.stringify(event, null, 2));
 
   try {
-    // Extract cartId and customerName from the event body
     const body = JSON.parse(event.body);
     const cartId = body.cartId;
     const customerName = body.customerName || 'Guest';
@@ -27,7 +26,7 @@ exports.createguestOrder = async (event) => {
       };
     }
 
-    // Retrieve cart data from the cart table
+    // Retrieve the cart from the cart table
     const getCartParams = {
       TableName: 'Pota-To-Go-cart',
       Key: { cartId },
@@ -44,37 +43,30 @@ exports.createguestOrder = async (event) => {
       };
     }
 
-    // Extract cartItems and specials
-    const orderItems = Object.keys(cart)
-      .filter(key => key.startsWith('cartItem'))
-      .map(key => cart[key]);
+    // Replace cart keys with order keys where applicable
+    const orderData = {};
+    Object.entries(cart).forEach(([key, value]) => {
+      if (key.startsWith('cart')) {
+        const orderKey = key.replace('cart', 'order');
+        orderData[orderKey] = value;
+      } else {
+        orderData[key] = value; // Copy other fields as-is
+      }
+    });
 
-    const specials = Object.keys(cart)
-      .filter(key => key.startsWith('specials'))
-      .map(key => cart[key]);
+    // Add missing fields
+    orderData.orderId = cartId; // Use cartId as orderId
+    orderData.customerName = customerName;
+    orderData.orderStatus = 'pending'; // Default order status
+    orderData.createdAt = new Date().toISOString(); // Timestamp for order creation
 
-    console.log('Order Items:', JSON.stringify(orderItems));
-    console.log('Specials:', JSON.stringify(specials));
+    console.log('Final Order Data:', JSON.stringify(orderData));
 
-    // Create a new order
-    const orderId = cartId;
-    const newOrder = {
-      orderId,
-      customerName,
-      orderItems,
-      specials,
-      orderStatus: 'pending',
-      createdAt: new Date().toISOString(),
-    };
-
-    console.log('New Order Details:', JSON.stringify(newOrder));
-
-    // Insert the new order into the orders table
+    // Save the new order to the orders table
     const putParams = {
       TableName: 'Pota-To-Go-orders',
-      Item: newOrder,
+      Item: orderData,
     };
-    console.log('Put Parameters:', JSON.stringify(putParams));
 
     await dynamoDB.send(new PutCommand(putParams));
     console.log('Order successfully added to the orders table');
@@ -83,12 +75,10 @@ exports.createguestOrder = async (event) => {
       statusCode: 200,
       body: JSON.stringify({
         message: 'Order created successfully',
-        orderId: newOrder.orderId,
-        customerName: newOrder.customerName,
-        orderItems: newOrder.orderItems,
-        specials: newOrder.specials,
-        orderStatus: newOrder.orderStatus,
-        createdAt: newOrder.createdAt,
+        orderId: orderData.orderId,
+        customerName: orderData.customerName,
+        orderStatus: orderData.orderStatus,
+        createdAt: orderData.createdAt,
       }),
       headers: { 'Content-Type': 'application/json' },
     };

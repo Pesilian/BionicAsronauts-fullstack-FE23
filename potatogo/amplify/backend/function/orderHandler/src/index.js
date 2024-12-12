@@ -7,7 +7,7 @@ const {
 
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-exports.createOrderFunction = async (event) => {
+exports.handler = async (event) => {
   console.log('Full event:', JSON.stringify(event, null, 2));
 
   try {

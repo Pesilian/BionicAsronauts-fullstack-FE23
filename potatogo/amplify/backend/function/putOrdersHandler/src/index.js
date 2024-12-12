@@ -19,7 +19,7 @@ exports.handler = async (event) => {
     const body = JSON.parse(event.body);
     console.log('Parsed body:', body);
 
-    const { orderId, orderStatus, orderItems } = body;
+    const { orderId, orderStatus, orderItems, specials } = body;
     const userRole = event.headers['x-user-role'];
     console.log(`Order ID: ${orderId}, User Role: ${userRole}`);
 
@@ -51,11 +51,24 @@ exports.handler = async (event) => {
       };
     }
 
-    const { orderStatus: currentStatus, orderItems: currentItems } = currentOrder.Item;
-    console.log(`Current Status: ${currentStatus}, Current Items: ${JSON.stringify(currentItems)}`);
+    // Step 2: Accessing orderItems and specials from DynamoDB response
+    const currentItems = [];
+    const currentSpecials = [];
 
-    // Step 2: Validate based on status and user role
-    if (currentStatus === 'done') {
+    // Dynamically push items from each orderItem field
+    for (let i = 1; currentOrder.Item[`orderItem${i}`]; i++) {
+      currentItems.push(...currentOrder.Item[`orderItem${i}`].L.map(item => item.S));
+    }
+
+    // Get specials
+    for (let i = 1; currentOrder.Item[`specials${i}`]; i++) {
+      currentSpecials.push(currentOrder.Item[`specials${i}`].S);
+    }
+
+    console.log(`Current Items: ${JSON.stringify(currentItems)}, Current Specials: ${JSON.stringify(currentSpecials)}`);
+
+    // Step 3: Validate based on status and user role
+    if (currentOrder.Item.orderStatus === 'done') {
       console.log('Attempt to edit a completed order');
       return {
         statusCode: 403,
@@ -64,7 +77,7 @@ exports.handler = async (event) => {
       };
     }
 
-    if (currentStatus === 'in progress' && userRole !== 'employee') {
+    if (currentOrder.Item.orderStatus === 'in progress' && userRole !== 'employee') {
       console.log('Unauthorized attempt to edit in-progress order by non-employee');
       return {
         statusCode: 403,
@@ -73,40 +86,58 @@ exports.handler = async (event) => {
       };
     }
 
-    // Step 3: Compare old and new items
+    // Step 4: Compare the old and new orderItems
     const addedItems = orderItems.filter(item => !currentItems.includes(item));
     const removedItems = currentItems.filter(item => !orderItems.includes(item));
 
+    // Step 5: Compare the old and new specials
+    const addedSpecials = specials.filter(item => !currentSpecials.includes(item));
+    const removedSpecials = currentSpecials.filter(item => !specials.includes(item));
+
     const changes = [];
     const expressionAttributeValues = {};
-
     let updateExpression = 'SET';
-    if (orderStatus && orderStatus !== currentStatus) {
+
+    // Update order status if necessary
+    if (orderStatus && orderStatus !== currentOrder.Item.orderStatus) {
       updateExpression += ' orderStatus = :orderStatus';
       expressionAttributeValues[':orderStatus'] = orderStatus;
-      changes.push(`Status changed from "${currentStatus}" to "${orderStatus}"`);
+      changes.push(`Status changed from "${currentOrder.Item.orderStatus}" to "${orderStatus}"`);
     }
 
+    // Update items if necessary
     if (orderItems && JSON.stringify(orderItems) !== JSON.stringify(currentItems)) {
       if (Object.keys(expressionAttributeValues).length > 0) updateExpression += ',';
       updateExpression += ' orderItems = :orderItems';
       expressionAttributeValues[':orderItems'] = orderItems;
-      changes.push(`Items updated`);
-      
-      if (addedItems.length > 0) {
-        changes.push(`Added: ${JSON.stringify(addedItems)}`);
-      }
-
-      if (removedItems.length > 0) {
-        changes.push(`Removed: ${JSON.stringify(removedItems)}`);
-      }
+      changes.push('Items updated');
     }
+
+    // Update specials if necessary
+    if (specials && JSON.stringify(specials) !== JSON.stringify(currentSpecials)) {
+      if (Object.keys(expressionAttributeValues).length > 0) updateExpression += ',';
+      updateExpression += ' specials = :specials';
+      expressionAttributeValues[':specials'] = specials;
+      changes.push('Specials updated');
+    }
+
+    // Add the modifiedAt field
+    const modifiedAt = new Date().toISOString();  // Current timestamp in ISO 8601 format
+    updateExpression += ', modifiedAt = :modifiedAt';
+    expressionAttributeValues[':modifiedAt'] = modifiedAt;
 
     console.log('Update Expression:', updateExpression);
     console.log('Expression Attribute Values:', expressionAttributeValues);
 
-    if (changes.length === 0) {
-      console.log('No changes detected in the update');
+    // Step 6: Construct the response
+    const addedItemsResponse = addedItems.length > 0 ? `Added Items: ${JSON.stringify(addedItems)}` : null;
+    const removedItemsResponse = removedItems.length > 0 ? `Removed Items: ${JSON.stringify(removedItems)}` : null;
+    const addedSpecialsResponse = addedSpecials.length > 0 ? `Added Specials: ${JSON.stringify(addedSpecials)}` : null;
+    const removedSpecialsResponse = removedSpecials.length > 0 ? `Removed Specials: ${JSON.stringify(removedSpecials)}` : null;
+
+    // Step 7: If no changes, return response
+    if (changes.length === 0 && !addedItemsResponse && !removedItemsResponse && !addedSpecialsResponse && !removedSpecialsResponse) {
+      console.log('No changes detected');
       return {
         statusCode: 200,
         body: JSON.stringify({ message: 'No changes made' }),
@@ -114,24 +145,28 @@ exports.handler = async (event) => {
       };
     }
 
-    // Step 4: Update the order
+    // Step 8: Update the order in DynamoDB
     const updateParams = {
       TableName: 'Pota-To-Go-orders',
       Key: { orderId },
       UpdateExpression: updateExpression,
       ExpressionAttributeValues: expressionAttributeValues,
     };
-    console.log('Update params:', updateParams);
 
     await dynamoDB.send(new UpdateCommand(updateParams));
     console.log(`Order ${orderId} updated successfully`);
 
-    // Step 5: Return success response with changes
+    // Step 9: Return success response with changes
     return {
       statusCode: 200,
       body: JSON.stringify({
         message: `Order ${orderId} updated successfully`,
         changes,
+        addedItems: addedItemsResponse,
+        removedItems: removedItemsResponse,
+        addedSpecials: addedSpecialsResponse,
+        removedSpecials: removedSpecialsResponse,
+        modifiedAt: modifiedAt,  
       }),
       headers: { 'Content-Type': 'application/json' },
     };

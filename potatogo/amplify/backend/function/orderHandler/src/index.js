@@ -1,8 +1,8 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const {
   DynamoDBDocumentClient,
-  PutCommand,
   GetCommand,
+  PutCommand,
 } = require('@aws-sdk/lib-dynamodb');
 
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
@@ -11,56 +11,58 @@ exports.createguestOrder = async (event) => {
   console.log('Full event:', JSON.stringify(event, null, 2));
 
   try {
-    // Extract cartItems and customerName from the body
+    // Extract cartId and customerName from the event body
     const body = JSON.parse(event.body);
-    const { cartItems, customerName } = body;
+    const cartId = body.cartId;
+    const customerName = body.customerName || 'Guest';
+    console.log('Parsed Cart Id:', cartId);
+    console.log('Parsed Customer Name:', customerName);
 
-    console.log('Parsed cartItems:', JSON.stringify(cartItems));
-    console.log('Parsed customerName:', customerName);
-
-    if (!cartItems || !Array.isArray(cartItems) || cartItems.length === 0) {
-      console.error('Invalid or missing cartItems in body');
+    if (!cartId) {
+      console.error('Missing cartId in body');
       return {
         statusCode: 400,
-        body: JSON.stringify({ message: 'cartItems is required and must be a non-empty array' }),
+        body: JSON.stringify({ message: 'Cart Id is required in the request body' }),
         headers: { 'Content-Type': 'application/json' },
       };
     }
 
-    if (!customerName) {
-      console.error('Missing customerName in body');
+    // Retrieve cart data from the cart table
+    const getCartParams = {
+      TableName: 'Pota-To-Go-cart',
+      Key: { cartId },
+    };
+    const cartData = await dynamoDB.send(new GetCommand(getCartParams));
+    const cart = cartData.Item;
+
+    if (!cart) {
+      console.error('Cart not found in database');
       return {
-        statusCode: 400,
-        body: JSON.stringify({ message: 'customerName is required' }),
+        statusCode: 404,
+        body: JSON.stringify({ message: 'Cart not found' }),
         headers: { 'Content-Type': 'application/json' },
       };
     }
 
-    // Ensure unique orderId
-    let newOrderId;
-    while (true) {
-      newOrderId = Math.floor(Math.random() * 1000000).toString();
-      console.log('Generated orderId:', newOrderId);
+    // Extract cartItems and specials
+    const orderItems = Object.keys(cart)
+      .filter(key => key.startsWith('cartItem'))
+      .map(key => cart[key]);
 
-      const checkParams = {
-        TableName: 'Pota-To-Go-orders',
-        Key: { orderId: newOrderId },
-      };
+    const specials = Object.keys(cart)
+      .filter(key => key.startsWith('specials'))
+      .map(key => cart[key]);
 
-      const existingOrder = await dynamoDB.send(new GetCommand(checkParams));
-      if (!existingOrder.Item) {
-        console.log('Unique orderId confirmed:', newOrderId);
-        break;
-      }
-
-      console.warn('Duplicate orderId detected, regenerating...');
-    }
+    console.log('Order Items:', JSON.stringify(orderItems));
+    console.log('Specials:', JSON.stringify(specials));
 
     // Create a new order
+    const orderId = cartId;
     const newOrder = {
-      orderId: newOrderId,
+      orderId,
       customerName,
-      cartItems,
+      orderItems,
+      specials,
       orderStatus: 'pending',
       createdAt: new Date().toISOString(),
     };
@@ -70,13 +72,7 @@ exports.createguestOrder = async (event) => {
     // Insert the new order into the orders table
     const putParams = {
       TableName: 'Pota-To-Go-orders',
-      Item: {
-        orderId: newOrder.orderId,
-        customerName: newOrder.customerName,
-        cartItems: JSON.stringify(newOrder.cartItems),
-        orderStatus: newOrder.orderStatus,
-        createdAt: newOrder.createdAt,
-      },
+      Item: newOrder,
     };
     console.log('Put Parameters:', JSON.stringify(putParams));
 
@@ -89,7 +85,8 @@ exports.createguestOrder = async (event) => {
         message: 'Order created successfully',
         orderId: newOrder.orderId,
         customerName: newOrder.customerName,
-        cartItems: newOrder.cartItems,
+        orderItems: newOrder.orderItems,
+        specials: newOrder.specials,
         orderStatus: newOrder.orderStatus,
         createdAt: newOrder.createdAt,
       }),

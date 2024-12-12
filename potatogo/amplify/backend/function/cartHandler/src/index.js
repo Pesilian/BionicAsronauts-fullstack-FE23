@@ -7,38 +7,28 @@ const {
 
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-exports.addToCart = async (event) => {
+exports.addToCart = async event => {
   try {
     const body =
       typeof event.body === 'string' ? JSON.parse(event.body) : event;
 
-    let { cartId, cartItems, specials, price, customerName } = body;
+    let { cartId, menuItems, customerName } = body;
 
     customerName = customerName || 'Guest';
     console.log('Parsed Customer Name:', customerName);
 
-    if (!cartItems && !specials) {
+    if (!menuItems) {
       return {
         statusCode: 400,
         body: JSON.stringify({
-          message: 'Either cartItems or specials must be provided.',
-        }),
-        headers: { 'Content-Type': 'application/json' },
-      };
-    }
-
-    if (!price) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({
-          message: 'Price must be provided.',
+          message: 'menuItems must be provided.',
         }),
         headers: { 'Content-Type': 'application/json' },
       };
     }
 
     if (!cartId) {
-      cartId = Math.floor(Math.random() * 1000000).toString(); // Generate a random cart ID
+      cartId = Math.floor(Math.random() * 1000000).toString();
     }
 
     const getCartParams = {
@@ -56,22 +46,18 @@ exports.addToCart = async (event) => {
       key.startsWith('specials')
     ).length;
 
-    // Update the cart with new cartItems or specials
-    if (cartItems) {
+    if (menuItems.cartItems) {
       const newItemKey = `cartItem${currentItemsCount + 1}`;
-      updatedCart[newItemKey] = cartItems;
+      updatedCart[newItemKey] = menuItems.cartItems;
     }
 
-    if (specials) {
+    if (menuItems.Specials) {
       const newSpecialsKey = `specials${currentSpecialsCount + 1}`;
-      updatedCart[newSpecialsKey] = specials;
+      updatedCart[newSpecialsKey] = menuItems.Specials;
     }
 
-    // Update total price
-    updatedCart.totalPrice = (existingData.totalPrice || 0) + price;
     updatedCart.updatedAt = new Date().toISOString();
 
-    // Save updated cart in DynamoDB
     const putParams = {
       TableName: 'Pota-To-Go-cart',
       Item: {

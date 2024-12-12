@@ -1,15 +1,11 @@
 {
-    "cartId": {"S": "321321"},
-    "customerName": {"S": "Agent Smith"},
-    "orderItems": {"L": [
-      {"S": "Pizza"},
-      {"S": "Burger"},
-      {"S": "Burger"},
-      {"S": "Fries"}
-    ]},
-    "totalCost": {"S": ""},
-    "orderStatus": {"S": "pending"},
-    "createdAt": {"S": ""},
-    "modifiedAt": {"S": ""}
-  }
-  
+  "cartId": { "S": "234567" },
+  "customerName": { "S": "Agent Smith" },
+  "cartItem1": { "L": [{ "S": "Great Big Potato" }, { "S": "Butter" }, { "S": "Chives" }, { "S": "Cheese" }] },
+  "cartItem2": { "L": [{ "S": "Sweet Potato" }, { "S": "Sour Cream" }, { "S": "Bacon" }] },
+  "cartItem3": { "L": [{ "S": "Classic Potato" }, { "S": "Salt" }, { "S": "Pepper" }, { "S": "Herbs" }] },
+  "specials1": { "S": "Loaded Supreme Potato"},
+  "specials2": { "S": "Family Feast Potato" },
+  "totalPrice": { "N": "70.0" },
+  "updatedAt": { "S": "2024-12-12T12:00:00Z" }
+}

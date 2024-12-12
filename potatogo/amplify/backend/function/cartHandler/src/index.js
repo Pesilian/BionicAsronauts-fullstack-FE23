@@ -46,12 +46,15 @@ exports.addToCart = async event => {
       key.startsWith('specials')
     ).length;
 
+    console.log('Menu Items:', menuItems);
+
     if (menuItems.cartItems) {
       const newItemKey = `cartItem${currentItemsCount + 1}`;
       updatedCart[newItemKey] = menuItems.cartItems;
     }
 
     if (menuItems.Specials) {
+      console.log('Adding Specials:', menuItems.Specials);
       const newSpecialsKey = `specials${currentSpecialsCount + 1}`;
       updatedCart[newSpecialsKey] = menuItems.Specials;
     }

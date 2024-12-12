@@ -1,14 +1,5 @@
-/* Amplify Params - DO NOT EDIT
-	ENV
-	REGION
-Amplify Params - DO NOT EDIT */
-
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const {
-  DynamoDBDocumentClient,
-  UpdateCommand,
-  GetCommand
-} = require('@aws-sdk/lib-dynamodb');
+const { DynamoDBDocumentClient, UpdateCommand, GetCommand } = require('@aws-sdk/lib-dynamodb');
 
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
@@ -55,14 +46,18 @@ exports.handler = async (event) => {
     const currentItems = [];
     const currentSpecials = [];
 
-    // Dynamically push items from each orderItem field
-    for (let i = 1; currentOrder.Item[`orderItem${i}`]; i++) {
+    // Dynamically push items from each orderItem field (orderItem1, orderItem2, ...)
+    let i = 1;
+    while (currentOrder.Item[`orderItem${i}`]) {
       currentItems.push(...currentOrder.Item[`orderItem${i}`].L.map(item => item.S));
+      i++;
     }
 
     // Get specials
-    for (let i = 1; currentOrder.Item[`specials${i}`]; i++) {
+    i = 1;
+    while (currentOrder.Item[`specials${i}`]) {
       currentSpecials.push(currentOrder.Item[`specials${i}`].S);
+      i++;
     }
 
     console.log(`Current Items: ${JSON.stringify(currentItems)}, Current Specials: ${JSON.stringify(currentSpecials)}`);
@@ -166,7 +161,7 @@ exports.handler = async (event) => {
         removedItems: removedItemsResponse,
         addedSpecials: addedSpecialsResponse,
         removedSpecials: removedSpecialsResponse,
-        modifiedAt: modifiedAt,  
+        modifiedAt: modifiedAt,  // Include the modifiedAt in the response
       }),
       headers: { 'Content-Type': 'application/json' },
     };

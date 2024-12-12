@@ -11,9 +11,13 @@ exports.handler = async (event) => {
   console.log('Full event:', JSON.stringify(event, null, 2));
 
   try {
-    const body = JSON.parse(event.body);
+    // Adjust to handle both API Gateway and Lambda console inputs
+    const body = typeof event.body === 'string' ? JSON.parse(event.body) : event;
+
+    // Extract cartId and customerName
     const cartId = body.cartId;
     const customerName = body.customerName || 'Guest';
+
     console.log('Parsed Cart Id:', cartId);
     console.log('Parsed Customer Name:', customerName);
 

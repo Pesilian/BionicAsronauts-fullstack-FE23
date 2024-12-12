@@ -1,6 +1,11 @@
 [
   {
-    "Action": [],
-    "Resource": []
+    "Action": [
+      "dynamodb:DeleteItem",
+      "dynamodb:Query"
+    ],
+    "Resource": [
+      "arn:aws:dynamodb:eu-north-1:977099030879:table/Pota-To-Go-orders"
+    ]
   }
 ]

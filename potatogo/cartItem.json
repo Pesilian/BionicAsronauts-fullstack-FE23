@@ -1,0 +1,15 @@
+{
+    "cartId": {"S": "321321"},
+    "customerName": {"S": "Agent Smith"},
+    "orderItems": {"L": [
+      {"S": "Pizza"},
+      {"S": "Burger"},
+      {"S": "Burger"},
+      {"S": "Fries"}
+    ]},
+    "totalCost": {"S": ""},
+    "orderStatus": {"S": "pending"},
+    "createdAt": {"S": ""},
+    "modifiedAt": {"S": ""}
+  }
+  

@@ -1,8 +1,9 @@
 export interface Order {
-  id: string; // Use string to match API IDs
+  orderId: string;
   customerName: string;
-  items: string[];
-  status: string;
+  orderItems: string[];
   totalCost: number;
+  orderStatus: string;
   createdAt: string;
+  modifiedAt: string;
 }

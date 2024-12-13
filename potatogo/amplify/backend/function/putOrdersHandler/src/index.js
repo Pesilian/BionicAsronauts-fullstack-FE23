@@ -11,7 +11,9 @@ const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 exports.handler = async (event) => {
   try {
     // Parse the incoming request body
-    const body = JSON.parse(event.body);
+    const body = typeof event.body === 'string' ? JSON.parse(event.body) : event.body;
+
+    // const body = JSON.parse(event.body);
     const { orderId, orderStatus, userName, ...updatedFields } = body; // Extract userName and other fields
     const userRole = event.headers['x-user-role']; // Get user role from headers
 

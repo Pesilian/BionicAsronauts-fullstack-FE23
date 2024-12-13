@@ -7,5 +7,6 @@
   "specials1": { "S": "Loaded Supreme Potato"},
   "specials2": { "S": "Family Feast Potato" },
   "totalPrice": { "N": "70.0" },
+  "orderStatus": { "S": "Pending" },
   "updatedAt": { "S": "2024-12-12T12:00:00Z" }
 }

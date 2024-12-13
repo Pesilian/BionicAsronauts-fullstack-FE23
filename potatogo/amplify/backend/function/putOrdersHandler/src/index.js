@@ -23,7 +23,7 @@ exports.handler = async (event) => {
       };
     }
 
-    // Step 1: Fetch the current order
+    // Step 1: Fetch the current order from DynamoDB
     const getParams = {
       TableName: 'Pota-To-Go-orders',
       Key: { orderId },
@@ -46,14 +46,14 @@ exports.handler = async (event) => {
     const currentItems = [];
     const currentSpecials = [];
 
-    // Dynamically push items from each orderItem field (orderItem1, orderItem2, ...)
+    // Dynamically push items from each orderItemX field (orderItem1, orderItem2, ...)
     let i = 1;
     while (currentOrder.Item[`orderItem${i}`]) {
       currentItems.push(...currentOrder.Item[`orderItem${i}`].L.map(item => item.S));
       i++;
     }
 
-    // Get specials
+    // Get specials (specials1, specials2, etc.)
     i = 1;
     while (currentOrder.Item[`specials${i}`]) {
       currentSpecials.push(currentOrder.Item[`specials${i}`].S);

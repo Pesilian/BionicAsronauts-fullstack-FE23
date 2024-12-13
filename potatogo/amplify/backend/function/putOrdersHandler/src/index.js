@@ -86,30 +86,26 @@ exports.handler = async (event) => {
         const newValue = updatedFields[key];
         const currentValue = currentFields[key] || [];
 
+        // Treat specialsX as arrays for consistency
+        const newArray = Array.isArray(newValue) ? newValue : [newValue];
+        const currentArray = Array.isArray(currentValue) ? currentValue : [currentValue];
+
         // Determine added and removed items with context
-        if (Array.isArray(newValue) && Array.isArray(currentValue)) {
-          const added = newValue.filter(item => !currentValue.includes(item));
-          const removed = currentValue.filter(item => !newValue.includes(item));
+        const added = newArray.filter(item => !currentArray.includes(item));
+        const removed = currentArray.filter(item => !newArray.includes(item));
 
-          if (added.length > 0) {
-            added.forEach(item => changes.push(`${item} added to ${key}`));
-          }
+        if (added.length > 0) {
+          added.forEach(item => changes.push(`${item} added to ${key}`));
+        }
 
-          if (removed.length > 0) {
-            removed.forEach(item => changes.push(`${item} removed from ${key}`));
-          }
+        if (removed.length > 0) {
+          removed.forEach(item => changes.push(`${item} removed from ${key}`));
         }
 
         // Check for differences
-        if (typeof newValue === 'string' && newValue !== currentValue) {
-          changes.push(`${currentValue} removed from ${key}, ${newValue} added to ${key}`);
+        if (JSON.stringify(newArray) !== JSON.stringify(currentArray)) {
           updateExpression += ` ${key} = :${key},`;
-          expressionAttributeValues[`:${key}`] = newValue;
-        }
-
-        if (JSON.stringify(newValue) !== JSON.stringify(currentValue)) {
-          updateExpression += ` ${key} = :${key},`;
-          expressionAttributeValues[`:${key}`] = newValue;
+          expressionAttributeValues[`:${key}`] = newArray.length === 1 ? newArray[0] : newArray;
         }
       }
     });

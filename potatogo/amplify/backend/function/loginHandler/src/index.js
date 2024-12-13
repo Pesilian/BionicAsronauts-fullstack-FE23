@@ -63,10 +63,18 @@ exports.handler = async (event) => {
       };
     }
 
+    // Send full user details upon successful login
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ message: "Login successful", role: Item.role }),
+      body: JSON.stringify({
+        message: "Login successful",
+        role: Item.role,
+        name: Item.name,
+        address: Item.address,
+        phone: Item.phone,
+        email: Item.email,
+      }),
     };
   } catch (error) {
     return {

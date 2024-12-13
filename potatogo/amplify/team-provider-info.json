@@ -23,7 +23,7 @@
         },
         "loginHandler": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
-          "s3Key": "amplify-builds/loginHandler-6e4b4c6a746e75427049-build.zip"
+          "s3Key": "amplify-builds/loginHandler-73664f70547566717a6e-build.zip"
         },
         "menuHandler": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",

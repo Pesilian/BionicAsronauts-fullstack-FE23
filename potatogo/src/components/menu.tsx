@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './menu.css';
+import CartPopup from './cart';
 
 interface MenuItem {
   menuItem: string;
@@ -17,6 +18,19 @@ interface MenuPopupProps {
 }
 
 const MenuPopup: React.FC<MenuPopupProps> = ({ onClose }) => {
+  const [showCartPopup, setShowCartPopup] = useState(false);
+  const [cartId, setCartId] = useState<string | null>(null); // Store the cartId
+
+  const handleShowCartPopup = () => {
+    console.log('Current cartId:', cartId);
+
+    setShowCartPopup(true);
+  };
+
+  const handleClosePopup = () => {
+    setShowCartPopup(false);
+  };
+
   const [menuItems, setMenuItems] = useState<Record<string, MenuItem[]>>({});
   const [specials, setSpecials] = useState<Special[]>([]);
   const [selectedItems, setSelectedItems] = useState<(MenuItem | Special)[]>(
@@ -94,7 +108,22 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose }) => {
 
   const handleAddAllToCart = async () => {
     try {
-      const payload: any = {};
+      let currentCartId = cartId;
+
+      if (!currentCartId) {
+        const newCartResponse = await axios.post(
+          'https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/cart',
+          {}
+        );
+
+        const newCartData = JSON.parse(newCartResponse.data.body);
+        currentCartId = newCartData.cartId;
+        setCartId(currentCartId);
+      }
+
+      const payload: any = {
+        cartId: currentCartId,
+      };
 
       if (selectedItems.length === 1 && isSpecial(selectedItems[0])) {
         const special = selectedItems[0] as Special;
@@ -124,6 +153,14 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose }) => {
 
       console.log('Lyckades skicka:', response.data);
 
+      const responseData = JSON.parse(response.data.body);
+      const updatedCartId = responseData.cartId;
+      if (updatedCartId) {
+        setCartId(updatedCartId);
+      }
+
+      console.log(cartId);
+
       setSelectedItems([]);
     } catch (error) {
       console.error('Kunde inte lägga till i kundvagnen:', error);
@@ -144,6 +181,13 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose }) => {
   return (
     <div className="menu-popup-overlay" onClick={handleOverlayClick}>
       <div className="menu-popup-content" onClick={e => e.stopPropagation()}>
+        {showCartPopup && (
+          <CartPopup cartId={cartId} onClose={handleClosePopup} />
+        )}
+
+        <button className="cart-button" onClick={handleShowCartPopup}>
+          Show cart
+        </button>
         <h2 className="menu-popup-header">Our specials</h2>
         <p className="menu-popup-price">Price incl drink: 80:-</p>
         {specials.length > 0 ? (

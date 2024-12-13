@@ -95,7 +95,6 @@ const LandingPage: React.FC = () => {
         />
       )}
 
-      {/* Menu Popup Trigger */}
       {showMenuPopup && <MenuPopup onClose={handleClosePopup} />}
 
       <section className="howto-section">

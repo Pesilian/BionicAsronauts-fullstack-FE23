@@ -25,7 +25,6 @@ exports.deleteCartItem = async event => {
       };
     }
 
-    // Hämta befintlig kundvagn
     const getCartParams = {
       TableName: 'Pota-To-Go-cart',
       Key: { cartId },
@@ -44,7 +43,6 @@ exports.deleteCartItem = async event => {
       };
     }
 
-    // Kontrollera om itemToRemoveKey finns i kundvagnen
     if (!existingCart.Item[itemToRemoveKey]) {
       return {
         statusCode: 404,
@@ -57,17 +55,15 @@ exports.deleteCartItem = async event => {
       };
     }
 
-    // Använd UpdateCommand för att ta bort hela item2 (eller den nyckel du anger)
     const updateParams = {
       TableName: 'Pota-To-Go-cart',
       Key: { cartId },
-      UpdateExpression: `REMOVE ${itemToRemoveKey}`, // Ta bort hela attributet (t.ex. "item2")
-      ReturnValues: 'ALL_NEW', // Returnera hela objektet efter uppdatering
+      UpdateExpression: `REMOVE ${itemToRemoveKey}`,
+      ReturnValues: 'ALL_NEW',
     };
 
     const result = await dynamoDB.send(new UpdateCommand(updateParams));
 
-    // Beräkna det nya totalpriset genom att summera om alla kvarvarande items
     let updatedTotalPrice = 0;
     Object.keys(result.Attributes).forEach(key => {
       if (key !== 'totalPrice' && result.Attributes[key].price) {
@@ -75,7 +71,6 @@ exports.deleteCartItem = async event => {
       }
     });
 
-    // Uppdatera totalPrice
     const totalPriceParams = {
       TableName: 'Pota-To-Go-cart',
       Key: { cartId },

@@ -1,0 +1,52 @@
+# **Update Order API**
+
+## **Endpoint**
+**PUT** `/order`
+
+## **Headers**
+- `x-user-role`: (Required) `'employee'` or `'customer'`
+
+## **Body Example**
+```json
+{
+  "orderId": "234567",
+  "orderStatus": "Completed", //<--Set new orderStatus if needed.
+  "orderItem1": ["Big Potato", "Butter", "Chives"],
+  "specials2": "Holiday Feast Potato"
+```
+
+## **Key Rules**
+### **General Behavior**
+- Items in the body **replace** existing values. 
+  - Missing fields are **removed**.
+  - New values are **added**.
+- Updates include a `modifiedAt` timestamp.
+- **Special Case**: Setting a field to `null` explicitly removes it from the order. When setting the `specialsX` to a new value the function first sets it to `null` before updating it. This sometimes results in "`null` was added to specialsX" or "`null` was removed from `specialsX`" in the json response.
+
+### **Role-Specific Rules**
+- **Employees**:
+  - Can update any field, including `orderStatus`.
+- **Customers**:
+  - Can only update orders with `orderStatus: "Pending"`.
+  - Updates are limited to `orderItemX` and `specialsX`, and must match the order's `userName`.
+
+## **Response Codes**
+- **200**: Success with details of changes.
+- **400**: Missing `orderId` or invalid request.
+- **403**: Insufficient permissions or invalid fields for the user role.
+- **404**: Order not found.
+- **500**: Server error.
+
+---
+
+## **Example Response (200)**
+```json
+{
+  "message": "Order 234567 updated successfully",
+  "changes": [
+    "Butter added to orderItem1",
+    "Holiday Feast Potato added to specials2"
+  ],
+  "statusChange": "Order status changed from 'Pending' to 'Completed'",
+  "modifiedAt": "2024-12-13T12:00:00Z"
+}

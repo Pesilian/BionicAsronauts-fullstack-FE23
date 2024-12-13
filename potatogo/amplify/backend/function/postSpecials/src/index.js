@@ -8,7 +8,7 @@ exports.addToSpecials = async event => {
     const body = event;
     const menuItems = body.menuItems;
     const specialsName = body.specialsName;
-    const totalPrice = body.totalPrice; // Ta emot totalPrice i body
+    const totalPrice = body.totalPrice;
 
     if (
       !specialsName ||
@@ -27,27 +27,24 @@ exports.addToSpecials = async event => {
       };
     }
 
-    // Initiera objekt för att lagra uppdaterade items
     let updatedItems = {};
 
-    // Iterera genom menyn och lägg till varje item
     menuItems.forEach((item, index) => {
-      const itemKey = `item${index + 1}`; // Dynamiskt sätt en nyckel för varje item, t.ex. item1, item2, etc.
+      const itemKey = `item${index + 1}`;
       updatedItems[itemKey] = {
         potatoe: item.potatoe,
-        toppings: item.toppings || [], // Om toppings inte finns, sätt en tom array
+        toppings: item.toppings || [],
         price: item.price,
       };
     });
 
-    // Uppdatera specialen med de nya items och totalPrice
     const putParams = {
       TableName: 'Pota-To-Go-specials',
       Item: {
         specialsName,
-        ...updatedItems, // Sprid de dynamiska item-nycklarna
-        totalPrice, // Ta emot och använd totalPrice från body
-        updatedAt: new Date().toISOString(), // Tidsstämpel
+        ...updatedItems,
+        totalPrice,
+        updatedAt: new Date().toISOString(),
       },
     };
 
@@ -58,7 +55,7 @@ exports.addToSpecials = async event => {
       body: JSON.stringify({
         message: 'Specials posted successfully',
         specialsName,
-        items: updatedItems, // Returnera de nya item objekten
+        items: updatedItems,
         totalPrice,
       }),
       headers: {

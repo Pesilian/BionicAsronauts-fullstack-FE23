@@ -6,7 +6,7 @@ interface CartItem {
   customerName: string;
   updatedAt: string;
   cartId: string;
-  [key: string]: string | string[] | undefined; // Dynamiskt antal cartItems och specials
+  [key: string]: string | string[] | undefined;
 }
 
 interface CartPopupProps {
@@ -16,55 +16,84 @@ interface CartPopupProps {
 
 const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [selectedItems, setSelectedItems] = useState<CartItem[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const fetchData = async () => {
+    if (!cartId) {
+      console.log('No cartId provided');
+      return;
+    }
+    console.log('Fetching data for cartId:', cartId);
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const cartResponse = await axios.post(
+        `https://c7d8k8kv2g.execute-api.eu-north-1.amazonaws.com/default/linasTest`,
+        { cartId }
+      );
+
+      const cartData = JSON.parse(cartResponse.data.body);
+
+      console.log('Parsed cart data:', cartData);
+
+      if (cartData && cartData.cartItems && cartData.cartItems.length > 0) {
+        setCartItems(cartData.cartItems);
+      } else {
+        console.log('No valid cart data found.');
+        setError('No valid cart data found.');
+      }
+    } catch (error: unknown) {
+      setError('Kunde inte ladda data.');
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      if (!cartId) {
-        console.log('No cartId provided');
-        return;
-      }
-      console.log('Fetching data for cartId:', cartId);
-
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const cartResponse = await axios.post(
-          `https://c7d8k8kv2g.execute-api.eu-north-1.amazonaws.com/default/linasTest`,
-          { cartId }
-        );
-
-        const cartData = JSON.parse(cartResponse.data.body); // Parse JSON body
-
-        console.log('Parsed cart data:', cartData);
-
-        if (cartData && cartData.cartItems && cartData.cartItems.length > 0) {
-          setCartItems(cartData.cartItems); // Sätt cartItems här om det finns
-        } else {
-          console.log('No valid cart data found.');
-          setError('No valid cart data found.');
-        }
-      } catch (error: unknown) {
-        setError('Kunde inte ladda data.');
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchData();
   }, [cartId]);
 
-  const handleCheckboxChange = (item: CartItem, isChecked: boolean) => {
-    if (isChecked) {
-      setSelectedItems(prevItems => [...prevItems, item]);
-    } else {
-      setSelectedItems(prevItems =>
-        prevItems.filter(selectedItem => selectedItem !== item)
+  const handleDeleteSubItem = async (
+    itemKey: string,
+    itemToRemoveKey: string
+  ) => {
+    if (!cartId) return;
+
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const response = await axios.delete(
+        `https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/cart`,
+        {
+          data: { cartId, itemToRemoveKey },
+        }
       );
+
+      console.log('Delete response:', response.data);
+
+      const responseData = JSON.parse(response.data.body);
+
+      if (
+        responseData &&
+        responseData.message &&
+        responseData.message.includes('removed successfully')
+      ) {
+        console.log('Item removed successfully, fetching updated cart...');
+
+        fetchData();
+      } else {
+        setError(`Failed to remove item: ${responseData.message}`);
+      }
+    } catch (error) {
+      setError('Kunde inte ta bort objektet.');
+      console.error(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -87,11 +116,11 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
 
               {/* Dynamiskt rendera cartItems */}
               {Object.keys(item).map((key, idx) => {
-                // Exkludera customerName, updatedAt och cartId från rendering
                 if (
                   key === 'customerName' ||
                   key === 'updatedAt' ||
-                  key === 'cartId'
+                  key === 'cartId' ||
+                  key === 'totalPrice'
                 ) {
                   return null;
                 }
@@ -99,33 +128,43 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
                 const value = item[key];
 
                 if (Array.isArray(value)) {
-                  // Om det är en array (cartItems), rendera varje item i arrayen
                   return (
                     <div key={idx}>
                       <h3>{key}:</h3>
                       {value.map((subItem, subIdx) => (
-                        <p key={subIdx} className="cart-popup-item">
-                          {subItem}
-                        </p>
+                        <div
+                          key={subIdx}
+                          className="cart-popup-subItemContainer"
+                        >
+                          <p className="cart-popup-item">{subItem}</p>
+                          <button
+                            className="delete-button"
+                            onClick={() =>
+                              handleDeleteSubItem(item.cartId, key)
+                            }
+                          >
+                            Ta bort {subItem}
+                          </button>
+                        </div>
                       ))}
                     </div>
                   );
                 } else {
-                  // Om det är en sträng (specials)
                   return (
-                    <p key={idx} className="cart-popup-item">
-                      {key}: {value}
-                    </p>
+                    <div key={idx} className="cart-popup-subItemContainer">
+                      <p className="cart-popup-item">
+                        {key}: {value}
+                      </p>
+                      <button
+                        className="delete-button"
+                        onClick={() => handleDeleteSubItem(item.cartId, key)}
+                      >
+                        Ta bort {key}
+                      </button>
+                    </div>
                   );
                 }
               })}
-
-              <input
-                className="menu-popup-checkbox"
-                type="checkbox"
-                checked={selectedItems.includes(item)}
-                onChange={e => handleCheckboxChange(item, e.target.checked)}
-              />
             </div>
           ))
         ) : (

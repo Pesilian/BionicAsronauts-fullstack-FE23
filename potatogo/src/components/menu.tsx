@@ -19,7 +19,7 @@ interface MenuPopupProps {
 
 const MenuPopup: React.FC<MenuPopupProps> = ({ onClose }) => {
   const [showCartPopup, setShowCartPopup] = useState(false);
-  const [cartId, setCartId] = useState<string | null>(null); // Store the cartId
+  const [cartId, setCartId] = useState<string | null>(null);
 
   const handleShowCartPopup = () => {
     console.log('Current cartId:', cartId);

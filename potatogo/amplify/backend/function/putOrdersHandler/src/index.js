@@ -101,6 +101,12 @@ exports.handler = async (event) => {
         }
 
         // Check for differences
+        if (typeof newValue === 'string' && newValue !== currentValue) {
+          changes.push(`${currentValue} removed from ${key}, ${newValue} added to ${key}`);
+          updateExpression += ` ${key} = :${key},`;
+          expressionAttributeValues[`:${key}`] = newValue;
+        }
+
         if (JSON.stringify(newValue) !== JSON.stringify(currentValue)) {
           updateExpression += ` ${key} = :${key},`;
           expressionAttributeValues[`:${key}`] = newValue;

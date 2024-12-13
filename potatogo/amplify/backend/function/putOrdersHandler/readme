@@ -1,0 +1,36 @@
+# Update Order API
+
+## Endpoint
+PUT /order
+
+## Headers
+- x-user-role: (Required) 'employee' or 'customer'
+
+## Body Example
+{
+  "orderId": "234567",
+  "orderStatus": "Completed", // Only for 'employee'
+  "orderItem1": ["Big Potato", "Butter", "Chives"],
+  "specials2": "Holiday Feast Potato"
+}
+
+## How It Works
+- Items in the body are **added to the order**, while any not provided are **removed**.
+- Employees: Can update all fields, including `orderStatus`.
+- Customers: Can only update orders with `orderStatus` = "Pending" and modify `orderItemX` or `specialsX`.
+
+## Returns
+- 200: Order updated successfully, with details of changes.
+- 400: Missing `orderId` or invalid request.
+- 403: Access denied (e.g., insufficient permissions).
+- 404: Order not found.
+- 500: Server error.
+
+### Example Return (200)
+```json
+{
+  "message": "Order 234567 updated successfully",
+  "changes": ["Butter added to orderItem1", "Holiday Feast Potato added to specials2"],
+  "statusChange": "Order status changed from 'Pending' to 'Completed'",
+  "modifiedAt": "2024-12-13T12:00:00Z"
+}

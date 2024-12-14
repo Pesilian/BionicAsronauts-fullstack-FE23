@@ -9,9 +9,9 @@ const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
 exports.deleteCartItem = async event => {
   try {
-    const body = event;
+    const body = event; // Data från förfrågan
     const cartId = body.cartId;
-    const itemToRemoveKey = body.itemToRemoveKey;
+    const itemToRemoveKey = body.itemToRemoveKey; // Nyckeln för objektet som ska tas bort (t.ex. "item2")
 
     if (!cartId || !itemToRemoveKey) {
       return {

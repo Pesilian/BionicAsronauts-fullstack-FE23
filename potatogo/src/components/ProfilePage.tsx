@@ -9,33 +9,30 @@ const ProfilePage: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  // Hämta användardata från localStorage vid sidladdning
+  // Fetch profile and orders when the page loads
   useEffect(() => {
     const user = localStorage.getItem("user");
     if (user) {
-      setProfileData(JSON.parse(user));
+      const parsedUser = JSON.parse(user);
+      setProfileData(parsedUser); // Set the profile data from localStorage
       setIsLoggedIn(true);
-    }
-  
-    // Fetch orders based on the nickname from localStorage
-    if (user) {
-      const { nickname } = JSON.parse(user);
-  
+
+      // Fetch orders based on the nickname from localStorage
+      const { nickname } = parsedUser;
+
       // API call to fetch orders
       fetch("https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/order")
         .then((response) => response.json())
         .then((data) => {
-          // Log the response data to check if it's properly parsed
-          console.log("Fetched orders:", data);
-  
-          // Check if the body is a string and needs to be parsed
-          let parsedData = data.body ? JSON.parse(data.body) : data; // Parse body if it's a string
-  
-          // Ensure that items exist and are in array format
+          console.log("Fetched orders:", data); // Log the fetched orders
+
+          // Ensure body is correctly parsed (check if the body is a string and needs parsing)
+          let parsedData = data.body ? JSON.parse(data.body) : data;
+          
           if (parsedData && parsedData.items && Array.isArray(parsedData.items)) {
-            // Filter orders based on customerName
+            // Filter orders based on customerName (nickname)
             const userOrders = parsedData.items.filter((order: any) => order.customerName === nickname);
-            setOrders(userOrders);
+            setOrders(userOrders); // Set orders based on customerName
           } else {
             console.error("No orders found or invalid response structure:", parsedData);
           }
@@ -45,7 +42,6 @@ const ProfilePage: React.FC = () => {
         });
     }
   }, []);
-  
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -54,8 +50,11 @@ const ProfilePage: React.FC = () => {
   };
 
   if (!profileData) {
-    return <div>Loading...</div>; // Vänta tills användardata är laddad
+    return <div>Loading...</div>; // Wait until profile data is loaded
   }
+
+  // Ensure all fields exist before rendering
+  const { name, email, phone, address, cardName, surname, cardNumber, cardExpiryMonth, cardExpiryYear, cvc } = profileData || {};
 
   return (
     <div className="profile-page">
@@ -72,26 +71,26 @@ const ProfilePage: React.FC = () => {
           </button>
         </div>
       </header>
-
+      
       <div className="profile-container">
         <div className="profile-card-container">
           <div className="profile-section">
             <h2>Profile</h2>
             <div className="form-group">
               <label>Name</label>
-              <input type="text" value={profileData.name} readOnly />
+              <input type="text" value={name || "N/A"} readOnly />
             </div>
             <div className="form-group">
               <label>Email</label>
-              <input type="email" value={profileData.email} readOnly />
+              <input type="email" value={email || "N/A"} readOnly />
             </div>
             <div className="form-group">
               <label>Phone Number</label>
-              <input type="text" value={profileData.phone} readOnly />
+              <input type="text" value={phone || "N/A"} readOnly />
             </div>
             <div className="form-group">
-              <label>City</label>
-              <input type="text" value={profileData.city} readOnly />
+              <label>Address</label>
+              <input type="text" value={address || "N/A"} readOnly />
             </div>
             <button>Edit Profile</button>
             <div className="delete-account">
@@ -103,20 +102,20 @@ const ProfilePage: React.FC = () => {
             <h2>Card Information</h2>
             <div className="form-group">
               <label>Card name</label>
-              <input type="text" value={profileData.cardName} readOnly />
+              <input type="text" value={cardName || "N/A"} readOnly />
             </div>
             <div className="form-group">
               <label>First name</label>
-              <input type="text" value={profileData.surname} readOnly />
+              <input type="text" value={surname || "N/A"} readOnly />
             </div>
             <div className="form-group">
               <label>Card number</label>
-              <input type="text" value={profileData.cardNumber} readOnly />
+              <input type="text" value={cardNumber || "N/A"} readOnly />
             </div>
             <div className="card-expiry">
               <div className="form-group">
                 <label>Month</label>
-                <select value={profileData.cardExpiryMonth} disabled>
+                <select value={cardExpiryMonth || "N/A"} disabled>
                   <option>Select</option>
                   <option>01</option>
                   <option>02</option>
@@ -124,7 +123,7 @@ const ProfilePage: React.FC = () => {
               </div>
               <div className="form-group">
                 <label>Year</label>
-                <select value={profileData.cardExpiryYear} disabled>
+                <select value={cardExpiryYear || "N/A"} disabled>
                   <option>Select</option>
                   <option>2024</option>
                   <option>2025</option>
@@ -132,7 +131,7 @@ const ProfilePage: React.FC = () => {
               </div>
               <div className="form-group">
                 <label>CVC</label>
-                <input type="text" value={profileData.cvc} readOnly />
+                <input type="text" value={cvc || "N/A"} readOnly />
               </div>
             </div>
             <button>Change Card</button>

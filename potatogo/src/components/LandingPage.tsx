@@ -32,33 +32,25 @@ const LandingPage: React.FC = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log("Response from API:", data);
+        console.log("Response from API:", data); // Log the full response to check the structure
+  
         if (data.message === "Login successful") {
-          // Fetch user details from DynamoDB after login success
-          const userDetailsEndpoint = `https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/user/${nickname}`;
-          fetch(userDetailsEndpoint)
-            .then((response) => response.json())
-            .then((userData) => {
-              // Save complete user info in localStorage
-              localStorage.setItem(
-                "user",
-                JSON.stringify({
-                  nickname,
-                  name: userData.name,
-                  address: userData.address,
-                  phone: userData.phone,
-                  role: data.role,
-                })
-              );
-              setIsLoggedIn(true);
-              setNickname(nickname); // Set nickname
-              alert("Login successful!");
-              setIsLoginPopupOpen(false);
-            })
-            .catch((error) => {
-              console.error("Error fetching user details:", error);
-              alert("An error occurred fetching user details.");
-            });
+          // After successful login, store user details in localStorage
+          const userDetails = {
+            nickname,
+            name: data.name || "N/A", // Ensure these fields are returned from the API
+            address: data.address || "N/A",
+            phone: data.phone || "N/A",
+            email: data.email || "N/A",
+            role: data.role || "N/A",
+          };
+  
+          localStorage.setItem("user", JSON.stringify(userDetails)); // Save user data
+  
+          setIsLoggedIn(true);
+          setNickname(nickname);
+          alert("Login successful!");
+          setIsLoginPopupOpen(false);
         } else {
           alert("Invalid credentials!");
         }
@@ -67,9 +59,8 @@ const LandingPage: React.FC = () => {
         console.error("Login failed:", error);
         alert("An error occurred during login.");
       });
-  };
+  };  
   
-
   const handleLogout = () => {
     localStorage.removeItem("user"); // Ta bort användardata från localStorage
     setIsLoggedIn(false); // Uppdatera statusen

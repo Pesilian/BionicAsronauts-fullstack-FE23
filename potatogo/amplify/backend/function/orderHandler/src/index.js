@@ -7,14 +7,17 @@ const {
 
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-exports.createguestOrder = async (event) => {
+exports.handler = async (event) => {
   console.log('Full event:', JSON.stringify(event, null, 2));
 
   try {
-    // Extract cartId and customerName from the event body
-    const body = JSON.parse(event.body);
+    // Adjust to handle both API Gateway and Lambda console inputs
+    const body = typeof event.body === 'string' ? JSON.parse(event.body) : event;
+
+    // Extract cartId and customerName
     const cartId = body.cartId;
     const customerName = body.customerName || 'Guest';
+
     console.log('Parsed Cart Id:', cartId);
     console.log('Parsed Customer Name:', customerName);
 
@@ -44,25 +47,29 @@ exports.createguestOrder = async (event) => {
       };
     }
 
-    // Extract cartItems and specials
+    // Replace cartItemX with orderItemX
     const orderItems = Object.keys(cart)
       .filter(key => key.startsWith('cartItem'))
-      .map(key => cart[key]);
+      .reduce((acc, key) => {
+        const orderKey = key.replace('cart', 'order'); // Replace cart with order
+        acc[orderKey] = cart[key];
+        return acc;
+      }, {});
 
+    // Extract specials
     const specials = Object.keys(cart)
       .filter(key => key.startsWith('specials'))
-      .map(key => cart[key]);
-
-    console.log('Order Items:', JSON.stringify(orderItems));
-    console.log('Specials:', JSON.stringify(specials));
+      .reduce((acc, key) => {
+        acc[key] = cart[key];
+        return acc;
+      }, {});
 
     // Create a new order
-    const orderId = cartId;
     const newOrder = {
-      orderId,
+      ...specials, // Include specials as-is
+      ...orderItems, // Include renamed order items
+      orderId: cartId,
       customerName,
-      orderItems,
-      specials,
       orderStatus: 'pending',
       createdAt: new Date().toISOString(),
     };
@@ -85,8 +92,6 @@ exports.createguestOrder = async (event) => {
         message: 'Order created successfully',
         orderId: newOrder.orderId,
         customerName: newOrder.customerName,
-        orderItems: newOrder.orderItems,
-        specials: newOrder.specials,
         orderStatus: newOrder.orderStatus,
         createdAt: newOrder.createdAt,
       }),

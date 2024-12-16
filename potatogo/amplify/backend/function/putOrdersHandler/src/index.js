@@ -1,8 +1,3 @@
-/* Amplify Params - DO NOT EDIT
-	ENV
-	REGION
-Amplify Params - DO NOT EDIT */
-
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const {
   DynamoDBDocumentClient,
@@ -10,135 +5,152 @@ const {
   GetCommand
 } = require('@aws-sdk/lib-dynamodb');
 
+// Initialize DynamoDB client
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
 exports.handler = async (event) => {
-  console.log('Incoming Event:', JSON.stringify(event, null, 2));
-
   try {
-    const body = JSON.parse(event.body);
-    console.log('Parsed body:', body);
+    // Parse the incoming request body
+    const body = typeof event.body === 'string' ? JSON.parse(event.body) : event.body;
 
-    const { orderId, orderStatus, orderItems } = body;
-    const userRole = event.headers['x-user-role'];
-    console.log(`Order ID: ${orderId}, User Role: ${userRole}`);
+    const { orderId, orderStatus, userName, ...updatedFields } = body; // Extract userName and other fields
+    const userRole = event.headers['x-user-role']; // Get user role from headers
 
+    // Step 1: Validate orderId
     if (!orderId) {
-      console.log('Validation failed: Order ID missing');
       return {
         statusCode: 400,
         body: JSON.stringify({ message: 'Order ID is required' }),
-        headers: { 'Content-Type': 'application/json' },
       };
     }
 
-    // Step 1: Fetch the current order
+    // Step 2: Fetch current order from DynamoDB
     const getParams = {
       TableName: 'Pota-To-Go-orders',
       Key: { orderId },
     };
-    console.log('Fetching current order with params:', getParams);
 
     const currentOrder = await dynamoDB.send(new GetCommand(getParams));
-    console.log('Current Order:', currentOrder);
 
+    // Step 3: Handle if the order doesn't exist
     if (!currentOrder.Item) {
-      console.log(`Order not found: ${orderId}`);
       return {
         statusCode: 404,
         body: JSON.stringify({ message: 'Order not found' }),
-        headers: { 'Content-Type': 'application/json' },
       };
     }
 
-    const { orderStatus: currentStatus, orderItems: currentItems } = currentOrder.Item;
-    console.log(`Current Status: ${currentStatus}, Current Items: ${JSON.stringify(currentItems)}`);
+    // Extract current fields
+    const { orderStatus: currentStatus, customerName, ...currentFields } = currentOrder.Item;
 
-    // Step 2: Validate based on status and user role
-    if (currentStatus === 'done') {
-      console.log('Attempt to edit a completed order');
-      return {
-        statusCode: 403,
-        body: JSON.stringify({ message: 'Cannot edit a completed order' }),
-        headers: { 'Content-Type': 'application/json' },
-      };
+    // Step 4: Validate permissions and customer match
+    if (userRole !== 'employee') {
+      if (!userName || userName !== customerName) {
+        return {
+          statusCode: 403,
+          body: JSON.stringify({ message: 'Access denied: You can only edit your own orders.' }),
+        };
+      }
+
+      // Restrict non-employee users to only add or delete items and specials
+      const invalidFields = Object.keys(updatedFields).filter(
+        (key) => !key.startsWith('orderItem') && !key.startsWith('specials')
+      );
+
+      if (invalidFields.length > 0) {
+        return {
+          statusCode: 403,
+          body: JSON.stringify({
+            message: `Access denied: Non-employees can only add or delete items and specials. Invalid fields: ${invalidFields.join(', ')}`,
+          }),
+        };
+      }
     }
 
-    if (currentStatus === 'in progress' && userRole !== 'employee') {
-      console.log('Unauthorized attempt to edit in-progress order by non-employee');
-      return {
-        statusCode: 403,
-        body: JSON.stringify({ message: 'Only employees can edit in-progress orders' }),
-        headers: { 'Content-Type': 'application/json' },
-      };
-    }
-
-    // Step 3: Compare old and new items
-    const addedItems = orderItems.filter(item => !currentItems.includes(item));
-    const removedItems = currentItems.filter(item => !orderItems.includes(item));
-
-    const changes = [];
-    const expressionAttributeValues = {};
-
+    // Step 5: Prepare for updates
     let updateExpression = 'SET';
-    if (orderStatus && orderStatus !== currentStatus) {
-      updateExpression += ' orderStatus = :orderStatus';
+    const expressionAttributeValues = {};
+    const changes = [];
+    let statusChange = null;
+
+    // Step 6: Update order status (only for employees)
+    if (userRole === 'employee' && orderStatus && orderStatus !== currentStatus) {
+      updateExpression += ' orderStatus = :orderStatus,';
       expressionAttributeValues[':orderStatus'] = orderStatus;
-      changes.push(`Status changed from "${currentStatus}" to "${orderStatus}"`);
+      statusChange = `Order status changed from "${currentStatus}" to "${orderStatus}"`;
     }
 
-    if (orderItems && JSON.stringify(orderItems) !== JSON.stringify(currentItems)) {
-      if (Object.keys(expressionAttributeValues).length > 0) updateExpression += ',';
-      updateExpression += ' orderItems = :orderItems';
-      expressionAttributeValues[':orderItems'] = orderItems;
-      changes.push('Items updated');
-    }
+    // Step 7: Handle updates for each orderItemX and specialsX dynamically
+    Object.keys(updatedFields).forEach((key) => {
+      if (key.startsWith('orderItem') || key.startsWith('specials')) {
+        const newValue = updatedFields[key];
+        const currentValue = currentFields[key] || [];
 
-    // Step 4: Generate the added and removed items response
-    const addedItemsResponse = addedItems.length > 0 ? `Added: ${JSON.stringify(addedItems)}` : null;
-    const removedItemsResponse = removedItems.length > 0 ? `Removed: ${JSON.stringify(removedItems)}` : null;
+        // Treat specialsX as arrays for consistency
+        const newArray = Array.isArray(newValue) ? newValue : [newValue];
+        const currentArray = Array.isArray(currentValue) ? currentValue : [currentValue];
 
-    console.log('Update Expression:', updateExpression);
-    console.log('Expression Attribute Values:', expressionAttributeValues);
+        // Determine added and removed items with context
+        const added = newArray.filter(item => !currentArray.includes(item));
+        const removed = currentArray.filter(item => !newArray.includes(item));
 
-    if (changes.length === 0 && !addedItemsResponse && !removedItemsResponse) {
-      console.log('No changes detected in the update');
+        if (added.length > 0) {
+          added.forEach(item => changes.push(`${item} added to ${key}`));
+        }
+
+        if (removed.length > 0) {
+          removed.forEach(item => changes.push(`${item} removed from ${key}`));
+        }
+
+        // Check for differences
+        if (JSON.stringify(newArray) !== JSON.stringify(currentArray)) {
+          updateExpression += ` ${key} = :${key},`;
+          expressionAttributeValues[`:${key}`] = newArray.length === 1 ? newArray[0] : newArray;
+        }
+      }
+    });
+
+    // Add a modifiedAt timestamp
+    const modifiedAt = new Date().toISOString();
+    updateExpression += ' modifiedAt = :modifiedAt,';
+    expressionAttributeValues[':modifiedAt'] = modifiedAt;
+
+    // Finalize the update expression
+    updateExpression = updateExpression.slice(0, -1); // Remove trailing comma
+
+    // If no changes, return early
+    if (changes.length === 0 && !statusChange) {
       return {
         statusCode: 200,
         body: JSON.stringify({ message: 'No changes made' }),
-        headers: { 'Content-Type': 'application/json' },
       };
     }
 
-    // Step 5: Update the order
+    // Step 8: Update in DynamoDB
     const updateParams = {
       TableName: 'Pota-To-Go-orders',
       Key: { orderId },
       UpdateExpression: updateExpression,
       ExpressionAttributeValues: expressionAttributeValues,
     };
-    console.log('Update params:', updateParams);
 
     await dynamoDB.send(new UpdateCommand(updateParams));
-    console.log(`Order ${orderId} updated successfully`);
 
-    // Step 6: Return success response with detailed changes
+    // Step 9: Return success response
     return {
       statusCode: 200,
       body: JSON.stringify({
         message: `Order ${orderId} updated successfully`,
-        changes: changes,
-        addedItems: addedItemsResponse,
-        removedItems: removedItemsResponse
+        changes,
+        statusChange,
+        modifiedAt,
       }),
-      headers: { 'Content-Type': 'application/json' },
     };
   } catch (error) {
-    console.error('Error during order update:', error);
+    // Handle errors
     return {
       statusCode: 500,
       body: JSON.stringify({ message: 'Failed to update order', error: error.message }),
-      headers: { 'Content-Type': 'application/json' },
     };
   }
 };

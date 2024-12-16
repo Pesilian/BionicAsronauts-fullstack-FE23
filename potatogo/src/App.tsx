@@ -6,7 +6,7 @@ import ProfilePage from "./components/ProfilePage";
 import "./App.css";
 
 function App() {
-  const [showLandingPage, setShowLandingPage] = useState(true);
+  const [showLandingPage,] = useState(true);
 
   return (
     <Router>

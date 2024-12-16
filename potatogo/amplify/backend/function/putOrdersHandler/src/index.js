@@ -18,6 +18,7 @@ exports.handler = async (event) => {
 
     // Step 1: Validate orderId
     if (!orderId) {
+      console.log('Validation failed: Order ID missing');
       return {
         statusCode: 400,
         body: JSON.stringify({ message: 'Order ID is required' }),
@@ -29,11 +30,13 @@ exports.handler = async (event) => {
       TableName: 'Pota-To-Go-orders',
       Key: { orderId },
     };
+    console.log('Fetching current order with params:', getParams);
 
     const currentOrder = await dynamoDB.send(new GetCommand(getParams));
 
     // Step 3: Handle if the order doesn't exist
     if (!currentOrder.Item) {
+      console.log(`Order not found: ${orderId}`);
       return {
         statusCode: 404,
         body: JSON.stringify({ message: 'Order not found' }),
@@ -133,8 +136,10 @@ exports.handler = async (event) => {
       UpdateExpression: updateExpression,
       ExpressionAttributeValues: expressionAttributeValues,
     };
+    console.log('Update params:', updateParams);
 
     await dynamoDB.send(new UpdateCommand(updateParams));
+    console.log(`Order ${orderId} updated successfully`);
 
     // Step 9: Return success response
     return {

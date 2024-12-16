@@ -81,11 +81,6 @@
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
           "s3Key": "amplify-builds/deleteSpecials-482b6b52314d5a7a6951-build.zip"
         },
-        "updateCart": {
-          "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
-          "s3Key": "amplify-builds/updateCart-3134394d46416375496b-build.zip"
-        },
-        "updateMenu": {},
         "deleteMenuItem": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
           "s3Key": "amplify-builds/deleteMenuItem-416e64384a777841376f-build.zip"
@@ -94,7 +89,10 @@
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
           "s3Key": "amplify-builds/deleteCartItem-526255316c5831525262-build.zip"
         },
-        "updateSpecials": {}
+        "updateCart": {
+          "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
+          "s3Key": "amplify-builds/updateCart-3134394d46416375496b-build.zip"
+        }
       },
       "storage": {
         "potatogoDB": {}

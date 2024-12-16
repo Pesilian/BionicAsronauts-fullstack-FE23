@@ -5,14 +5,29 @@ import howto1 from '../assets/howto1.svg';
 import howto2 from '../assets/howto2.svg';
 import howto3 from '../assets/howto3.svg';
 import chef from '../assets/chef.svg';
+import cart from '../assets/cart.svg';
 import sousteam from '../assets/sousteam.svg';
 import potatoes from '../assets/potatoes.svg';
 import LoginPopup from './LoginPopup';
-import MenuPopup from './menu'; // Ensure this is correctly imported
+import MenuPopup from './menu';
+import CartPopup from './cart';
 
 const LandingPage: React.FC = () => {
   const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false);
   const [showMenuPopup, setShowMenuPopup] = useState(false);
+
+  const [isCartPopupOpen, setIsCartPopupOpen] = useState(false);
+  const [selectedCartId, setSelectedCartId] = useState<string | null>(null);
+
+  const handleShowCartPopup = () => {
+    setSelectedCartId('123');
+    setIsCartPopupOpen(true);
+  };
+
+  const handleCloseCartPopup = () => {
+    setIsCartPopupOpen(false);
+    setSelectedCartId(null);
+  };
 
   const handleShowMenuPopup = () => {
     setShowMenuPopup(true);
@@ -59,11 +74,16 @@ const LandingPage: React.FC = () => {
           <p className="subtitle">Fast Food, Done the Potato Way</p>
         </div>
         <div className="header-right">
-          <p className="nav-item">Orders</p>
           <p className="nav-item">Contact</p>
           <p className="nav-item" onClick={() => setIsLoginPopupOpen(true)}>
             Log in
           </p>
+          <img
+            src={cart}
+            alt="Cart"
+            className="cart-btn"
+            onClick={handleShowCartPopup}
+          />
         </div>
       </header>
       <section className="content-section">
@@ -93,6 +113,10 @@ const LandingPage: React.FC = () => {
           onClose={() => setIsLoginPopupOpen(false)}
           onLogin={handleLogin}
         />
+      )}
+
+      {isCartPopupOpen && (
+        <CartPopup onClose={handleCloseCartPopup} cartId={selectedCartId} />
       )}
 
       {showMenuPopup && <MenuPopup onClose={handleClosePopup} />}

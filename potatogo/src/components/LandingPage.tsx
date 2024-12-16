@@ -20,6 +20,7 @@ const LandingPage: React.FC = () => {
 
   useEffect(() => {
     const cachedCartId = localStorage.getItem('cartId');
+    console.log(cachedCartId);
     if (cachedCartId) {
       setSelectedCartId(cachedCartId);
     }
@@ -35,7 +36,6 @@ const LandingPage: React.FC = () => {
 
   const handleCloseCartPopup = () => {
     setIsCartPopupOpen(false);
-    setSelectedCartId(null);
   };
 
   const handleShowMenuPopup = () => {

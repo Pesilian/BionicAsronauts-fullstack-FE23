@@ -18,6 +18,7 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [orderNote, setOrderNote] = useState(''); // Ny state för inputruta
 
   const fetchData = async () => {
     if (!cartId) {
@@ -103,6 +104,44 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
     }
   };
 
+  const handlePlaceOrder = async () => {
+    if (!cartId) return;
+
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      // Förbered orderdata inklusive noten från inputrutan
+      const orderData = {
+        cartId,
+        cartItems,
+        orderNote, // Skicka med ordernote
+      };
+
+      const response = await axios.post(
+        `https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/placeOrder`,
+        orderData
+      );
+
+      const responseData = response.data;
+
+      if (
+        responseData &&
+        responseData.message === 'Order placed successfully'
+      ) {
+        alert('Beställning lagd!');
+        onClose();
+      } else {
+        setError('Kunde inte lägga beställningen.');
+      }
+    } catch (error) {
+      setError('Kunde inte lägga beställningen.');
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="cart-popup-overlay" onClick={handleOverlayClick}>
       <div className="cart-popup-content" onClick={e => e.stopPropagation()}>
@@ -171,7 +210,21 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
           <p>No items in cart</p>
         )}
 
+        <div className="cart-popup-input-container">
+          <label htmlFor="order-note">Order Note:</label>
+          <textarea
+            id="order-note"
+            value={orderNote}
+            onChange={e => setOrderNote(e.target.value)}
+            placeholder="Leave a special note for your order..."
+          />
+        </div>
+
         {error && <p style={{ color: 'red' }}>{error}</p>}
+
+        <div className="cart-popup-actions">
+          <button onClick={handlePlaceOrder}>Place Order</button>
+        </div>
       </div>
     </div>
   );

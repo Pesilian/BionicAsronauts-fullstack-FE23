@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './LandingPage.css';
 import lppotato from '../assets/lppotato.svg';
 import howto1 from '../assets/howto1.svg';
@@ -15,13 +15,22 @@ import CartPopup from './cart';
 const LandingPage: React.FC = () => {
   const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false);
   const [showMenuPopup, setShowMenuPopup] = useState(false);
-
   const [isCartPopupOpen, setIsCartPopupOpen] = useState(false);
   const [selectedCartId, setSelectedCartId] = useState<string | null>(null);
 
+  useEffect(() => {
+    const cachedCartId = localStorage.getItem('cartId');
+    if (cachedCartId) {
+      setSelectedCartId(cachedCartId);
+    }
+  }, []);
+
   const handleShowCartPopup = () => {
-    setSelectedCartId('123');
-    setIsCartPopupOpen(true);
+    if (selectedCartId) {
+      setIsCartPopupOpen(true);
+    } else {
+      alert('No cart found. Please add items to the cart first.');
+    }
   };
 
   const handleCloseCartPopup = () => {

@@ -106,6 +106,13 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose }) => {
     }
   };
 
+  useEffect(() => {
+    const storedCartId = localStorage.getItem('cartId');
+    if (storedCartId) {
+      setCartId(storedCartId);
+    }
+  }, []);
+
   const handleAddAllToCart = async () => {
     try {
       let currentCartId = cartId;
@@ -119,6 +126,10 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose }) => {
         const newCartData = JSON.parse(newCartResponse.data.body);
         currentCartId = newCartData.cartId;
         setCartId(currentCartId);
+
+        if (currentCartId) {
+          localStorage.setItem('cartId', currentCartId);
+        }
       }
 
       const payload: any = {
@@ -155,11 +166,11 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose }) => {
 
       const responseData = JSON.parse(response.data.body);
       const updatedCartId = responseData.cartId;
+
       if (updatedCartId) {
         setCartId(updatedCartId);
+        localStorage.setItem('cartId', updatedCartId);
       }
-
-      console.log(cartId);
 
       setSelectedItems([]);
     } catch (error) {

@@ -17,6 +17,7 @@ const LandingPage: React.FC = () => {
   const [nickname, setNickname] = useState<string | null>(null);
   const navigate = useNavigate(); // För att navigera till /profile när användaren klickar på sitt nickname
 
+
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -89,7 +90,9 @@ const LandingPage: React.FC = () => {
           <p className="subtitle">Fast Food, Done the Potato Way</p>
         </div>
         <div className="header-right">
-          <p className="nav-item">Contact</p>
+        <p className="nav-item" onClick={() => setShowContactPopup(true)}>
+            Contact
+          </p>
           {isLoggedIn ? (
             <>
               <p

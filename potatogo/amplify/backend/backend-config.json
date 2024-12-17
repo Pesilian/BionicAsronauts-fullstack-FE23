@@ -316,6 +316,22 @@
         }
       ]
     },
+    "AMPLIFY_function_getCart_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getCart"
+        }
+      ]
+    },
+    "AMPLIFY_function_getCart_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getCart"
+        }
+      ]
+    },
     "AMPLIFY_function_getMenu_deploymentBucketName": {
       "usedBy": [
         {

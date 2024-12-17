@@ -193,7 +193,7 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose }) => {
     <div className="menu-popup-overlay" onClick={handleOverlayClick}>
       <div className="menu-popup-content" onClick={e => e.stopPropagation()}>
         {showCartPopup && (
-          <CartPopup cartId={cartId} onClose={handleClosePopup} />
+          <CartPopup onClose={handleClosePopup} cartId={cartId} />
         )}
 
         <button className="cart-button" onClick={handleShowCartPopup}>

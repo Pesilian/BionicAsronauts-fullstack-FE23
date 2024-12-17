@@ -38,7 +38,9 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
         }
       );
 
-      const cartData = JSON.parse(cartResponse.data.body);
+      console.log('Full cart response:', cartResponse);
+
+      const cartData = cartResponse.data;
 
       console.log('Parsed cart data:', cartData);
 
@@ -49,8 +51,8 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
         setError('No valid cart data found.');
       }
     } catch (error: unknown) {
-      setError('Kunde inte ladda data.');
-      console.error(error);
+      setError('Cant load data');
+      console.error('Error fetching data:', error);
     } finally {
       setIsLoading(false);
     }
@@ -152,7 +154,7 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
               <p className="cart-popup-item">Customer: {item.customerName}</p>
               <p className="cart-popup-item">Updated At: {item.updatedAt}</p>
 
-              {/* Dynamiskt rendera cartItems */}
+              {/* rendera cartItems */}
               {Object.keys(item).map((key, idx) => {
                 if (
                   key === 'customerName' ||

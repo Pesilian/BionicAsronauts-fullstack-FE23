@@ -8,22 +8,28 @@ const {
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
 exports.getCart = async event => {
-  const body = event;
-  const cartId = body.cartId;
+  const cartId = event.queryStringParameters
+    ? event.queryStringParameters.cartId
+    : null;
+
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'OPTIONS,GET',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Credentials': 'true',
+  };
+
+  if (!cartId) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({
+        message: 'cartId is required',
+      }),
+      headers,
+    };
+  }
 
   try {
-    if (!cartId) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({
-          message: 'cartId is required',
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      };
-    }
-
     const getCartParams = {
       TableName: 'Pota-To-Go-cart',
       Key: { cartId },
@@ -37,9 +43,7 @@ exports.getCart = async event => {
         body: JSON.stringify({
           message: 'Cart not found',
         }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
       };
     }
 
@@ -57,9 +61,7 @@ exports.getCart = async event => {
       return {
         statusCode: 404,
         body: JSON.stringify({ message: 'No items found for this cart' }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
       };
     }
 
@@ -68,9 +70,7 @@ exports.getCart = async event => {
       body: JSON.stringify({
         cartItems: result.Items,
       }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
     };
   } catch (error) {
     console.error('Error occurred:', error);
@@ -81,9 +81,7 @@ exports.getCart = async event => {
         message: 'Failed to process request',
         error: error.message,
       }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
     };
   }
 };

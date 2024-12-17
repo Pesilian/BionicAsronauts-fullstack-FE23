@@ -1,0 +1,74 @@
+.menu-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.menu-popup-content {
+  background-color: #8fbd92;
+  font-family: 'Roboto Serif', serif;
+  color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.menu-popup-header {
+  color: #ffffff;
+}
+
+.menu-popup-price {
+  font-family: 'Roboto Serif', serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  letter-spacing: -0.019em;
+  text-align: left;
+  color: #ffffff;
+  text-align: center;
+}
+
+.menu-popup-itemContainer {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.menu-popup-item {
+  color: #ffffff;
+}
+
+.menu-popup-checkbox {
+  width: 20px;
+}
+
+.addToCartBtn {
+  background-color: #8fbd92;
+  color: #ffffff;
+  font-family: 'Roboto Serif', serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 24px;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 60px;
+}
+
+.addToCartBtn:hover {
+  background-color: #7ea883;
+}

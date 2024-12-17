@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Importera useNavigate
+import { useNavigate } from "react-router-dom"; 
 import "./LandingPage.css";
 import LoginPopup from "./LoginPopup";
 import lppotato from '../assets/lppotato.svg';
@@ -7,18 +8,25 @@ import howto1 from '../assets/howto1.svg';
 import howto2 from '../assets/howto2.svg';
 import howto3 from '../assets/howto3.svg';
 import chef from '../assets/chef.svg';
+
+import cart from '../assets/cart.svg';
 import sousteam from '../assets/sousteam.svg';
 import potatoes from '../assets/potatoes.svg';
+import LoginPopup from './LoginPopup';
+import MenuPopup from './menu';
+import CartPopup from './cart';
 import ContactPopup from './contactPopUp';
 
 const LandingPage: React.FC = () => {
   const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [nickname, setNickname] = useState<string | null>(null);
-  const navigate = useNavigate(); // För att navigera till /profile när användaren klickar på sitt nickname
-
-
-  useEffect(() => {
+     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+      const [nickname, setNickname] = useState<string | null>(null);
+      const navigate = useNavigate();
+  const [showMenuPopup, setShowMenuPopup] = useState(false);
+  const [isCartPopupOpen, setIsCartPopupOpen] = useState(false);
+  const [selectedCartId, setSelectedCartId] = useState<string | null>(null);
+    
+    useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       const user = JSON.parse(storedUser);
@@ -26,19 +34,54 @@ const LandingPage: React.FC = () => {
       setNickname(user.nickname); // Sätt användarnamn
     }
   }, []);
+    
+   
 
-  const [showContactPopup, setShowContactPopup] = useState(false);
+  useEffect(() => {
+    const cachedCartId = localStorage.getItem('cartId');
+    console.log(cachedCartId);
+    if (cachedCartId) {
+      setSelectedCartId(cachedCartId);
+    }
+  }, []);
+    
+      const handleLogin = (nickname: string, password: string) => {
+    const apiEndpoint =
+      "https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/login";
+    
+      const [showContactPopup, setShowContactPopup] = useState(false);
+
+  const handleShowCartPopup = () => {
+    if (selectedCartId) {
+      setIsCartPopupOpen(true);
+    } else {
+      alert('No cart found. Please add items to the cart first.');
+    }
+  };
+
+  const handleCloseCartPopup = () => {
+    setIsCartPopupOpen(false);
+  };
+
+  const handleShowMenuPopup = () => {
+    setShowMenuPopup(true);
+  };
+
+  const handleClosePopup = () => {
+    setShowMenuPopup(false);
+  };
 
   const handleLogin = (nickname: string, password: string) => {
     const apiEndpoint =
-      "https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/login";
-  
+      'https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/login';
+
     fetch(apiEndpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ nickname, password }),
+
     })
       .then((res) => res.json())
       .then((data) => {
@@ -60,6 +103,7 @@ const LandingPage: React.FC = () => {
           setIsLoggedIn(true);
           setNickname(nickname);
           alert("Login successful!");
+
           setIsLoginPopupOpen(false);
         } else {
           alert('Invalid credentials!');
@@ -110,6 +154,13 @@ const LandingPage: React.FC = () => {
               Log in
             </p>
           )}
+          <img
+            src={cart}
+            alt="Cart"
+            className="cart-btn"
+            onClick={handleShowCartPopup}
+          />
+
         </div>
       </header>
       <section className="content-section">
@@ -145,6 +196,12 @@ const LandingPage: React.FC = () => {
         />
       )}
 
+      {isCartPopupOpen && (
+        <CartPopup onClose={handleCloseCartPopup} cartId={selectedCartId} />
+      )}
+
+      {showMenuPopup && <MenuPopup onClose={handleClosePopup} />}
+
       <section className="howto-section">
         <div className="howto-title">
           <p>The Potato Process</p>
@@ -159,8 +216,9 @@ const LandingPage: React.FC = () => {
           <div className="howto-image">
             <img src={howto3} alt="How to 3" />
           </div>
+
         </div>
-        <button className="customize-button">
+        <button className="customize-button" onClick={handleShowMenuPopup}>
           Start customizing Your Baked Bliss
         </button>
       </section>
@@ -201,6 +259,7 @@ const LandingPage: React.FC = () => {
             </p>
           </div>
         </div>
+
         <div className="about-us-images">
           <img src={chef} alt="Chef" className="about-us-image" />
           <img src={sousteam} alt="Sous Team" className="about-us-image" />

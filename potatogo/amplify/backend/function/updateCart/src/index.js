@@ -9,9 +9,9 @@ const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
 exports.updateCart = async event => {
   try {
-    const body = event; // Data från förfrågan
+    const body = event;
     const cartId = body.cartId;
-    const newItem = body.newItem; // Det nya objektet som ska läggas till
+    const newItem = body.newItem;
 
     if (!cartId || !newItem) {
       return {
@@ -25,7 +25,6 @@ exports.updateCart = async event => {
       };
     }
 
-    // Hämta befintlig kundvagn
     const getCartParams = {
       TableName: 'Pota-To-Go-cart',
       Key: { cartId },
@@ -44,17 +43,14 @@ exports.updateCart = async event => {
       };
     }
 
-    // Hämta befintliga items och det totala priset
     const existingItems = existingCart.Item;
     const existingTotalPrice = existingCart.Item.totalPrice || 0;
 
-    // Hitta nästa lediga item-nummer
     let nextItemNumber = 1;
     while (existingItems[`item${nextItemNumber}`]) {
       nextItemNumber++;
     }
 
-    // Lägg till det nya itemet med rätt nummer
     const updatedItems = {
       ...existingItems,
       [`item${nextItemNumber}`]: {
@@ -64,15 +60,13 @@ exports.updateCart = async event => {
       },
     };
 
-    // Uppdatera det totala priset
     const updatedTotalPrice = existingTotalPrice + newItem.price;
 
-    // Uppdatera kundvagnen i DynamoDB
     const putParams = {
       TableName: 'Pota-To-Go-cart',
       Item: {
         cartId,
-        ...updatedItems, // Lägg till de uppdaterade itemen med nya attribut
+        ...updatedItems,
         totalPrice: updatedTotalPrice,
         updatedAt: new Date().toISOString(),
       },

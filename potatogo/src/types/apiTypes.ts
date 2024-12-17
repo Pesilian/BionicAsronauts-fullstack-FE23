@@ -1,5 +1,12 @@
 import { Order } from './orderTypes';
 
+export interface ApiResponseBody {
+  body?: {
+    items?: any[];
+    lastEvaluatedKey?: string | null;
+  };
+}
+
 
 // Parameters for fetchOrders API
 export interface FetchOrdersParams {
@@ -12,7 +19,7 @@ export interface FetchOrdersParams {
   export interface FetchOrdersResponse {
     items: Order[];
     lastEvaluatedKey?: string | null;
-  }
+  }  
   
   
   // Request body for updateOrders API
@@ -30,7 +37,12 @@ export interface FetchOrdersParams {
     modifiedAt?: string;
   }
   
-  
+  // Request body for deleteOrders API
+  export interface DeleteOrderBody {
+    orderId: string;
+  }
+
+
   // Response for deleteOrders API
   export interface DeleteOrderResponse {
     success: boolean;

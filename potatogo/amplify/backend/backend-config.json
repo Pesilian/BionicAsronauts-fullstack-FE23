@@ -112,6 +112,11 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "getCart": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "getOrdersHandler": {
       "build": true,
       "dependsOn": [],
@@ -308,6 +313,22 @@
         {
           "category": "function",
           "resourceName": "deleteStock"
+        }
+      ]
+    },
+    "AMPLIFY_function_getCart_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getCart"
+        }
+      ]
+    },
+    "AMPLIFY_function_getCart_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getCart"
         }
       ]
     },

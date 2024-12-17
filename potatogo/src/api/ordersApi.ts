@@ -2,6 +2,7 @@ import { get, put, del } from '@aws-amplify/api';
 import {
   FetchOrdersParams,
   FetchOrdersResponse,
+  ApiResponseBody,
   UpdateOrderBody,
   UpdateOrderResponse,
   DeleteOrderResponse,
@@ -21,14 +22,15 @@ export const fetchOrders = async (params: FetchOrdersParams): Promise<FetchOrder
 
     const { body } = await restOperation.response;
 
-    // Parse response body
-    const responseBody = await body.json();
-    console.log('Parsed API Response:', responseBody);
+    // Safely parse and cast the response
+    const responseBody = (await body.json()) as ApiResponseBody;
 
-    // Return items and lastEvaluatedKey
+    console.log('ResponseBody:', responseBody);
+
+    // Access nested items and lastEvaluatedKey safely
     return {
-      items: (responseBody.items || []).map(parseOrder),
-      lastEvaluatedKey: responseBody.lastEvaluatedKey || null,
+      items: (responseBody.body?.items || []).map(parseOrder),
+      lastEvaluatedKey: responseBody.body?.lastEvaluatedKey || null,
     };
   } catch (error) {
     console.error('Error fetching orders:', error);
@@ -54,15 +56,13 @@ export const updateOrders = async (orderId: string, data: UpdateOrderBody): Prom
       },
     });
 
-    // Await the response and handle the readable stream
-    const rawResponse = await restOperation.response;
-
-    // Convert ReadableStream to string
-    const responseText = await new Response(rawResponse.body).text();
-    const responseBody = JSON.parse(responseText);
+    // Extract and parse the response body
+    const { body } = await restOperation.response;
+    const responseBody = (await body.json() as unknown) as { body: UpdateOrderResponse };
 
     console.log('API Response:', responseBody);
 
+    // Return the parsed update response
     return parseUpdateResponse(responseBody.body);
   } catch (error) {
     console.error(`Error updating order with ID ${orderId}:`, error);
@@ -72,7 +72,9 @@ export const updateOrders = async (orderId: string, data: UpdateOrderBody): Prom
 
 
 
+
 // Delete an order
+
 export const deleteOrders = async (orderId: string): Promise<DeleteOrderResponse> => {
   try {
     const restOperation = del({
@@ -80,20 +82,21 @@ export const deleteOrders = async (orderId: string): Promise<DeleteOrderResponse
       path: `/order/${orderId}`,
     });
 
-    // Await the response and handle the readable stream
-    const rawResponse = await restOperation.response;
+    // Trigger the DELETE request and await the response
+    await restOperation.response;
 
-    // Convert ReadableStream to string
-    const responseText = await new Response(rawResponse.body).text();
-    const responseBody = JSON.parse(responseText);
+    console.log(`DELETE call succeeded for order ID: ${orderId}`);
 
-    console.log('API Response:', responseBody);
-
-    return responseBody.body as DeleteOrderResponse;
-  } catch (error) {
+    // Return a success response
+    return { success: true, message: `Order ${orderId} deleted successfully.` };
+  } catch (error: any) { // Temporarily cast error to 'any'
     console.error(`Error deleting order with ID ${orderId}:`, error);
-    throw error;
-  }
+  
+    const errorMessage =
+      error.response?.body ? JSON.parse(error.response.body).message : 'Unknown error occurred';
+  
+    throw new Error(errorMessage || `Failed to delete order ${orderId}`);
+  }  
 };
 
 

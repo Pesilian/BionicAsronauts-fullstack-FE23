@@ -1,29 +1,19 @@
 import { Order } from '../types/orderTypes';
 
-
-export const parseOrder = (data: Record<string, any>): Order => {
-  const orderItems: string[][] = [];
-  const specials: string[] = [];
-
-  Object.entries(data).forEach(([key, value]) => {
-    if (key.startsWith('orderItem') && value.L) {
-      // Extract the list of items from DynamoDB's `L` type
-      orderItems.push(value.L.map((item: any) => item.S));
-    } else if (key.startsWith('specials') && value.S) {
-      // Extract the special value from DynamoDB's `S` type
-      specials.push(value.S);
-    }
-  });
-
+export const parseOrder = (data: any): Order => {
   return {
-    orderId: data.orderId.S,
-    customerName: data.customerName.S,
-    orderItems,
-    specials,
-    orderStatus: data.orderStatus.S,
-    totalPrice: Number(data.totalPrice.N),
-    createdAt: data.modifiedAt.S,
-    modifiedAt: data.updatedAt.S,
-    rawData: data, // Store the raw data for future use
+    orderId: data.orderId,
+    customerName: data.customerName,
+    orderStatus: data.orderStatus,
+    orderItems: [
+      data.orderItem1 || [],
+      data.orderItem2 || [],
+      data.orderItem3 || [],
+      data.orderItem4 || [],
+    ].filter(item => item.length > 0), // Filter out empty arrays
+    specials: [data.specials1, data.specials2, data.specials3].filter(Boolean),
+    totalPrice: Number(data.totalPrice) || 0,
+    createdAt: data.createdAt || data.modifiedAt || '',
+    modifiedAt: data.modifiedAt || '',
   };
 };

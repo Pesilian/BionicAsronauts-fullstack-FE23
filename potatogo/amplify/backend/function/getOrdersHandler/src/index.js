@@ -10,11 +10,7 @@ const {
   ScanCommand,
 } = require('@aws-sdk/lib-dynamodb');
 
-// DynamoDB Client
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
-
-// Use environment variable for the table name
-const TABLE_NAME = process.env.TABLE_NAME;
 
 exports.handler = async (event) => {
   console.log('Full event:', JSON.stringify(event, null, 2));
@@ -25,75 +21,73 @@ exports.handler = async (event) => {
 
     console.log('Query Parameters:', { orderId, orderStatus, customerName, lastEvaluatedKey });
 
-    let result;
-
     // Fetch by Order ID
     if (orderId) {
-      const query = {
-        TableName: TABLE_NAME,
+      const queryParams = {
+        TableName: 'Pota-To-Go-orders', 
         KeyConditionExpression: 'orderId = :orderId',
         ExpressionAttributeValues: {
           ':orderId': orderId,
         },
       };
 
-      result = await dynamoDB.send(new QueryCommand(query));
-    } else {
-      // Build Scan Parameters for customerName/orderStatus filters
-      const filterExpression = [];
-      const expressionAttributeValues = {};
-      const expressionAttributeNames = {};
-
-      if (orderStatus) {
-        filterExpression.push('#orderStatusAlias = :orderStatus');
-        expressionAttributeValues[':orderStatus'] = orderStatus;
-        expressionAttributeNames['#orderStatusAlias'] = 'orderStatus';
-      }
-
-      if (customerName) {
-        filterExpression.push('customerName = :customerName');
-        expressionAttributeValues[':customerName'] = customerName;
-      }
-
-      const scanParams = {
-        TableName: TABLE_NAME,
-        FilterExpression: filterExpression.length > 0 ? filterExpression.join(' AND ') : undefined,
-        ExpressionAttributeValues:
-          Object.keys(expressionAttributeValues).length > 0 ? expressionAttributeValues : undefined,
-        ExpressionAttributeNames:
-          Object.keys(expressionAttributeNames).length > 0 ? expressionAttributeNames : undefined,
-        ExclusiveStartKey: lastEvaluatedKey ? JSON.parse(lastEvaluatedKey) : undefined, // Pagination
-        Limit: 10, // Items per page
+      const result = await dynamoDB.send(new QueryCommand(queryParams));
+      return {
+        statusCode: 200,
+        headers: { "Content-Type": "application/json" },
+        body: {
+          items: result.Items,
+          lastEvaluatedKey: result.LastEvaluatedKey || null,
+        },
       };
-
-      console.log('Scan Parameters:', scanParams);
-
-      result = await dynamoDB.send(new ScanCommand(scanParams));
+      
     }
 
-    // Create the response object
-    const data = {
+    // Build Scan Parameters for customerName/orderStatus filters
+    const filterExpression = [];
+    const expressionAttributeValues = {};
+    const expressionAttributeNames = {};
+
+    if (orderStatus) {
+      filterExpression.push('#orderStatusAlias = :orderStatus');
+      expressionAttributeValues[':orderStatus'] = orderStatus;
+      expressionAttributeNames['#orderStatusAlias'] = 'orderStatus';
+    }
+
+    if (customerName) {
+      filterExpression.push('customerName = :customerName');
+      expressionAttributeValues[':customerName'] = customerName;
+    }
+
+    const scanParams = {
+      TableName: 'Pota-To-Go-orders', 
+      FilterExpression: filterExpression.length > 0 ? filterExpression.join(' AND ') : undefined,
+      ExpressionAttributeValues: Object.keys(expressionAttributeValues).length > 0 ? expressionAttributeValues : undefined,
+      ExpressionAttributeNames: Object.keys(expressionAttributeNames).length > 0 ? expressionAttributeNames : undefined,
+      ExclusiveStartKey: lastEvaluatedKey ? JSON.parse(lastEvaluatedKey) : undefined, 
+      Limit: 10, 
+    };
+
+    console.log('Scan Parameters:', scanParams);
+
+    const result = await dynamoDB.send(new ScanCommand(scanParams));
+
+    return {
       statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { "Content-Type": "application/json" },
       body: {
-        items: result.Items || [],
+        items: result.Items,
         lastEvaluatedKey: result.LastEvaluatedKey || null,
       },
     };
+    
 
-    return {JSON.stringify(data) }; // Stringify the entire response
   } catch (error) {
     console.error('Error occurred:', error);
-
-    const errorResponse = {
+    return {
       statusCode: 500,
+      body: JSON.stringify({ message: 'Failed to fetch orders', error: error.message }),
       headers: { 'Content-Type': 'application/json' },
-      body: {
-        message: 'Failed to fetch orders',
-        error: error.message,
-      },
     };
-
-    return { body: JSON.stringify(errorResponse) }; // Stringify the error response
   }
 };

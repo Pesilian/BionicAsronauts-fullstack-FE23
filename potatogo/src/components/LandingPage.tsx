@@ -1,8 +1,7 @@
-
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; 
-import "./LandingPage.css";
-import LoginPopup from "./LoginPopup";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './LandingPage.css';
+import LoginPopup from './LoginPopup';
 import lppotato from '../assets/lppotato.svg';
 import howto1 from '../assets/howto1.svg';
 import howto2 from '../assets/howto2.svg';
@@ -12,30 +11,27 @@ import chef from '../assets/chef.svg';
 import cart from '../assets/cart.svg';
 import sousteam from '../assets/sousteam.svg';
 import potatoes from '../assets/potatoes.svg';
-import LoginPopup from './LoginPopup';
 import MenuPopup from './menu';
 import CartPopup from './cart';
 import ContactPopup from './contactPopUp';
 
 const LandingPage: React.FC = () => {
   const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false);
-     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-      const [nickname, setNickname] = useState<string | null>(null);
-      const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [nickname, setNickname] = useState<string | null>(null);
+  const navigate = useNavigate();
   const [showMenuPopup, setShowMenuPopup] = useState(false);
   const [isCartPopupOpen, setIsCartPopupOpen] = useState(false);
   const [selectedCartId, setSelectedCartId] = useState<string | null>(null);
-    
-    useEffect(() => {
-    const storedUser = localStorage.getItem("user");
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
     if (storedUser) {
       const user = JSON.parse(storedUser);
       setIsLoggedIn(true);
-      setNickname(user.nickname); // Sätt användarnamn
+      setNickname(user.nickname);
     }
   }, []);
-    
-   
 
   useEffect(() => {
     const cachedCartId = localStorage.getItem('cartId');
@@ -44,12 +40,8 @@ const LandingPage: React.FC = () => {
       setSelectedCartId(cachedCartId);
     }
   }, []);
-    
-      const handleLogin = (nickname: string, password: string) => {
-    const apiEndpoint =
-      "https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/login";
-    
-      const [showContactPopup, setShowContactPopup] = useState(false);
+
+  const [showContactPopup, setShowContactPopup] = useState(false);
 
   const handleShowCartPopup = () => {
     if (selectedCartId) {
@@ -81,28 +73,27 @@ const LandingPage: React.FC = () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ nickname, password }),
-
     })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Response from API:", data); // Log the full response to check the structure
-  
-        if (data.message === "Login successful") {
+      .then(res => res.json())
+      .then(data => {
+        console.log('Response from API:', data); // Log the full response to check the structure
+
+        if (data.message === 'Login successful') {
           // After successful login, store user details in localStorage
           const userDetails = {
             nickname,
-            name: data.name || "N/A", // Ensure these fields are returned from the API
-            address: data.address || "N/A",
-            phone: data.phone || "N/A",
-            email: data.email || "N/A",
-            role: data.role || "N/A",
+            name: data.name || 'N/A', // Ensure these fields are returned from the API
+            address: data.address || 'N/A',
+            phone: data.phone || 'N/A',
+            email: data.email || 'N/A',
+            role: data.role || 'N/A',
           };
-  
-          localStorage.setItem("user", JSON.stringify(userDetails)); // Save user data
-  
+
+          localStorage.setItem('user', JSON.stringify(userDetails)); // Save user data
+
           setIsLoggedIn(true);
           setNickname(nickname);
-          alert("Login successful!");
+          alert('Login successful!');
 
           setIsLoginPopupOpen(false);
         } else {
@@ -113,17 +104,17 @@ const LandingPage: React.FC = () => {
         console.error('Login failed:', error);
         alert('An error occurred during login.');
       });
-  };  
-  
+  };
+
   const handleLogout = () => {
-    localStorage.removeItem("user"); // Ta bort användardata från localStorage
+    localStorage.removeItem('user'); // Ta bort användardata från localStorage
     setIsLoggedIn(false); // Uppdatera statusen
     setNickname(null);
-    alert("You have been logged out.");
+    alert('You have been logged out.');
   };
 
   const handleProfileNavigation = () => {
-    navigate("/profile"); // Navigera till /profile när användaren klickar på sitt nickname
+    navigate('/profile'); // Navigera till /profile när användaren klickar på sitt nickname
   };
 
   return (
@@ -134,15 +125,12 @@ const LandingPage: React.FC = () => {
           <p className="subtitle">Fast Food, Done the Potato Way</p>
         </div>
         <div className="header-right">
-        <p className="nav-item" onClick={() => setShowContactPopup(true)}>
+          <p className="nav-item" onClick={() => setShowContactPopup(true)}>
             Contact
           </p>
           {isLoggedIn ? (
             <>
-              <p
-                className="nav-item"
-                onClick={handleProfileNavigation}
-              >
+              <p className="nav-item" onClick={handleProfileNavigation}>
                 {nickname}
               </p>
               <button onClick={handleLogout} className="nav-item">
@@ -160,7 +148,6 @@ const LandingPage: React.FC = () => {
             className="cart-btn"
             onClick={handleShowCartPopup}
           />
-
         </div>
       </header>
       <section className="content-section">
@@ -216,7 +203,6 @@ const LandingPage: React.FC = () => {
           <div className="howto-image">
             <img src={howto3} alt="How to 3" />
           </div>
-
         </div>
         <button className="customize-button" onClick={handleShowMenuPopup}>
           Start customizing Your Baked Bliss

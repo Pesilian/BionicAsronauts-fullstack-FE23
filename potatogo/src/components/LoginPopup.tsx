@@ -19,7 +19,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ onClose, onLogin }) => {
     <div className="login-popup">
       <div className="login-popup-content">
         <button className="close-btn" onClick={onClose}>
-          X
+        ×
         </button>
         <h2>Log In</h2>
         <form onSubmit={handleSubmit}>

@@ -85,7 +85,7 @@ const ProfilePage: React.FC = () => {
         <div className="header-right">
           <p className="nav-item">Contact</p>
           <p className="nav-item">{profileData.nickname}</p>
-          <button onClick={handleLogout} className="nav-item">
+          <button onClick={handleLogout} className="logout-button">
             Log out
           </button>
         </div>

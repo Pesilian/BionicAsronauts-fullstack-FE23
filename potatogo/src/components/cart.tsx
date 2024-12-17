@@ -111,15 +111,12 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
       setIsLoading(true);
       setError(null);
 
-      // Förbered orderdata inklusive noten från inputrutan
       const orderData = {
         cartId,
-        cartItems,
-        orderNote, // Skicka med ordernote
       };
 
       const response = await axios.post(
-        `https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/placeOrder`,
+        `https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/order`,
         orderData
       );
 

@@ -92,7 +92,8 @@
         "updateCart": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
           "s3Key": "amplify-builds/updateCart-3134394d46416375496b-build.zip"
-        }
+        },
+        "getCart": {}
       },
       "storage": {
         "potatogoDB": {}

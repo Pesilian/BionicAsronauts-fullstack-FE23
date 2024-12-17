@@ -112,6 +112,11 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "getCart": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "getOrdersHandler": {
       "build": true,
       "dependsOn": [],

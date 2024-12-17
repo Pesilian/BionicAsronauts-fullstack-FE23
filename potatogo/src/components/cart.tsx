@@ -18,7 +18,7 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [orderNote, setOrderNote] = useState(''); // Ny state för inputruta
+  const [orderNote, setOrderNote] = useState('');
 
   const fetchData = async () => {
     if (!cartId) {
@@ -31,9 +31,11 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
     setError(null);
 
     try {
-      const cartResponse = await axios.post(
-        `https://c7d8k8kv2g.execute-api.eu-north-1.amazonaws.com/default/linasTest`,
-        { cartId }
+      const cartResponse = await axios.get(
+        `https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/cart`,
+        {
+          params: { cartId },
+        }
       );
 
       const cartData = JSON.parse(cartResponse.data.body);

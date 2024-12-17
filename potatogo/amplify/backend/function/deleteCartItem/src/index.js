@@ -2,6 +2,7 @@ const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const {
   DynamoDBDocumentClient,
   GetCommand,
+  DeleteCommand,
   UpdateCommand,
 } = require('@aws-sdk/lib-dynamodb');
 
@@ -9,19 +10,34 @@ const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
 exports.deleteCartItem = async event => {
   try {
-    const body = event; // Data från förfrågan
+    const body = JSON.parse(event.body || '{}');
     const cartId = body.cartId;
-    const itemToRemoveKey = body.itemToRemoveKey; // Nyckeln för objektet som ska tas bort (t.ex. "item2")
+    const itemToRemoveKey = body.itemToRemoveKey;
 
-    if (!cartId || !itemToRemoveKey) {
+    if (!cartId) {
       return {
         statusCode: 400,
         body: JSON.stringify({
-          message: 'cartId and itemToRemoveKey are required',
+          message: 'cartId is required',
         }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
+      };
+    }
+
+    if (!itemToRemoveKey) {
+      const deleteParams = {
+        TableName: 'Pota-To-Go-cart',
+        Key: { cartId },
+      };
+
+      await dynamoDB.send(new DeleteCommand(deleteParams));
+
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          message: `Cart ${cartId} removed successfully`,
+        }),
+        headers: { 'Content-Type': 'application/json' },
       };
     }
 
@@ -34,12 +50,8 @@ exports.deleteCartItem = async event => {
     if (!existingCart.Item) {
       return {
         statusCode: 404,
-        body: JSON.stringify({
-          message: 'Cart not found',
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        body: JSON.stringify({ message: 'Cart not found' }),
+        headers: { 'Content-Type': 'application/json' },
       };
     }
 
@@ -49,9 +61,7 @@ exports.deleteCartItem = async event => {
         body: JSON.stringify({
           message: `${itemToRemoveKey} not found in the cart`,
         }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
       };
     }
 
@@ -62,37 +72,15 @@ exports.deleteCartItem = async event => {
       ReturnValues: 'ALL_NEW',
     };
 
-    const result = await dynamoDB.send(new UpdateCommand(updateParams));
-
-    let updatedTotalPrice = 0;
-    Object.keys(result.Attributes).forEach(key => {
-      if (key !== 'totalPrice' && result.Attributes[key].price) {
-        updatedTotalPrice += result.Attributes[key].price;
-      }
-    });
-
-    const totalPriceParams = {
-      TableName: 'Pota-To-Go-cart',
-      Key: { cartId },
-      UpdateExpression: 'SET totalPrice = :totalPrice',
-      ExpressionAttributeValues: {
-        ':totalPrice': updatedTotalPrice,
-      },
-    };
-
-    await dynamoDB.send(new UpdateCommand(totalPriceParams));
+    const updatedCart = await dynamoDB.send(new UpdateCommand(updateParams));
 
     return {
       statusCode: 200,
       body: JSON.stringify({
         message: `${itemToRemoveKey} removed successfully`,
-        cartId,
-        updatedCart: result.Attributes,
-        totalPrice: updatedTotalPrice,
+        updatedCart: updatedCart.Attributes,
       }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
     };
   } catch (error) {
     console.error('Error occurred:', error);
@@ -103,9 +91,7 @@ exports.deleteCartItem = async event => {
         message: 'Failed to update cart',
         error: error.message,
       }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
     };
   }
 };

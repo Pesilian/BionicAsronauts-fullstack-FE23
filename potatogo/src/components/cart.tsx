@@ -20,6 +20,7 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [orderNote, setOrderNote] = useState('');
   const [cartIdState, setCartIdState] = useState<string | null>(cartId);
+  const [nickname, setNickname] = useState<string>(''); // State for nickname
 
   const clearCartId = () => {
     setCartIdState(null);
@@ -48,6 +49,7 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
       console.log('Full cart response:', cartResponse);
 
       const cartData = cartResponse.data;
+      const customerName = cartData.customerName;
 
       if (cartData && cartData.cartItems && cartData.cartItems.length > 0) {
         setCartItems(cartData.cartItems);
@@ -62,6 +64,14 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    const userDetails = localStorage.getItem('user');
+    if (userDetails) {
+      const parsedUserDetails = JSON.parse(userDetails);
+      setNickname(parsedUserDetails.nickname || 'Guest');
+    }
+  }, []);
 
   useEffect(() => {
     fetchData();
@@ -117,13 +127,22 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
       setIsLoading(true);
       setError(null);
 
+      const customerName = cartItems[0]?.customerName || 'Unknown';
+
       const response = await axios.post(
         `https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/order`,
-        { cartId: cartIdState }
+        { cartId: cartIdState, customerName: customerName, orderNote }
       );
 
       if (response.status === 200) {
-        alert('Order placed successfully!');
+        console.log('Order placed successfully!', response);
+
+        await axios.delete(
+          `https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/cart`,
+          { data: { cartId: cartIdState } }
+        );
+
+        alert('Order placed and cart removed successfully!');
         clearCartId();
         onClose();
       } else {
@@ -131,7 +150,7 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
       }
     } catch (error) {
       setError('Kunde inte lägga beställningen');
-      console.error('Error placing order:', error);
+      console.error('Error placing order or removing cart:', error);
     } finally {
       setIsLoading(false);
     }
@@ -145,7 +164,8 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
         ) : cartItems.length > 0 ? (
           cartItems.map((item, index) => (
             <div className="cart-popup-itemContainer" key={index}>
-              <p className="cart-popup-item">Customer: {item.customerName}</p>
+              {/* Replace customerName with nickname */}
+              <p className="cart-popup-item">Customer: {nickname}</p>
 
               {/* rendera cartItems */}
               {Object.keys(item).map((key, idx) => {

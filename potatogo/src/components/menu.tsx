@@ -134,8 +134,15 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
         }
       }
 
+      const userDetails = localStorage.getItem('user');
+      console.log('user');
+      const customerName = userDetails
+        ? JSON.parse(userDetails).nickname
+        : 'Guest';
+
       const payload: any = {
         cartId: currentCartId,
+        customerName: customerName,
       };
 
       if (selectedItems.length === 1 && isSpecial(selectedItems[0])) {

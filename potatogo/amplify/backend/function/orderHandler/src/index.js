@@ -7,14 +7,13 @@ const {
 
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-exports.handler = async (event) => {
+exports.handler = async event => {
   console.log('Full event:', JSON.stringify(event, null, 2));
 
   try {
-    // Adjust to handle both API Gateway and Lambda console inputs
-    const body = typeof event.body === 'string' ? JSON.parse(event.body) : event;
+    const body =
+      typeof event.body === 'string' ? JSON.parse(event.body) : event;
 
-    // Extract cartId and customerName
     const cartId = body.cartId;
     const customerName = body.customerName || 'Guest';
 
@@ -25,12 +24,13 @@ exports.handler = async (event) => {
       console.error('Missing cartId in body');
       return {
         statusCode: 400,
-        body: JSON.stringify({ message: 'Cart Id is required in the request body' }),
+        body: JSON.stringify({
+          message: 'Cart Id is required in the request body',
+        }),
         headers: { 'Content-Type': 'application/json' },
       };
     }
 
-    // Retrieve cart data from the cart table
     const getCartParams = {
       TableName: 'Pota-To-Go-cart',
       Key: { cartId },
@@ -47,16 +47,14 @@ exports.handler = async (event) => {
       };
     }
 
-    // Replace cartItemX with orderItemX
     const orderItems = Object.keys(cart)
       .filter(key => key.startsWith('cartItem'))
       .reduce((acc, key) => {
-        const orderKey = key.replace('cart', 'order'); // Replace cart with order
+        const orderKey = key.replace('cart', 'order');
         acc[orderKey] = cart[key];
         return acc;
       }, {});
 
-    // Extract specials
     const specials = Object.keys(cart)
       .filter(key => key.startsWith('specials'))
       .reduce((acc, key) => {
@@ -64,11 +62,14 @@ exports.handler = async (event) => {
         return acc;
       }, {});
 
-    // Create a new order
+    const generateOrderId = () => {
+      return `${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
+    };
+
     const newOrder = {
-      ...specials, // Include specials as-is
-      ...orderItems, // Include renamed order items
-      orderId: cartId,
+      ...specials,
+      ...orderItems,
+      orderId: generateOrderId(),
       customerName,
       orderStatus: 'pending',
       createdAt: new Date().toISOString(),
@@ -76,7 +77,6 @@ exports.handler = async (event) => {
 
     console.log('New Order Details:', JSON.stringify(newOrder));
 
-    // Insert the new order into the orders table
     const putParams = {
       TableName: 'Pota-To-Go-orders',
       Item: newOrder,

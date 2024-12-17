@@ -22,12 +22,6 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
   const [cartIdState, setCartIdState] = useState<string | null>(cartId);
   const [nickname, setNickname] = useState<string>(''); // State for nickname
 
-  const clearCartId = () => {
-    setCartIdState(null);
-    localStorage.removeItem('cartId');
-    console.log('cartId removed from localStorage');
-  };
-
   const fetchData = async () => {
     if (!cartIdState) {
       console.log('No cartId provided');
@@ -141,6 +135,12 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
           `https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/cart`,
           { data: { cartId: cartIdState } }
         );
+
+        const clearCartId = () => {
+          setCartIdState(null);
+          localStorage.removeItem('cartId');
+          console.log('cartId removed from localStorage');
+        };
 
         alert('Order placed and cart removed successfully!');
         clearCartId();

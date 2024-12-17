@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './contactPopUp.css';
+import '../styles/contactPopUp.css';
 
 interface ContactPopupProps {
   onClose: () => void;

@@ -24,3 +24,13 @@
   max-height: 80vh;
   overflow-y: auto;
 }
+
+.remove-cartItem {
+  border: none;
+  background-color: #8fbd92;
+}
+
+.remove-cartItem:hover {
+  background-color: #8fbd92;
+  color: grey;
+}

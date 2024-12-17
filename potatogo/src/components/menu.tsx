@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './menu.css';
+import '../styles/menu.css';
 import CartPopup from './cart';
 
 interface MenuItem {

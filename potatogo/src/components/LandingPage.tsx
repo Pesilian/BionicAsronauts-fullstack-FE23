@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './LandingPage.css';
+import '../styles/LandingPage.css';
 import LoginPopup from './LoginPopup';
 import lppotato from '../assets/lppotato.svg';
 import howto1 from '../assets/howto1.svg';
 import howto2 from '../assets/howto2.svg';
 import howto3 from '../assets/howto3.svg';
 import chef from '../assets/chef.svg';
-
 import cart from '../assets/cart.svg';
 import sousteam from '../assets/sousteam.svg';
 import potatoes from '../assets/potatoes.svg';

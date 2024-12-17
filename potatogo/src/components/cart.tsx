@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './cart.css';
+import '../styles/cart.css';
 
 interface CartItem {
   customerName: string;
@@ -146,7 +146,6 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
           cartItems.map((item, index) => (
             <div className="cart-popup-itemContainer" key={index}>
               <p className="cart-popup-item">Customer: {item.customerName}</p>
-              <p className="cart-popup-item">Updated At: {item.updatedAt}</p>
 
               {/* rendera cartItems */}
               {Object.keys(item).map((key, idx) => {
@@ -164,20 +163,17 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
                 if (Array.isArray(value)) {
                   return (
                     <div key={idx}>
-                      <h3>{key}:</h3>
+                      {/* <h3>{key}:</h3> */}
                       {value.map((subItem, subIdx) => (
-                        <div
-                          key={subIdx}
-                          className="cart-popup-subItemContainer"
-                        >
-                          <p className="cart-popup-item">{subItem}</p>
+                        <div key={subIdx} className="cart-item">
+                          <p className="cart-item">{subItem}</p>
                           <button
-                            className="delete-button"
+                            className="remove-cartItem"
                             onClick={() =>
                               handleDeleteSubItem(item.cartId, key)
                             }
                           >
-                            Ta bort {subItem}
+                            Remove {subItem}
                           </button>
                         </div>
                       ))}
@@ -185,15 +181,13 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
                   );
                 } else {
                   return (
-                    <div key={idx} className="cart-popup-subItemContainer">
-                      <p className="cart-popup-item">
-                        {key}: {value}
-                      </p>
+                    <div key={idx} className="cart-item">
+                      <p className="cart-item">{value}</p>
                       <button
-                        className="delete-button"
+                        className="remove-cartItem"
                         onClick={() => handleDeleteSubItem(item.cartId, key)}
                       >
-                        Ta bort {key}
+                        Remove {key}
                       </button>
                     </div>
                   );
@@ -208,17 +202,19 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
         <div className="cart-popup-input-container">
           <label htmlFor="order-note">Order Note:</label>
           <textarea
-            id="order-note"
+            className="order-note"
             value={orderNote}
             onChange={e => setOrderNote(e.target.value)}
             placeholder="Leave a special note for your order..."
           />
         </div>
 
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {error && <p>{error}</p>}
 
         <div className="cart-popup-actions">
-          <button onClick={handlePlaceOrder}>Place Order</button>
+          <button className="place-orderBtn" onClick={handlePlaceOrder}>
+            Place Order
+          </button>
         </div>
       </div>
     </div>

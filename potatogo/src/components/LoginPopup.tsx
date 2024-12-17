@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import "./LoginPopup.css";
+import React, { useState } from 'react';
+import '../styles/LoginPopup.css';
 
 interface LoginPopupProps {
   onClose: () => void;
@@ -7,8 +7,8 @@ interface LoginPopupProps {
 }
 
 const LoginPopup: React.FC<LoginPopupProps> = ({ onClose, onLogin }) => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +29,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ onClose, onLogin }) => {
               type="text"
               id="username"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={e => setUsername(e.target.value)}
               required
             />
           </div>
@@ -39,7 +39,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ onClose, onLogin }) => {
               type="password"
               id="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={e => setPassword(e.target.value)}
               required
             />
           </div>

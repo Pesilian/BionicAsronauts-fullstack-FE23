@@ -19,13 +19,20 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [orderNote, setOrderNote] = useState('');
+  const [cartIdState, setCartIdState] = useState<string | null>(cartId);
+
+  const clearCartId = () => {
+    setCartIdState(null);
+    localStorage.removeItem('cartId');
+    console.log('cartId removed from localStorage');
+  };
 
   const fetchData = async () => {
-    if (!cartId) {
+    if (!cartIdState) {
       console.log('No cartId provided');
       return;
     }
-    console.log('Fetching data for cartId:', cartId);
+    console.log('Fetching data for cartId:', cartIdState);
 
     setIsLoading(true);
     setError(null);
@@ -34,15 +41,13 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
       const cartResponse = await axios.get(
         `https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/cart`,
         {
-          params: { cartId },
+          params: { cartId: cartIdState },
         }
       );
 
       console.log('Full cart response:', cartResponse);
 
       const cartData = cartResponse.data;
-
-      console.log('Parsed cart data:', cartData);
 
       if (cartData && cartData.cartItems && cartData.cartItems.length > 0) {
         setCartItems(cartData.cartItems);
@@ -60,13 +65,13 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
 
   useEffect(() => {
     fetchData();
-  }, [cartId]);
+  }, [cartIdState]);
 
   const handleDeleteSubItem = async (
     itemKey: string,
     itemToRemoveKey: string
   ) => {
-    if (!cartId) return;
+    if (!cartIdState) return;
 
     try {
       setIsLoading(true);
@@ -75,11 +80,9 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
       const response = await axios.delete(
         `https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/cart`,
         {
-          data: { cartId, itemToRemoveKey },
+          data: { cartId: cartIdState, itemToRemoveKey },
         }
       );
-
-      console.log('Delete response:', response.data);
 
       const responseData = JSON.parse(response.data.body);
 
@@ -89,7 +92,6 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
         responseData.message.includes('removed successfully')
       ) {
         console.log('Item removed successfully, fetching updated cart...');
-
         fetchData();
       } else {
         setError(`Failed to remove item: ${responseData.message}`);
@@ -109,35 +111,27 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
   };
 
   const handlePlaceOrder = async () => {
-    if (!cartId) return;
+    if (!cartIdState) return;
 
     try {
       setIsLoading(true);
       setError(null);
 
-      const orderData = {
-        cartId,
-      };
-
       const response = await axios.post(
         `https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/order`,
-        orderData
+        { cartId: cartIdState }
       );
 
-      const responseData = response.data;
-
-      if (
-        responseData &&
-        responseData.message === 'Order placed successfully'
-      ) {
-        alert('Beställning lagd!');
+      if (response.status === 200) {
+        alert('Order placed successfully!');
+        clearCartId();
         onClose();
       } else {
-        setError('Kunde inte lägga beställningen.');
+        setError('Kunde inte lägga beställningen');
       }
     } catch (error) {
-      setError('Kunde inte lägga beställningen.');
-      console.error(error);
+      setError('Kunde inte lägga beställningen');
+      console.error('Error placing order:', error);
     } finally {
       setIsLoading(false);
     }

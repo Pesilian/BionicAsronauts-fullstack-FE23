@@ -15,9 +15,10 @@ interface Special {
 
 interface MenuPopupProps {
   onClose: () => void;
+  onCartIdChange: (newCartId: string) => void;
 }
 
-const MenuPopup: React.FC<MenuPopupProps> = ({ onClose }) => {
+const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
   const [showCartPopup, setShowCartPopup] = useState(false);
   const [cartId, setCartId] = useState<string | null>(null);
 
@@ -127,7 +128,8 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose }) => {
         currentCartId = newCartData.cartId;
         setCartId(currentCartId);
 
-        if (currentCartId) {
+        if (onCartIdChange && currentCartId) {
+          onCartIdChange(currentCartId);
           localStorage.setItem('cartId', currentCartId);
         }
       }

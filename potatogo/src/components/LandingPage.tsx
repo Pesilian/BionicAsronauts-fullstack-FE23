@@ -63,6 +63,11 @@ const LandingPage: React.FC = () => {
     setShowMenuPopup(false);
   };
 
+  const updateCartId = (newCartId: string) => {
+    setSelectedCartId(newCartId);
+    localStorage.setItem('cartId', newCartId);
+  };
+
   const handleLogin = (nickname: string, password: string) => {
     const apiEndpoint =
       'https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/login';
@@ -187,7 +192,9 @@ const LandingPage: React.FC = () => {
         <CartPopup onClose={handleCloseCartPopup} cartId={selectedCartId} />
       )}
 
-      {showMenuPopup && <MenuPopup onClose={handleClosePopup} />}
+      {showMenuPopup && (
+        <MenuPopup onClose={handleClosePopup} onCartIdChange={updateCartId} />
+      )}
 
       <section className="howto-section">
         <div className="howto-title">

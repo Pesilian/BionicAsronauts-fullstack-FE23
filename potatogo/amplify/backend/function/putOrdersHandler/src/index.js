@@ -2,7 +2,7 @@ const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const {
   DynamoDBDocumentClient,
   UpdateCommand,
-  GetCommand
+  GetCommand,
 } = require('@aws-sdk/lib-dynamodb');
 
 // Initialize DynamoDB client
@@ -18,10 +18,12 @@ exports.handler = async (event) => {
 
     // Step 1: Validate orderId
     if (!orderId) {
-      return {
+      const data = {
         statusCode: 400,
-        body: JSON.stringify({ message: 'Order ID is required' }),
+        headers: { 'Content-Type': 'application/json' },
+        body: { message: 'Order ID is required' },
       };
+      return { body: JSON.stringify(data) };
     }
 
     // Step 2: Fetch current order from DynamoDB
@@ -34,10 +36,12 @@ exports.handler = async (event) => {
 
     // Step 3: Handle if the order doesn't exist
     if (!currentOrder.Item) {
-      return {
+      const data = {
         statusCode: 404,
-        body: JSON.stringify({ message: 'Order not found' }),
+        headers: { 'Content-Type': 'application/json' },
+        body: { message: 'Order not found' },
       };
+      return { body: JSON.stringify(data) };
     }
 
     // Extract current fields
@@ -46,24 +50,28 @@ exports.handler = async (event) => {
     // Step 4: Validate permissions and customer match
     if (userRole !== 'employee') {
       if (!userName || userName !== customerName) {
-        return {
+        const data = {
           statusCode: 403,
-          body: JSON.stringify({ message: 'Access denied: You can only edit your own orders.' }),
+          headers: { 'Content-Type': 'application/json' },
+          body: { message: 'Access denied: You can only edit your own orders.' },
         };
+        return { body: JSON.stringify(data) };
       }
 
-      // Restrict non-employee users to only add or delete items and specials
+      // Restrict non-employee users
       const invalidFields = Object.keys(updatedFields).filter(
         (key) => !key.startsWith('orderItem') && !key.startsWith('specials')
       );
 
       if (invalidFields.length > 0) {
-        return {
+        const data = {
           statusCode: 403,
-          body: JSON.stringify({
+          headers: { 'Content-Type': 'application/json' },
+          body: {
             message: `Access denied: Non-employees can only add or delete items and specials. Invalid fields: ${invalidFields.join(', ')}`,
-          }),
+          },
         };
+        return { body: JSON.stringify(data) };
       }
     }
 
@@ -80,29 +88,21 @@ exports.handler = async (event) => {
       statusChange = `Order status changed from "${currentStatus}" to "${orderStatus}"`;
     }
 
-    // Step 7: Handle updates for each orderItemX and specialsX dynamically
+    // Step 7: Handle updates for orderItemX and specialsX
     Object.keys(updatedFields).forEach((key) => {
       if (key.startsWith('orderItem') || key.startsWith('specials')) {
         const newValue = updatedFields[key];
         const currentValue = currentFields[key] || [];
 
-        // Treat specialsX as arrays for consistency
         const newArray = Array.isArray(newValue) ? newValue : [newValue];
         const currentArray = Array.isArray(currentValue) ? currentValue : [currentValue];
 
-        // Determine added and removed items with context
-        const added = newArray.filter(item => !currentArray.includes(item));
-        const removed = currentArray.filter(item => !newArray.includes(item));
+        const added = newArray.filter((item) => !currentArray.includes(item));
+        const removed = currentArray.filter((item) => !newArray.includes(item));
 
-        if (added.length > 0) {
-          added.forEach(item => changes.push(`${item} added to ${key}`));
-        }
+        if (added.length > 0) added.forEach((item) => changes.push(`${item} added to ${key}`));
+        if (removed.length > 0) removed.forEach((item) => changes.push(`${item} removed from ${key}`));
 
-        if (removed.length > 0) {
-          removed.forEach(item => changes.push(`${item} removed from ${key}`));
-        }
-
-        // Check for differences
         if (JSON.stringify(newArray) !== JSON.stringify(currentArray)) {
           updateExpression += ` ${key} = :${key},`;
           expressionAttributeValues[`:${key}`] = newArray.length === 1 ? newArray[0] : newArray;
@@ -110,20 +110,20 @@ exports.handler = async (event) => {
       }
     });
 
-    // Add a modifiedAt timestamp
+    // Add modifiedAt timestamp
     const modifiedAt = new Date().toISOString();
     updateExpression += ' modifiedAt = :modifiedAt,';
     expressionAttributeValues[':modifiedAt'] = modifiedAt;
 
-    // Finalize the update expression
     updateExpression = updateExpression.slice(0, -1); // Remove trailing comma
 
-    // If no changes, return early
     if (changes.length === 0 && !statusChange) {
-      return {
+      const data = {
         statusCode: 200,
-        body: JSON.stringify({ message: 'No changes made' }),
+        headers: { 'Content-Type': 'application/json' },
+        body: { message: 'No changes made' },
       };
+      return { body: JSON.stringify(data) };
     }
 
     // Step 8: Update in DynamoDB
@@ -136,21 +136,25 @@ exports.handler = async (event) => {
 
     await dynamoDB.send(new UpdateCommand(updateParams));
 
-    // Step 9: Return success response
-    return {
+    // Step 9: Success Response
+    const data = {
       statusCode: 200,
-      body: JSON.stringify({
+      headers: { 'Content-Type': 'application/json' },
+      body: {
         message: `Order ${orderId} updated successfully`,
         changes,
         statusChange,
         modifiedAt,
-      }),
+      },
     };
+    return { body: JSON.stringify(data) };
+
   } catch (error) {
-    // Handle errors
-    return {
+    const data = {
       statusCode: 500,
-      body: JSON.stringify({ message: 'Failed to update order', error: error.message }),
+      headers: { 'Content-Type': 'application/json' },
+      body: { message: 'Failed to update order', error: error.message },
     };
+    return { body: JSON.stringify(data) };
   }
 };

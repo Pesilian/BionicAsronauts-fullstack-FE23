@@ -1,0 +1,16 @@
+.container {
+    display: flex;
+  }
+  
+  .content {
+    flex: 1;
+    margin-left: 200px; /* Matches AdminNav width */
+    padding: 1rem;
+  }
+  
+  .ordersPlaceholder {
+    margin-top: 2rem;
+    font-size: 1.2rem;
+    color: #555;
+  }
+  

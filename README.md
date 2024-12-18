@@ -12,7 +12,7 @@ This project is currently in development. Users can view our landingpage and men
 
 ## Project Screen Shot:
 
-![screenshot](./asset/pota-to-go-screenshot.jpg)
+![screenshot](./potatogo/src/assets/pota-to-go-screenshot.jpg)
 
 ## Installation and Setup Instructions
 

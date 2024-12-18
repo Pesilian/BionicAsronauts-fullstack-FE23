@@ -19,6 +19,7 @@ export const fetchOrders = async (params: FetchOrdersParams): Promise<FetchOrder
       apiName: 'potatogoapi',
       path: `/order?${queryString}`,
     });
+    console.log(`Fetching orders with query: /order?status=${params.status}`);
 
     const { body } = await restOperation.response;
 

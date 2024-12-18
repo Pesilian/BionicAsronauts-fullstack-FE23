@@ -14,14 +14,8 @@ const OrdersView: React.FC = () => {
         {/* Tabs Navigation */}
         <OrderNavTabs currentTab={currentTab} onTabChange={setCurrentTab} />
 
-        {/* Display Orders or Search */}
-        {currentTab === 'search' ? (
-          <div className={styles.ordersPlaceholder}>
-            <p>Search functionality coming soon!</p>
-          </div>
-        ) : (
-          <OrderList status={currentTab} />
-        )}
+        {/* Display Orders */}
+        <OrderList status={currentTab.toLowerCase()} />
       </div>
     </div>
   );

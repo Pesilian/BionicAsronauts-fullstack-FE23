@@ -6,30 +6,30 @@ interface OrderNavTabsProps {
   onTabChange: (tab: string) => void;
 }
 
-const orderNavTabs: React.FC<OrderNavTabsProps> = ({ currentTab, onTabChange }) => {
+const OrderNavTabs: React.FC<OrderNavTabsProps> = ({ currentTab, onTabChange }) => {
   return (
     <div className={styles.tabs}>
       <button
-        className={`${styles.tab} ${currentTab === 'Pending' ? styles.active : ''}`}
-        onClick={() => onTabChange('Pending')}
+        className={`${styles.tab} ${currentTab === 'pending' ? styles.active : ''}`}
+        onClick={() => onTabChange('pending')}
       >
         Pending
       </button>
       <button
-        className={`${styles.tab} ${currentTab === 'In Progress' ? styles.active : ''}`}
-        onClick={() => onTabChange('In Progress')}
+        className={`${styles.tab} ${currentTab === 'in progress' ? styles.active : ''}`}
+        onClick={() => onTabChange('in progress')}
       >
         In Progress
       </button>
       <button
-        className={`${styles.tab} ${currentTab === 'Done' ? styles.active : ''}`}
-        onClick={() => onTabChange('Done')}
+        className={`${styles.tab} ${currentTab === 'done' ? styles.active : ''}`}
+        onClick={() => onTabChange('done')}
       >
         Done
       </button>
       <button
         className={`${styles.tab} ${styles.search}`}
-        onClick={() => onTabChange('Search')}
+        onClick={() => onTabChange('search')}
       >
         🔍
       </button>
@@ -37,4 +37,4 @@ const orderNavTabs: React.FC<OrderNavTabsProps> = ({ currentTab, onTabChange }) 
   );
 };
 
-export default orderNavTabs;
+export default OrderNavTabs;

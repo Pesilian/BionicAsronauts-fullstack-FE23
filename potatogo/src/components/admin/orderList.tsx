@@ -6,7 +6,7 @@ import OrderItem from './orderItem';
 import styles from '../../styles/admin/orderList.module.css';
 
 interface OrderListProps {
-  status: string; // "pending", "in progress", "done", etc.
+  status: string; // "pending", "in progress", "done"
 }
 
 const OrderList: React.FC<OrderListProps> = ({ status }) => {
@@ -16,17 +16,11 @@ const OrderList: React.FC<OrderListProps> = ({ status }) => {
 
   useEffect(() => {
     const loadOrders = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
         const response = await fetchOrders({ status });
-
-        console.log('Raw response:', response); // Log raw backend data
-
-        // Parse response into normalized Order objects
         const parsedOrders = response.items.map((item: any) => parseOrder(item));
         setOrders(parsedOrders);
-
-        console.log('Parsed orders:', parsedOrders); // Log parsed orders
       } catch (err) {
         console.error(err);
         setError('Failed to load orders.');

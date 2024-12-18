@@ -1,26 +1,43 @@
+/* Container */
 .orderItem {
-    padding: 1rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-bottom: 1rem;
-    background-color: #fafafa;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease;
-  }
-  
-  .orderItem:hover {
-    transform: translateY(-2px);
-  }
-  
-  .orderHeader {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 0.5rem;
-  }
-  
-  .items, .specials {
-    margin-top: 0.5rem;
-    font-size: 0.9rem;
-    color: #555;
-  }
-  
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+  color: #333; /* Dark text for visibility */
+}
+
+/* Header */
+.orderHeader {
+  background-color: #f0f0f0; /* Light gray for contrast */
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  font-weight: bold;
+  color: #000; /* Ensures black text visibility */
+}
+
+.orderHeader:hover {
+  background-color: #e0e0e0; /* Slightly darker on hover */
+}
+
+/* Details */
+.orderDetails {
+  background-color: #fff;
+  padding: 10px;
+  border-top: 1px solid #ccc;
+  color: #444; /* Slightly darker gray */
+}
+
+/* Items and Specials */
+.items, .specials {
+  margin: 10px 0;
+}
+
+.items p, .specials p {
+  margin: 0;
+  padding: 2px 0;
+}

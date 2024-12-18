@@ -10,7 +10,7 @@ export const parseOrder = (data: any): Order => {
       data.orderItem2 || [],
       data.orderItem3 || [],
       data.orderItem4 || [],
-    ].filter(item => item.length > 0), // Filter out empty arrays
+    ].filter(item => item.length > 0), 
     specials: [data.specials1, data.specials2, data.specials3].filter(Boolean),
     totalPrice: Number(data.totalPrice) || 0,
     createdAt: data.createdAt || data.modifiedAt || '',

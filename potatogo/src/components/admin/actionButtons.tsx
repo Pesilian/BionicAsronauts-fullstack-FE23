@@ -4,7 +4,7 @@ import styles from '../../styles/admin/actionButtons.module.css';
 
 interface ActionButtonsProps {
   orderId: string;
-  onDelete: () => void; // Callback for refreshing the list
+  onDelete: () => void;
 }
 
 const ActionButtons: React.FC<ActionButtonsProps> = ({ orderId, onDelete }) => {
@@ -29,7 +29,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ orderId, onDelete }) => {
       setLoading(true);
       await deleteOrders(orderId);
       alert(`Order ${orderId} deleted successfully`);
-      onDelete(); // Trigger refresh
+      onDelete(); 
     } catch (err) {
       setError('Failed to delete order');
     } finally {

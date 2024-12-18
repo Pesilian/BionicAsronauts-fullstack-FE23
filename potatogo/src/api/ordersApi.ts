@@ -10,17 +10,23 @@ import {
 import { parseOrder } from '../utils/parseOrder';
 import { parseUpdateResponse } from '../utils/parseUpdateResponse';
 
-// Fetch orders function
+// Fetch orders
 export const fetchOrders = async (params: FetchOrdersParams): Promise<FetchOrdersResponse> => {
   try {
-    const queryString = new URLSearchParams(params as Record<string, string>).toString();
+    const queryString = new URLSearchParams(
+      Object.entries(params).reduce((acc, [key, value]) => {
+        if (value !== undefined) acc[key] = value;
+        return acc;
+      }, {} as Record<string, string>)
+    ).toString();
+    
 
     const restOperation = get({
       apiName: 'potatogoapi',
       path: `/order?${queryString}`,
     });
-    console.log(`Fetching orders with query: /order?orderStatus=${params.orderStatus}`);
-    console.log('Request Output:', params);
+    console.log(`Fetching orders with query: /order?${queryString}`);
+
 
     const { body } = await restOperation.response;
 
@@ -51,17 +57,17 @@ export const updateOrders = async (orderId: string, data: UpdateOrderBody): Prom
           'Content-Type': 'application/json',
           'x-user-role': 'employee',
         },
-        body: JSON.stringify({ ...data, orderId }), // Include orderId in the body
+        body: JSON.stringify({ ...data, orderId }),
       },
     });
 
-    // Extract and parse the response body
+    
     const { body } = await restOperation.response;
     const responseBody = (await body.json() as unknown) as { body: UpdateOrderResponse };
 
     console.log('API Response:', responseBody);
 
-    // Return the parsed update response
+    
     return parseUpdateResponse(responseBody.body);
   } catch (error) {
     console.error(`Error updating order with ID ${orderId}:`, error);
@@ -87,12 +93,12 @@ export const deleteOrders = async (orderId: string): Promise<DeleteOrderResponse
       
     });
 
-    // Trigger the DELETE request and await the response
+    
     await restOperation.response;
 
     console.log(`DELETE call succeeded for order ID: ${orderId}`);
 
-    // Return a success response
+    
     return { success: true, message: `Order ${orderId} deleted successfully.` };
   } catch (error: any) { // Temporarily cast error to 'any'
     console.error(`Error deleting order with ID ${orderId}:`, error);

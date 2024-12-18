@@ -14,7 +14,7 @@ const OrderList: React.FC<OrderListProps> = ({ orderStatus }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Define loadOrders function at the top level
+  
   const loadOrders = async () => {
     setLoading(true);
     try {
@@ -29,7 +29,7 @@ const OrderList: React.FC<OrderListProps> = ({ orderStatus }) => {
     }
   };
 
-  // Fetch orders when orderStatus changes
+  
   useEffect(() => {
     loadOrders();
   }, [orderStatus]);
@@ -44,7 +44,7 @@ const OrderList: React.FC<OrderListProps> = ({ orderStatus }) => {
           <OrderItem
             key={order.orderId}
             order={order}
-            onDelete={loadOrders} // Pass the loadOrders function
+            onDelete={loadOrders}
           />
         ))
       ) : (

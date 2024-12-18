@@ -1,38 +1,34 @@
-/* Container */
 .orderItem {
   margin-bottom: 15px;
   border: 1px solid #ccc;
   border-radius: 5px;
   overflow: hidden;
   font-family: Arial, sans-serif;
-  color: #333; /* Dark text for visibility */
+  color: #333;
 }
 
-/* Header */
 .orderHeader {
-  background-color: #f0f0f0; /* Light gray for contrast */
+  background-color: #f0f0f0;
   padding: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
   font-weight: bold;
-  color: #000; /* Ensures black text visibility */
+  color: #000;
 }
 
 .orderHeader:hover {
-  background-color: #e0e0e0; /* Slightly darker on hover */
+  background-color: #e0e0e0;
 }
 
-/* Details */
 .orderDetails {
   background-color: #fff;
   padding: 10px;
   border-top: 1px solid #ccc;
-  color: #444; /* Slightly darker gray */
+  color: #444;
 }
 
-/* Items and Specials */
 .items, .specials {
   margin: 10px 0;
 }

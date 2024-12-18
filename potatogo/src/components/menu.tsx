@@ -201,13 +201,6 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
   return (
     <div className="menu-popup-overlay" onClick={handleOverlayClick}>
       <div className="menu-popup-content" onClick={e => e.stopPropagation()}>
-        {showCartPopup && (
-          <CartPopup onClose={handleClosePopup} cartId={cartId} />
-        )}
-
-        <button className="cart-button" onClick={handleShowCartPopup}>
-          Show cart
-        </button>
         <h2 className="menu-popup-header">Our specials</h2>
         <p className="menu-popup-price">Price incl drink: 80:-</p>
         {specials.length > 0 ? (
@@ -256,6 +249,14 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
 
       <button className="addToCartBtn" onClick={handleAddAllToCart}>
         Add to cart
+      </button>
+
+      {showCartPopup && (
+        <CartPopup onClose={handleClosePopup} cartId={cartId} />
+      )}
+
+      <button className="show-cartBtn" onClick={handleShowCartPopup}>
+        Show cart
       </button>
     </div>
   );

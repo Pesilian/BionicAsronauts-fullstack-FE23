@@ -1,0 +1,135 @@
+/* Profile Page Styles */
+.profile-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100vw;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f3e5;
+  font-family: "Roboto Serif", serif;
+  color: #000000;
+}
+
+.profile-container {
+  display: flex;
+  width: 90%;
+  margin-top: 20px;
+}
+
+.profile-card-container {
+  display: flex;
+  flex-direction: column;
+  flex: 0.4;
+  gap: 20px;
+}
+
+.orders-section {
+  flex: 0.6;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.orders-section h2 {
+  font-family: "Inter", sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.order-item {
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 15px;
+}
+
+.order-status {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.order-details {
+  font-size: 14px;
+}
+
+.logout-button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  background-color: #ff7043;
+  color: white;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+
+/* Profile and Card Sections */
+.profile-section,
+.card-section {
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+h2 {
+  font-family: "Inter", sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.form-group {
+  margin-bottom: 10px;
+}
+
+label {
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  background-color: #ff7043;
+  color: white;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+
+.card-expiry {
+  display: flex;
+  justify-content: space-between;
+}
+
+.delete-account {
+  display: flex;
+  justify-content: center;
+}
+
+.delete-button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  background-color: #f44336;
+  color: white;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}

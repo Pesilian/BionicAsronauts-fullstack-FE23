@@ -1,0 +1,145 @@
+/* OVERLAY */
+.contact-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7); /* Mörk overlay */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* POPUP CONTENT */
+.contact-popup-content {
+  background: #fff; /* Vit bakgrund */
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Skugga för 3D-effekt */
+  width: 400px;
+  padding: 20px 25px;
+  text-align: center;
+  position: relative;
+  animation: popup-fade-in 0.4s ease-out; /* Enkel fade-in */
+}
+
+@keyframes popup-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* CLOSE BUTTON */
+.close-button {
+  position: absolute;
+  top: 1px;
+  right: 10px;
+  background: none;
+  width: 40px;
+  border: none;
+  font-size: 28px;
+  font-weight: normal;
+  color: #000000;
+  cursor: pointer;
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.close-button:hover {
+  transform: scale(1.1); /* Lätt zoom vid hover */
+}
+
+/* TITLES */
+.contact-popup-content h2 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.contact-popup-content p {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+/* CONTACT DETAILS */
+.contact-details {
+  margin: 10px 0 20px;
+  text-align: left;
+}
+
+.contact-details p {
+  margin: 5px 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: #444;
+}
+
+.contact-details strong {
+  color: #000;
+}
+
+/* TEXTAREA */
+.message-form textarea {
+  width: 95%;
+  height: 100px;
+  padding: 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  resize: none;
+  margin-bottom: 10px;
+  transition: border 0.3s ease;
+}
+
+.message-form textarea:focus {
+  border-color: #8fbd92;
+  outline: none;
+  box-shadow: 0 0 5px rgba(143, 189, 146, 0.5);
+}
+
+/* ERROR AND SUCCESS MESSAGES */
+.error-message,
+.success-message {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.error-message {
+  color: #fa6b4b;
+}
+
+.success-message {
+  color: #8fbd92;
+}
+
+/* SEND BUTTON */
+.send-button {
+  width: 100%;
+  padding: 10px;
+  background-color: #8fbd92; /* Grön knapp */
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.send-button:hover {
+  background-color: #7ea883; /* Mörkare grön */
+  transform: scale(1.02); /* Lätt zoom-effekt */
+}

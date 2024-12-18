@@ -67,7 +67,7 @@
         },
         "getOrdersHandler": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",
-          "s3Key": "amplify-builds/getOrdersHandler-664a7941494f6e426630-build.zip"
+          "s3Key": "amplify-builds/getOrdersHandler-6d45655a554444625979-build.zip"
         },
         "deleteOrdersHandler": {
           "deploymentBucketName": "amplify-potatogo-dev-1d07f-deployment",

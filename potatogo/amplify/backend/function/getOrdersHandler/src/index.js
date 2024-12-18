@@ -12,19 +12,24 @@ const {
 
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-exports.handler = async (event) => {
+exports.handler = async event => {
   console.log('Full event:', JSON.stringify(event, null, 2));
 
   try {
     const queryParams = event.queryStringParameters || {};
-    const { orderId, orderStatus, customerName, lastEvaluatedKey } = queryParams;
+    const { orderId, orderStatus, customerName, lastEvaluatedKey } =
+      queryParams;
 
-    console.log('Query Parameters:', { orderId, orderStatus, customerName, lastEvaluatedKey });
+    console.log('Query Parameters:', {
+      orderId,
+      orderStatus,
+      customerName,
+      lastEvaluatedKey,
+    });
 
-    // Fetch by Order ID
     if (orderId) {
       const queryParams = {
-        TableName: 'Pota-To-Go-orders', 
+        TableName: 'Pota-To-Go-orders',
         KeyConditionExpression: 'orderId = :orderId',
         ExpressionAttributeValues: {
           ':orderId': orderId,
@@ -34,16 +39,14 @@ exports.handler = async (event) => {
       const result = await dynamoDB.send(new QueryCommand(queryParams));
       return {
         statusCode: 200,
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
         body: {
           items: result.Items,
           lastEvaluatedKey: result.LastEvaluatedKey || null,
         },
       };
-      
     }
 
-    // Build Scan Parameters for customerName/orderStatus filters
     const filterExpression = [];
     const expressionAttributeValues = {};
     const expressionAttributeNames = {};
@@ -60,12 +63,23 @@ exports.handler = async (event) => {
     }
 
     const scanParams = {
-      TableName: 'Pota-To-Go-orders', 
-      FilterExpression: filterExpression.length > 0 ? filterExpression.join(' AND ') : undefined,
-      ExpressionAttributeValues: Object.keys(expressionAttributeValues).length > 0 ? expressionAttributeValues : undefined,
-      ExpressionAttributeNames: Object.keys(expressionAttributeNames).length > 0 ? expressionAttributeNames : undefined,
-      ExclusiveStartKey: lastEvaluatedKey ? JSON.parse(lastEvaluatedKey) : undefined, 
-      Limit: 10, 
+      TableName: 'Pota-To-Go-orders',
+      FilterExpression:
+        filterExpression.length > 0
+          ? filterExpression.join(' AND ')
+          : undefined,
+      ExpressionAttributeValues:
+        Object.keys(expressionAttributeValues).length > 0
+          ? expressionAttributeValues
+          : undefined,
+      ExpressionAttributeNames:
+        Object.keys(expressionAttributeNames).length > 0
+          ? expressionAttributeNames
+          : undefined,
+      ExclusiveStartKey: lastEvaluatedKey
+        ? JSON.parse(lastEvaluatedKey)
+        : undefined,
+      Limit: 10,
     };
 
     console.log('Scan Parameters:', scanParams);
@@ -74,19 +88,20 @@ exports.handler = async (event) => {
 
     return {
       statusCode: 200,
-      headers: { "Content-Type": "application/json" },
+      headers: { 'Content-Type': 'application/json' },
       body: {
         items: result.Items,
         lastEvaluatedKey: result.LastEvaluatedKey || null,
       },
     };
-    
-
   } catch (error) {
     console.error('Error occurred:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: 'Failed to fetch orders', error: error.message }),
+      body: JSON.stringify({
+        message: 'Failed to fetch orders',
+        error: error.message,
+      }),
       headers: { 'Content-Type': 'application/json' },
     };
   }

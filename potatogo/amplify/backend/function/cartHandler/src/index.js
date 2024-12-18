@@ -27,8 +27,12 @@ exports.addToCart = async event => {
       };
     }
 
+    const generateCartId = () => {
+      return `${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
+    };
+
     if (!cartId) {
-      cartId = Math.floor(Math.random() * 1000000).toString();
+      cartId = generateCartId();
     }
 
     const getCartParams = {

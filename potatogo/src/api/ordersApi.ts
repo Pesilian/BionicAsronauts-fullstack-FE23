@@ -20,6 +20,7 @@ export const fetchOrders = async (params: FetchOrdersParams): Promise<FetchOrder
       path: `/order?${queryString}`,
     });
     console.log(`Fetching orders with query: /order?status=${params.status}`);
+    console.log('Request Output:', params);
 
     const { body } = await restOperation.response;
 

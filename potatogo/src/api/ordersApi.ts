@@ -19,17 +19,14 @@ export const fetchOrders = async (params: FetchOrdersParams): Promise<FetchOrder
       apiName: 'potatogoapi',
       path: `/order?${queryString}`,
     });
-    console.log(`Fetching orders with query: /order?status=${params.status}`);
+    console.log(`Fetching orders with query: /order?orderStatus=${params.orderStatus}`);
     console.log('Request Output:', params);
 
     const { body } = await restOperation.response;
 
-    // Safely parse and cast the response
     const responseBody = (await body.json()) as ApiResponseBody;
-
     console.log('ResponseBody:', responseBody);
 
-    // Access nested items and lastEvaluatedKey safely
     return {
       items: (responseBody.body?.items || []).map(parseOrder),
       lastEvaluatedKey: responseBody.body?.lastEvaluatedKey || null,
@@ -82,6 +79,12 @@ export const deleteOrders = async (orderId: string): Promise<DeleteOrderResponse
     const restOperation = del({
       apiName: 'potatogoapi',
       path: `/order/${orderId}`,
+      options: {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+      
     });
 
     // Trigger the DELETE request and await the response

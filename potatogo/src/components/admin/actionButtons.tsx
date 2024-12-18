@@ -4,9 +4,10 @@ import styles from '../../styles/admin/actionButtons.module.css';
 
 interface ActionButtonsProps {
   orderId: string;
+  onDelete: () => void; // Callback for refreshing the list
 }
 
-const ActionButtons: React.FC<ActionButtonsProps> = ({ orderId }) => {
+const ActionButtons: React.FC<ActionButtonsProps> = ({ orderId, onDelete }) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -14,7 +15,6 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ orderId }) => {
   const handleSave = async () => {
     try {
       setLoading(true);
-      // Placeholder: Update order logic (can add form state here)
       await updateOrders(orderId, { orderStatus: 'updated' });
       setIsEditing(false);
     } catch (err) {
@@ -29,6 +29,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ orderId }) => {
       setLoading(true);
       await deleteOrders(orderId);
       alert(`Order ${orderId} deleted successfully`);
+      onDelete(); // Trigger refresh
     } catch (err) {
       setError('Failed to delete order');
     } finally {

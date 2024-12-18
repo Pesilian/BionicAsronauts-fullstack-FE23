@@ -5,52 +5,29 @@ import styles from '../../styles/admin/orderItem.module.css';
 
 interface OrderItemProps {
   order: Order;
+  onDelete: () => void; // Accept onDelete as a prop
 }
 
-const OrderItem: React.FC<OrderItemProps> = ({ order }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  const toggleDetails = () => {
-    setIsExpanded((prev) => !prev);
-  };
+const OrderItem: React.FC<OrderItemProps> = ({ order, onDelete }) => {
+  const [isExpanded, setIsExpanded] = useState(false); // Toggle dropdown visibility
 
   return (
     <div className={styles.orderItem}>
-      {/* Order Header - Collapsible */}
-      <div className={styles.orderHeader} onClick={toggleDetails}>
-        <p>
-          <strong>Order ID:</strong> {order.orderId}
-        </p>
-        <p>
-          <strong>Customer:</strong> {order.customerName}
-        </p>
+      {/* Header Section - Toggle Dropdown */}
+      <div className={styles.orderHeader} onClick={() => setIsExpanded(!isExpanded)}>
+        <p><strong>Order ID:</strong> {order.orderId}</p>
+        <p><strong>Customer:</strong> {order.customerName}</p>
       </div>
 
-      {/* Collapsible Details */}
+      {/* Collapsible Section */}
       {isExpanded && (
         <div className={styles.orderDetails}>
-          <p>
-            <strong>Status:</strong> {order.orderStatus}
-          </p>
-          <p>
-            <strong>Total Price:</strong> ${order.totalPrice}
-          </p>
-          <div className={styles.items}>
-            <p>
-              <strong>Order Items:</strong>
-            </p>
-            {order.orderItems.map((items, index) => (
-              <p key={index}>{items.join(', ')}</p>
-            ))}
-          </div>
-          {order.specials.length > 0 && (
-            <div className={styles.specials}>
-              <p>
-                <strong>Specials:</strong> {order.specials.join(', ')}
-              </p>
-            </div>
-          )}
-          <ActionButtons orderId={order.orderId} />
+          <p><strong>Status:</strong> {order.orderStatus}</p>
+          <p><strong>Specials:</strong> {order.specials?.join(', ') || 'None'}</p>
+          <p><strong>Created At:</strong> {order.createdAt}</p>
+
+          {/* Action Buttons */}
+          <ActionButtons orderId={order.orderId} onDelete={onDelete} />
         </div>
       )}
     </div>

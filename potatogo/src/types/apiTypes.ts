@@ -10,7 +10,7 @@ export interface ApiResponseBody {
 
 // Parameters for fetchOrders API
 export interface FetchOrdersParams {
-    status?: string;
+    orderStatus?: string;
     orderId?: string;
     customerName?: string;
   }

@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import '../styles/menu.css';
 import CartPopup from './cart';
+import cart from '../assets/cart.svg';
+
 
 interface MenuItem {
   menuItem: string;
@@ -21,6 +23,16 @@ interface MenuPopupProps {
 const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
   const [showCartPopup, setShowCartPopup] = useState(false);
   const [cartId, setCartId] = useState<string | null>(null);
+
+  const categoryRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+
+   const handleScrollToCategory = (category: string) => {
+    const targetRef = categoryRefs.current[category];
+    if (targetRef) {
+      targetRef.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
 
   const handleShowCartPopup = () => {
     console.log('Current cartId:', cartId);
@@ -42,11 +54,11 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
 
   const categoryOrder = [
     'Potatoes',
-    'Butter',
+    'Butters',
     'Protein',
     'Toppings',
-    'Cheese',
-    'Sauce',
+    'Cheeses',
+    'Sauces',
     'Drinks',
   ];
 
@@ -201,11 +213,40 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
   return (
     <div className="menu-popup-overlay" onClick={handleOverlayClick}>
       <div className="menu-popup-content" onClick={e => e.stopPropagation()}>
-        <h2 className="menu-popup-header">Our specials</h2>
+      <div className="category-navigation">
+      <select
+       className="category-select"
+            onChange={e => handleScrollToCategory(e.target.value)}
+            defaultValue=""
+          >
+            <option value="" disabled>
+              Select a category
+            </option>
+            {categoryOrder.map(category => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
+          {showCartPopup && (
+        <CartPopup onClose={handleClosePopup} cartId={cartId} />
+      )}
+       <img
+            src={cart}
+            alt="Cart"
+            className="cart-btn"
+            onClick={handleShowCartPopup}
+          />
+
+        </div>
+        <h2 ref={el => (categoryRefs.current['Specials'] = el)} className="menu-popup-header">Our specials</h2>
         <p className="menu-popup-price">Price incl drink: 80:-</p>
+        <div className='cartegory-container'>
         {specials.length > 0 ? (
           specials.map((special, index) => (
+           
             <div className="menu-popup-itemContainer" key={index}>
+              
               <p className="menu-popup-item">{special.specialsName}</p>
               <input
                 className="menu-popup-checkbox"
@@ -214,11 +255,12 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
                 onChange={e => handleCheckboxChange(special, e.target.checked)}
               />
             </div>
+            
           ))
         ) : (
           <p>No specials available</p>
         )}
-
+</div>
         <h2 className="menu-popup-header">Or choose your own creation:</h2>
 
         <p className="menu-popup-price">Price incl drink 85:-</p>
@@ -227,7 +269,7 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
           <p>Loading</p>
         ) : (
           sortedCategories.map(([category, items]) => (
-            <div key={category}>
+            <div key={category}  ref={el => (categoryRefs.current[category] = el)} className='cartegory-container'>
               <h3 className="menu-popup-itemHeader">{category}</h3>
               {items.map((item: MenuItem) => (
                 <div className="menu-popup-itemContainer" key={item.menuItem}>
@@ -251,13 +293,7 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
         Add to cart
       </button>
 
-      {showCartPopup && (
-        <CartPopup onClose={handleClosePopup} cartId={cartId} />
-      )}
-
-      <button className="show-cartBtn" onClick={handleShowCartPopup}>
-        Show cart
-      </button>
+      
     </div>
   );
 };

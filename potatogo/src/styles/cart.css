@@ -25,7 +25,17 @@
   overflow-y: auto;
 }
 
+
+.cart-item {
+  background-color: beige;
+  color: black;
+  border: solid beige 20px;
+  border-radius: 20px;
+  margin: 20px;
+}
+
 .remove-cartItem {
+ 
   border: none;
   background-color: #8fbd92;
 }
@@ -33,4 +43,23 @@
 .remove-cartItem:hover {
   background-color: #8fbd92;
   color: grey;
+}
+
+.order-note-header {
+  font-weight: 200;
+}
+
+.order-note {
+  border: none;
+  width: 80%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  border-radius: 10px;
+  padding: 20px;
+  margin: 20px;
+}
+
+.place-orderBtn {
+  margin-top: 20px;
 }

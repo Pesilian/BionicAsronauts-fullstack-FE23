@@ -1,7 +1,6 @@
 
 import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import MenuList from "./components/menu";
 import LandingPage from "./components/LandingPage";
 import ProfilePage from "./components/ProfilePage";
 import "./App.css";

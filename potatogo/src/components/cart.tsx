@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../styles/cart.css';
+import OrderConfirmation from './confirmationPopUp';
 
 interface CartItem {
   customerName: string;
@@ -20,7 +21,11 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [orderNote, setOrderNote] = useState('');
   const [cartIdState, setCartIdState] = useState<string | null>(cartId);
-  const [nickname, setNickname] = useState<string>(''); // State for nickname
+  const [nickname, setNickname] = useState<string>('');
+  const [orderConfirmation, setOrderConfirmation] = useState<{
+    orderId: string;
+    items: CartItem[];
+  } | null>(null);
 
   const fetchData = async () => {
     if (!cartIdState) {
@@ -121,7 +126,7 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
       setIsLoading(true);
       setError(null);
 
-      const customerName = cartItems[0]?.customerName || 'Unknown';
+      const customerName = cartItems[0]?.customerName || 'Guest';
 
       const response = await axios.post(
         `https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/order`,
@@ -129,27 +134,29 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
       );
 
       if (response.status === 200) {
+        const responseBody = JSON.parse(response.data.body);
+        const orderId = responseBody.orderId;
         console.log('Order placed successfully!', response);
+
+
+        setOrderConfirmation({
+          orderId,
+          items: cartItems,
+        });
 
         await axios.delete(
           `https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/cart`,
           { data: { cartId: cartIdState } }
         );
 
-        const clearCartId = () => {
-          setCartIdState(null);
-          localStorage.removeItem('cartId');
-          console.log('cartId removed from localStorage');
-        };
-
-        alert('Order placed and cart removed successfully!');
-        clearCartId();
-        onClose();
+        setCartIdState(null);
+        localStorage.removeItem('cartId');
+        console.log('cartId removed from localStorage');
       } else {
-        setError('Kunde inte lägga beställningen');
+        setError('Error placing order');
       }
     } catch (error) {
-      setError('Kunde inte lägga beställningen');
+      setError('Error placing order or removing cart');
       console.error('Error placing order or removing cart:', error);
     } finally {
       setIsLoading(false);
@@ -158,84 +165,95 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
 
   return (
     <div className="cart-popup-overlay" onClick={handleOverlayClick}>
-      <div className="cart-popup-content" onClick={e => e.stopPropagation()}>
-        {isLoading ? (
-          <p>Loading...</p>
-        ) : cartItems.length > 0 ? (
-          cartItems.map((item, index) => (
-            <div className="cart-popup-itemContainer" key={index}>
-              {/* Replace customerName with nickname */}
-              <p className="cart-popup-item">Customer: {nickname}</p>
+      <div className="cart-popup-content" onClick={(e) => e.stopPropagation()}>
+        {orderConfirmation ? (
+          <OrderConfirmation
+            orderId={orderConfirmation.orderId}
+            items={orderConfirmation.items}
+            onClose={onClose}
+          />
+        ) : (
+          <>
+            {isLoading ? (
+              <p>Loading...</p>
+            ) : cartItems.length > 0 ? (
+              cartItems.map((item, index) => (
+                <div className="cart-popup-itemContainer" key={index}>
+                
+                  <p className="customer">Customer: {nickname}</p>
 
-              {/* rendera cartItems */}
-              {Object.keys(item).map((key, idx) => {
-                if (
-                  key === 'customerName' ||
-                  key === 'updatedAt' ||
-                  key === 'cartId' ||
-                  key === 'totalPrice'
-                ) {
-                  return null;
-                }
+                  {/* Render cartItems */}
+                  {Object.keys(item).map((key, idx) => {
+                    if (
+                      key === 'customerName' ||
+                      key === 'updatedAt' ||
+                      key === 'cartId' ||
+                      key === 'totalPrice'
+                    ) {
+                      return null;
+                    }
 
-                const value = item[key];
+                    const value = item[key];
 
-                if (Array.isArray(value)) {
-                  return (
-                    <div key={idx}>
-                      {/* <h3>{key}:</h3> */}
-                      {value.map((subItem, subIdx) => (
-                        <div key={subIdx} className="cart-item">
-                          <p className="cart-item">{subItem}</p>
+                    if (Array.isArray(value)) {
+                      return (
+                        <div key={idx}>
+                          {value.map((subItem, subIdx) => (
+                            <div key={subIdx} className="cart-item">
+                              <p>{subItem}</p>
+                              <button
+                                className="remove-cartItem"
+                                onClick={() =>
+                                  handleDeleteSubItem(item.cartId, key)
+                                }
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    } else {
+                      return (
+                        <div key={idx} className="cart-item">
+                          <p>{value}</p>
                           <button
                             className="remove-cartItem"
-                            onClick={() =>
-                              handleDeleteSubItem(item.cartId, key)
-                            }
+                            onClick={() => handleDeleteSubItem(item.cartId, key)}
                           >
-                            Remove {subItem}
+                            Remove
                           </button>
                         </div>
-                      ))}
-                    </div>
-                  );
-                } else {
-                  return (
-                    <div key={idx} className="cart-item">
-                      <p className="cart-item">{value}</p>
-                      <button
-                        className="remove-cartItem"
-                        onClick={() => handleDeleteSubItem(item.cartId, key)}
-                      >
-                        Remove {key}
-                      </button>
-                    </div>
-                  );
-                }
-              })}
+                      );
+                    }
+                  })}
+                </div>
+              ))
+            ) : (
+              <p>No items in cart</p>
+            )}
+
+            <div className="cart-popup-input-container">
+              <label className="order-note-header" htmlFor="order-note">
+                Leave a message to the kitchen:
+              </label>
+              <textarea
+                className="order-note"
+                value={orderNote}
+                onChange={(e) => setOrderNote(e.target.value)}
+                placeholder="Leave a special note for your order..."
+              />
             </div>
-          ))
-        ) : (
-          <p>No items in cart</p>
+
+            {error && <p>{error}</p>}
+
+            <div className="cart-popup-actions">
+              <button className="place-orderBtn" onClick={handlePlaceOrder}>
+                Place Order
+              </button>
+            </div>
+          </>
         )}
-
-        <div className="cart-popup-input-container">
-          <label htmlFor="order-note">Order Note:</label>
-          <textarea
-            className="order-note"
-            value={orderNote}
-            onChange={e => setOrderNote(e.target.value)}
-            placeholder="Leave a special note for your order..."
-          />
-        </div>
-
-        {error && <p>{error}</p>}
-
-        <div className="cart-popup-actions">
-          <button className="place-orderBtn" onClick={handlePlaceOrder}>
-            Place Order
-          </button>
-        </div>
       </div>
     </div>
   );

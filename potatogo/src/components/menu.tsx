@@ -55,6 +55,7 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const categoryOrder = [
+    'Specials',
     'Potatoes',
     'Butters',
     'Protein',
@@ -170,47 +171,58 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
         cartId: currentCartId,
         customerName: customerName,
       };
+      const menuItems: any = {};
 
       if (selectedItems.length === 1 && isSpecial(selectedItems[0])) {
         const special = selectedItems[0] as Special;
-        payload.menuItems = {
-          Specials: special.specialsName,
-        };
+        menuItems.Specials = [
+          {
+            name: special.specialsName,
+            price: special.price,
+          },
+        ];
       } else {
-        payload.menuItems = {
-          cartItems: selectedItems
-            .map(item => {
-              if (isSpecial(item)) {
-                return item.specialsName;
-              } else {
-                return item.menuItem;
-              }
-            })
-            .filter((value, index, self) => self.indexOf(value) === index),
-        };
+        menuItems.cartItems = selectedItems
+          .map(item => {
+            if (isSpecial(item)) {
+              return {
+                name: item.specialsName,
+                price: item.price,
+              };
+            } else {
+              return {
+                name: item.menuItem,
+                price: item.price,
+              };
+            }
+          })
+          .filter((value, index, self) => self.indexOf(value) === index);
       }
+  
 
+      payload.menuItems = menuItems;
+  
       console.log('Payload to be sent:', JSON.stringify(payload, null, 2));
-
+  
       const response = await axios.post(
         'https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/cart',
         payload
       );
-
+  
       console.log('Lyckades skicka:', response.data);
-
+  
       const responseData = JSON.parse(response.data.body);
       const updatedCartId = responseData.cartId;
-
+  
       if (updatedCartId) {
         setCartId(updatedCartId);
         localStorage.setItem('cartId', updatedCartId);
       }
-
+  
       setSelectedItems([]);
     } catch (error) {
       console.error('Kunde inte lägga till i kundvagnen:', error);
-      alert('Ett fel inträffade vid tillägg.');
+    
     }
   };
 

@@ -6,7 +6,7 @@ const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 exports.addToMenu = async event => {
   try {
     const body = event;
-    const { menuItem, category } = body;
+    const { menuItem, category, price } = body;
 
     if (!menuItem || !category) {
       return {
@@ -25,6 +25,7 @@ exports.addToMenu = async event => {
       Item: {
         menuItem,
         category,
+        price,
         createdAt: new Date().toISOString(),
       },
     };
@@ -37,6 +38,7 @@ exports.addToMenu = async event => {
         message: 'Menu item added successfully',
         menuItem,
         category,
+        price,
       }),
       headers: {
         'Content-Type': 'application/json',

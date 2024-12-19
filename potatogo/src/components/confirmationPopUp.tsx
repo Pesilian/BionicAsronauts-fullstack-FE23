@@ -3,6 +3,7 @@ import React from 'react';
 interface OrderConfirmationProps {
   orderId: string;
   items: any[];
+  totalPrice: number; 
   onClose: () => void;
 }
 

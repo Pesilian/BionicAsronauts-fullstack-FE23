@@ -15,6 +15,8 @@ interface CartPopupProps {
   cartId: string | null;
 }
 
+
+
 const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +27,47 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
   const [orderConfirmation, setOrderConfirmation] = useState<{
     orderId: string;
     items: CartItem[];
+    totalPrice: number;
   } | null>(null);
+
+  const [menuPrices, setMenuPrices] =  useState<{ [key: string]: number }>({
+    special: 0,
+    potato: 0,
+  });
+
+  const fetchPrices = async () => {
+    try {
+      const specialResponse = await axios.get(
+        'https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/specials'
+      );
+      const potatoResponse = await axios.get(
+        'https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/menu'
+      );
+
+      const specialPrice = specialResponse.data.price || 0;
+      const potatoPrice = potatoResponse.data.price || 0;
+
+      setMenuPrices({ special: specialPrice, potato: potatoPrice });
+    } catch (error) {
+      setError('Could not fetch prices');
+      console.error('Error fetching prices:', error);
+    }
+  };
+
+  const calculateTotalPrice = (cartItems: CartItem[]) => {
+    let totalPrice = 0;
+
+    cartItems.forEach(item => {
+      if (item['Specials']) {
+        totalPrice += (Array.isArray(item['Specials']) ? item['Specials'].length : 0) * menuPrices.specials;
+      }
+      if (item['Potatoes']) {
+        totalPrice += (Array.isArray(item['Potatoes']) ? item['Potatoes'].length : 0) * menuPrices.potatoes;
+      }
+    });
+
+    return totalPrice;
+  };
 
   const fetchData = async () => {
     if (!cartIdState) {
@@ -73,6 +115,7 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
   }, []);
 
   useEffect(() => {
+    fetchPrices();
     fetchData();
   }, [cartIdState]);
 
@@ -128,6 +171,8 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
 
       const customerName = cartItems[0]?.customerName || 'Guest';
 
+      const totalPrice = calculateTotalPrice(cartItems);
+
       const response = await axios.post(
         `https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/order`,
         { cartId: cartIdState, customerName: customerName, orderNote }
@@ -142,6 +187,7 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
         setOrderConfirmation({
           orderId,
           items: cartItems,
+          totalPrice,
         });
 
         await axios.delete(
@@ -170,6 +216,7 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
           <OrderConfirmation
             orderId={orderConfirmation.orderId}
             items={orderConfirmation.items}
+            totalPrice={orderConfirmation.totalPrice}
             onClose={onClose}
           />
         ) : (
@@ -232,7 +279,9 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
             ) : (
               <p>No items in cart</p>
             )}
-
+  <div className="total-price">
+                <p>Total Price: {calculateTotalPrice(cartItems)} SEK</p>
+              </div>
             <div className="cart-popup-input-container">
               <label className="order-note-header" htmlFor="order-note">
                 Leave a message to the kitchen:

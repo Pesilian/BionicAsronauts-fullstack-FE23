@@ -8,11 +8,13 @@ import cart from '../assets/cart.svg';
 interface MenuItem {
   menuItem: string;
   category: string;
+  price: number
 }
 
 interface Special {
   specialsName: string;
-  description: string;
+  ingridients: string;
+  price: number;
 }
 
 interface MenuPopupProps {
@@ -83,6 +85,8 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
           'https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/menu'
         );
 
+        console.log(menuResponse)
+
         const menuData = JSON.parse(menuResponse.data.body);
         if (menuData && menuData.menuItems) {
           setMenuItems(menuData.menuItems);
@@ -92,12 +96,22 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
           'https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/specials'
         );
 
+        console.log(specialsResponse)
+     
+
         const specialsData = JSON.parse(specialsResponse.data.body);
-        if (specialsData && specialsData.specials) {
-          setSpecials(specialsData.specials);
+        
+
+        if (specialsData && specialsData.menuItems) {
+          const normalizedSpecials = specialsData.menuItems.map((special: any) => ({
+            specialsName: special.specialsName,
+            ingridients: special.ingridients || special.item1 || {},
+            price: special.price || 0,
+          }));
+          setSpecials(normalizedSpecials);
         }
       } catch (error: unknown) {
-        setError('Kunde inte ladda data.');
+        setError('Error while loading');
       } finally {
         setIsLoading(false);
       }
@@ -210,6 +224,8 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
     }
   };
 
+
+
   return (
     <div className="menu-popup-overlay" onClick={handleOverlayClick}>
       <div className="menu-popup-content" onClick={e => e.stopPropagation()}>
@@ -240,14 +256,15 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
 
         </div>
         <h2 ref={el => (categoryRefs.current['Specials'] = el)} className="menu-popup-header">Our specials</h2>
-        <p className="menu-popup-price">Price incl drink: 80:-</p>
+       
+
         <div className='cartegory-container'>
         {specials.length > 0 ? (
           specials.map((special, index) => (
            
             <div className="menu-popup-itemContainer" key={index}>
               
-              <p className="menu-popup-item">{special.specialsName}</p>
+              <p className="menu-popup-item">{special.specialsName} <span className="menu-popup-price">{special.price} kr</span></p>
               <input
                 className="menu-popup-checkbox"
                 type="checkbox"
@@ -263,7 +280,6 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
 </div>
         <h2 className="menu-popup-header">Or choose your own creation:</h2>
 
-        <p className="menu-popup-price">Price incl drink 85:-</p>
 
         {isLoading ? (
           <p>Loading</p>
@@ -271,17 +287,32 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
           sortedCategories.map(([category, items]) => (
             <div key={category}  ref={el => (categoryRefs.current[category] = el)} className='cartegory-container'>
               <h3 className="menu-popup-itemHeader">{category}</h3>
-              {items.map((item: MenuItem) => (
-                <div className="menu-popup-itemContainer" key={item.menuItem}>
-                  <p className="menu-popup-item">{item.menuItem}</p>
-                  <input
-                    className="menu-popup-checkbox"
-                    type="checkbox"
-                    checked={selectedItems.includes(item)}
-                    onChange={e => handleCheckboxChange(item, e.target.checked)}
-                  />
-                </div>
-              ))}
+              {category === 'Potatoes' && items.map((item: MenuItem) => (
+  <div className="menu-popup-itemContainer" key={item.menuItem}>
+    <p className="menu-popup-item">
+      {item.menuItem} - <span className="menu-popup-price">{item.price} kr</span>
+    </p>
+    <input
+      className="menu-popup-checkbox"
+      type="checkbox"
+      checked={selectedItems.includes(item)}
+      onChange={e => handleCheckboxChange(item, e.target.checked)}
+    />
+  </div>
+))}
+
+{category !== 'Potatoes' && items.map((item: MenuItem) => (
+  <div className="menu-popup-itemContainer" key={item.menuItem}>
+    <p className="menu-popup-item">{item.menuItem}</p>
+    <input
+      className="menu-popup-checkbox"
+      type="checkbox"
+      checked={selectedItems.includes(item)}
+      onChange={e => handleCheckboxChange(item, e.target.checked)}
+    />
+  </div>
+))}
+
             </div>
           ))
         )}

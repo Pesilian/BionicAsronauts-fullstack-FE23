@@ -47,7 +47,7 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
       const specialPrice = specialResponse.data.price || 0;
       const potatoPrice = potatoResponse.data.price || 0;
 
-      setMenuPrices({ special: specialPrice, potato: potatoPrice });
+      setMenuPrices({ specials: specialPrice, potatoes: potatoPrice });
     } catch (error) {
       setError('Could not fetch prices');
       console.error('Error fetching prices:', error);
@@ -56,7 +56,7 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
 
   const calculateTotalPrice = (cartItems: CartItem[]) => {
     let totalPrice = 0;
-
+  
     cartItems.forEach(item => {
       if (item['Specials']) {
         totalPrice += (Array.isArray(item['Specials']) ? item['Specials'].length : 0) * menuPrices.specials;
@@ -65,9 +65,10 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
         totalPrice += (Array.isArray(item['Potatoes']) ? item['Potatoes'].length : 0) * menuPrices.potatoes;
       }
     });
-
+  
     return totalPrice;
   };
+  
 
   const fetchData = async () => {
     if (!cartIdState) {
@@ -226,7 +227,6 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
             ) : cartItems.length > 0 ? (
               cartItems.map((item, index) => (
                 <div className="cart-popup-itemContainer" key={index}>
-                
                   <p className="customer">Customer: {nickname}</p>
 
                   {/* Render cartItems */}
@@ -248,6 +248,9 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
                           {value.map((subItem, subIdx) => (
                             <div key={subIdx} className="cart-item">
                               <p>{subItem}</p>
+                              <p>
+                    Price: {menuPrices[key] ? menuPrices[key] : 0} SEK
+                  </p>
                               <button
                                 className="remove-cartItem"
                                 onClick={() =>
@@ -264,6 +267,9 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
                       return (
                         <div key={idx} className="cart-item">
                           <p>{value}</p>
+                          <p>
+                Price: {menuPrices[key] ? menuPrices[key] : 0} SEK
+              </p>
                           <button
                             className="remove-cartItem"
                             onClick={() => handleDeleteSubItem(item.cartId, key)}

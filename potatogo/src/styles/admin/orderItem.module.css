@@ -37,3 +37,13 @@
   margin: 0;
   padding: 2px 0;
 }
+
+.items ul, .specials ul {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin: 5px 0;
+}
+
+.items ul li, .specials ul li {
+  margin: 5px 0;
+}

@@ -9,29 +9,46 @@ interface OrderItemProps {
 }
 
 const OrderItem: React.FC<OrderItemProps> = ({ order, onDelete }) => {
-  const [isExpanded, setIsExpanded] = useState(false); // Toggle dropdown visibility
+  const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <div className={styles.orderItem}>
-      {/* Header Section - Toggle Dropdown */}
+      {/* Collapsed View */}
       <div className={styles.orderHeader} onClick={() => setIsExpanded(!isExpanded)}>
         <p><strong>Order ID:</strong> {order.orderId}</p>
         <p><strong>Customer:</strong> {order.customerName}</p>
       </div>
 
-      {/* Collapsible Section */}
+      {/* Expanded View */}
       {isExpanded && (
         <div className={styles.orderDetails}>
-          <p><strong>Status:</strong> {order.orderStatus}</p>
-          <p><strong>Specials:</strong> {order.specials?.join(', ') || 'None'}</p>
-          <p><strong>Created At:</strong> {order.createdAt}</p>
+          {/* Order Items */}
+          <div className={styles.items}>
+            <p><strong>Order Items:</strong></p>
+            <ul>
+              {order.orderItems?.map((itemGroup, index) => (
+                <li key={index}>{itemGroup.join(', ')}</li>
+              )) || <li>None</li>}
+            </ul>
+          </div>
+          
+          {/* Specials */}
+          <div className={styles.specials}>
+            <p><strong>Specials:</strong></p>
+            <ul>
+              {order.specials?.map((special, index) => (
+                <li key={index}>{special}</li>
+              )) || <li>None</li>}
+            </ul>
+          </div>
 
-          {/* Action Buttons */}
           <ActionButtons orderId={order.orderId} onDelete={onDelete} />
         </div>
       )}
     </div>
   );
 };
+
+
 
 export default OrderItem;

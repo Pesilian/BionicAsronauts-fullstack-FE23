@@ -3,23 +3,17 @@ const { DynamoDBDocumentClient, PutCommand } = require('@aws-sdk/lib-dynamodb');
 
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-exports.addToSpecials = async event => {
+exports.addToSpecials = async (event) => {
   try {
-    const body = event;
-    const menuItems = body.menuItems;
-    const specialsName = body.specialsName;
-    const totalPrice = body.totalPrice;
+    const body = JSON.parse(event.body);  
+    const { ingridients, specialsName, price } = body;
 
-    if (
-      !specialsName ||
-      !menuItems ||
-      menuItems.length === 0 ||
-      totalPrice === undefined
-    ) {
+
+    if (!specialsName || !ingridients || ingridients.length === 0 || price === undefined) {
       return {
         statusCode: 400,
         body: JSON.stringify({
-          message: 'Specialsname, menu items and totalPrice are required',
+          message: 'Specialsname, ingridients, and price are required',
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -29,12 +23,13 @@ exports.addToSpecials = async event => {
 
     let updatedItems = {};
 
-    menuItems.forEach((item, index) => {
+   
+    ingridients.forEach((item, index) => {
       const itemKey = `item${index + 1}`;
       updatedItems[itemKey] = {
-        potatoe: item.potatoe,
-        toppings: item.toppings || [],
-        price: item.price,
+        potatoe: item.potatoe, 
+        toppings: item.toppings || [], 
+        price: item.price || price,  
       };
     });
 
@@ -43,7 +38,7 @@ exports.addToSpecials = async event => {
       Item: {
         specialsName,
         ...updatedItems,
-        totalPrice,
+        price,
         updatedAt: new Date().toISOString(),
       },
     };
@@ -56,7 +51,7 @@ exports.addToSpecials = async event => {
         message: 'Specials posted successfully',
         specialsName,
         items: updatedItems,
-        totalPrice,
+        price,
       }),
       headers: {
         'Content-Type': 'application/json',

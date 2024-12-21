@@ -144,63 +144,64 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
   const handleAddAllToCart = async () => {
     try {
       let currentCartId = cartId;
-
+  
       if (!currentCartId) {
         const newCartResponse = await axios.post(
           'https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/cart',
           {}
         );
-
+  
         const newCartData = JSON.parse(newCartResponse.data.body);
         currentCartId = newCartData.cartId;
         setCartId(currentCartId);
-
+  
         if (onCartIdChange && currentCartId) {
           onCartIdChange(currentCartId);
           localStorage.setItem('cartId', currentCartId);
         }
       }
-
+  
       const userDetails = localStorage.getItem('user');
-      console.log('user');
       const customerName = userDetails
         ? JSON.parse(userDetails).nickname
         : 'Guest';
-
+  
       const payload: any = {
         cartId: currentCartId,
         customerName: customerName,
       };
-      const menuItems: any = {};
-
-      if (selectedItems.length === 1 && isSpecial(selectedItems[0])) {
-        const special = selectedItems[0] as Special;
-        menuItems.Specials = [
-          {
-            name: special.specialsName,
-            price: special.price,
-          },
-        ];
-      } else {
-        menuItems.cartItems = selectedItems
-          .map(item => {
-            if (isSpecial(item)) {
-              return {
-                name: item.specialsName,
-                price: item.price,
-              };
-            } else {
-              return {
-                name: item.menuItem,
-                price: item.price,
-              };
-            }
-          })
-          .filter((value, index, self) => self.indexOf(value) === index);
+  
+      let mainItem: any = {}; 
+      let toppings: string[] = []; 
+  
+     
+      selectedItems.forEach(item => {
+        if (isSpecial(item)) {
+         
+          mainItem = {
+            name: item.specialsName,
+            price: item.price || 0,
+          };
+        } else {
+          if (item.price) {
+            
+            mainItem = {
+              name: item.menuItem,
+              price: item.price || 0,
+            };
+          } else {
+           
+            toppings.push(item.menuItem);
+          }
+        }
+      });
+  
+     
+      if (toppings.length > 0) {
+        mainItem.toppings = toppings;
       }
   
-
-      payload.menuItems = menuItems;
+      payload.menuItems = { mainItem }; 
   
       console.log('Payload to be sent:', JSON.stringify(payload, null, 2));
   
@@ -222,9 +223,9 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
       setSelectedItems([]);
     } catch (error) {
       console.error('Kunde inte lägga till i kundvagnen:', error);
-    
     }
   };
+  
 
   const isSpecial = (item: MenuItem | Special): item is Special => {
     return (item as Special).specialsName !== undefined;

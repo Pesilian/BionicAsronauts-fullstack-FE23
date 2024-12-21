@@ -3,11 +3,16 @@ import axios from 'axios';
 import '../styles/cart.css';
 import OrderConfirmation from './confirmationPopUp';
 
+interface SubItem {
+  name: string;
+  price: number;
+}
+
 interface CartItem {
   customerName: string;
   updatedAt: string;
   cartId: string;
-  [key: string]: string | string[] | undefined;
+  [key: string]: string | SubItem[] | undefined;
 }
 
 interface CartPopupProps {
@@ -15,83 +20,37 @@ interface CartPopupProps {
   cartId: string | null;
 }
 
-
-
 const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [orderNote, setOrderNote] = useState('');
   const [cartIdState, setCartIdState] = useState<string | null>(cartId);
-  const [nickname, setNickname] = useState<string>('');
+  const [nickname, setNickname] = useState<string>('Guest');
   const [orderConfirmation, setOrderConfirmation] = useState<{
     orderId: string;
     items: CartItem[];
     totalPrice: number;
   } | null>(null);
 
-  const [menuPrices, setMenuPrices] =  useState<{ [key: string]: number }>({
-    special: 0,
-    potato: 0,
-  });
-
-  const fetchPrices = async () => {
-    try {
-      const specialResponse = await axios.get(
-        'https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/specials'
-      );
-      const potatoResponse = await axios.get(
-        'https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/menu'
-      );
-
-      const specialPrice = specialResponse.data.price || 0;
-      const potatoPrice = potatoResponse.data.price || 0;
-
-      setMenuPrices({ specials: specialPrice, potatoes: potatoPrice });
-    } catch (error) {
-      setError('Could not fetch prices');
-      console.error('Error fetching prices:', error);
-    }
-  };
-
-  const calculateTotalPrice = (cartItems: CartItem[]) => {
-    let totalPrice = 0;
-  
-    cartItems.forEach(item => {
-      if (item['Specials']) {
-        totalPrice += (Array.isArray(item['Specials']) ? item['Specials'].length : 0) * menuPrices.specials;
-      }
-      if (item['Potatoes']) {
-        totalPrice += (Array.isArray(item['Potatoes']) ? item['Potatoes'].length : 0) * menuPrices.potatoes;
-      }
-    });
-  
-    return totalPrice;
-  };
-  
-
   const fetchData = async () => {
     if (!cartIdState) {
       console.log('No cartId provided');
       return;
     }
-    console.log('Fetching data for cartId:', cartIdState);
 
     setIsLoading(true);
     setError(null);
 
     try {
-      const cartResponse = await axios.get(
+      const response = await axios.get(
         `https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/cart`,
         {
           params: { cartId: cartIdState },
         }
       );
 
-      console.log('Full cart response:', cartResponse);
-
-      const cartData = cartResponse.data;
-      const customerName = cartData.customerName;
+      const cartData = response.data;
 
       if (cartData && cartData.cartItems && cartData.cartItems.length > 0) {
         setCartItems(cartData.cartItems);
@@ -99,8 +58,8 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
         console.log('No valid cart data found.');
         setError('No valid cart data found.');
       }
-    } catch (error: unknown) {
-      setError('Cant load data');
+    } catch (error) {
+      setError('Cannot load data');
       console.error('Error fetching data:', error);
     } finally {
       setIsLoading(false);
@@ -115,11 +74,6 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
     }
   }, []);
 
-  useEffect(() => {
-    fetchPrices();
-    fetchData();
-  }, [cartIdState]);
-
   const handleDeleteSubItem = async (
     itemKey: string,
     itemToRemoveKey: string
@@ -131,7 +85,7 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
       setError(null);
 
       const response = await axios.delete(
-        `https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/cart`,
+        'https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/cart',
         {
           data: { cartId: cartIdState, itemToRemoveKey },
         }
@@ -147,7 +101,7 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
         console.log('Item removed successfully, fetching updated cart...');
         fetchData();
       } else {
-        setError(`Failed to remove item: ${responseData.message}`);
+      setError(`Failed to remove item: ${responseData.message}`);
       }
     } catch (error) {
       setError('Kunde inte ta bort objektet.');
@@ -157,6 +111,30 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
     }
   };
 
+  const calculateTotalPrice = (): number => {
+    return cartItems.reduce((total, item) => {
+      return (
+        total +
+        Object.keys(item).reduce((subTotal, key) => {
+          const value = item[key];
+          if (Array.isArray(value)) {
+            return (
+              subTotal +
+              value.reduce((sum, subItem) => {
+                return sum + (subItem as SubItem).price;
+              }, 0)
+            );
+          }
+          return subTotal;
+        }, 0)
+      );
+    }, 0);
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [cartIdState]);
+
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose();
@@ -165,40 +143,36 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
 
   const handlePlaceOrder = async () => {
     if (!cartIdState) return;
-
+  
     try {
       setIsLoading(true);
       setError(null);
-
+  
       const customerName = cartItems[0]?.customerName || 'Guest';
-
-      const totalPrice = calculateTotalPrice(cartItems);
-
+      const totalPrice = calculateTotalPrice(); 
+  
       const response = await axios.post(
         `https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/order`,
-        { cartId: cartIdState, customerName: customerName, orderNote }
+        { cartId: cartIdState, customerName, orderNote, totalPrice } 
       );
-
+  
       if (response.status === 200) {
         const responseBody = JSON.parse(response.data.body);
         const orderId = responseBody.orderId;
-        console.log('Order placed successfully!', response);
-
-
+  
         setOrderConfirmation({
           orderId,
           items: cartItems,
-          totalPrice,
+          totalPrice: responseBody.totalPrice, 
         });
-
+  
         await axios.delete(
           `https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/cart`,
           { data: { cartId: cartIdState } }
         );
-
+  
         setCartIdState(null);
         localStorage.removeItem('cartId');
-        console.log('cartId removed from localStorage');
       } else {
         setError('Error placing order');
       }
@@ -209,6 +183,7 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
       setIsLoading(false);
     }
   };
+  
 
   return (
     <div className="cart-popup-overlay" onClick={handleOverlayClick}>
@@ -216,8 +191,6 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
         {orderConfirmation ? (
           <OrderConfirmation
             orderId={orderConfirmation.orderId}
-            items={orderConfirmation.items}
-            totalPrice={orderConfirmation.totalPrice}
             onClose={onClose}
           />
         ) : (
@@ -229,13 +202,11 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
                 <div className="cart-popup-itemContainer" key={index}>
                   <p className="customer">Customer: {nickname}</p>
 
-                  {/* Render cartItems */}
-                  {Object.keys(item).map((key, idx) => {
+                  {Object.keys(item).map((key) => {
                     if (
                       key === 'customerName' ||
                       key === 'updatedAt' ||
-                      key === 'cartId' ||
-                      key === 'totalPrice'
+                      key === 'cartId'
                     ) {
                       return null;
                     }
@@ -244,13 +215,11 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
 
                     if (Array.isArray(value)) {
                       return (
-                        <div key={idx}>
+                        <div key={key}>
                           {value.map((subItem, subIdx) => (
                             <div key={subIdx} className="cart-item">
-                              <p>{subItem}</p>
-                              <p>
-                    Price: {menuPrices[key] ? menuPrices[key] : 0} SEK
-                  </p>
+                              <p>{(subItem as SubItem).name}</p>
+                              <p>Price: {(subItem as SubItem).price} SEK</p>
                               <button
                                 className="remove-cartItem"
                                 onClick={() =>
@@ -263,31 +232,20 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
                           ))}
                         </div>
                       );
-                    } else {
-                      return (
-                        <div key={idx} className="cart-item">
-                          <p>{value}</p>
-                          <p>
-                Price: {menuPrices[key] ? menuPrices[key] : 0} SEK
-              </p>
-                          <button
-                            className="remove-cartItem"
-                            onClick={() => handleDeleteSubItem(item.cartId, key)}
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      );
                     }
+
+                    return null;
                   })}
                 </div>
               ))
             ) : (
               <p>No items in cart</p>
             )}
-  <div className="total-price">
-                <p>Total Price: {calculateTotalPrice(cartItems)} SEK</p>
-              </div>
+          
+          <div className="cart-popup-total">
+  <h3>Total Price: {calculateTotalPrice()} SEK</h3>
+</div>
+
             <div className="cart-popup-input-container">
               <label className="order-note-header" htmlFor="order-note">
                 Leave a message to the kitchen:

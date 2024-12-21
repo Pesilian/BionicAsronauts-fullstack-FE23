@@ -7,7 +7,7 @@ const {
 
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-exports.handler = async event => {
+exports.handler = async (event) => {
   console.log('Full event:', JSON.stringify(event, null, 2));
 
   try {
@@ -16,9 +16,13 @@ exports.handler = async event => {
 
     const cartId = body.cartId;
     const customerName = body.customerName || 'Guest';
+    const orderNote = body.orderNote || ''; 
+    const totalPrice = body.totalPrice || 0; 
 
     console.log('Parsed Cart Id:', cartId);
     console.log('Parsed Customer Name:', customerName);
+    console.log('Parsed Order Note:', orderNote);
+    console.log('Parsed Total Price:', totalPrice);
 
     if (!cartId) {
       console.error('Missing cartId in body');
@@ -35,6 +39,7 @@ exports.handler = async event => {
       TableName: 'Pota-To-Go-cart',
       Key: { cartId },
     };
+
     const cartData = await dynamoDB.send(new GetCommand(getCartParams));
     const cart = cartData.Item;
 
@@ -48,7 +53,7 @@ exports.handler = async event => {
     }
 
     const orderItems = Object.keys(cart)
-      .filter(key => key.startsWith('cartItem'))
+      .filter((key) => key.startsWith('cartItem'))
       .reduce((acc, key) => {
         const orderKey = key.replace('cart', 'order');
         acc[orderKey] = cart[key];
@@ -56,7 +61,7 @@ exports.handler = async event => {
       }, {});
 
     const specials = Object.keys(cart)
-      .filter(key => key.startsWith('specials'))
+      .filter((key) => key.startsWith('specials'))
       .reduce((acc, key) => {
         acc[key] = cart[key];
         return acc;
@@ -71,6 +76,8 @@ exports.handler = async event => {
       ...orderItems,
       orderId: generateOrderId(),
       customerName,
+      orderNote, 
+      totalPrice, 
       orderStatus: 'pending',
       createdAt: new Date().toISOString(),
     };
@@ -92,6 +99,8 @@ exports.handler = async event => {
         message: 'Order created successfully',
         orderId: newOrder.orderId,
         customerName: newOrder.customerName,
+        orderNote: newOrder.orderNote, 
+        totalPrice: newOrder.totalPrice, 
         orderStatus: newOrder.orderStatus,
         createdAt: newOrder.createdAt,
       }),

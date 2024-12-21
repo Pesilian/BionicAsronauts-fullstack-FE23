@@ -1,49 +1,30 @@
+.items div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+}
 .orderItem {
-  margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  overflow: hidden;
-  font-family: Arial, sans-serif;
-  color: #333;
+  color: #333; 
 }
 
 .orderHeader {
-  background-color: #f0f0f0;
-  padding: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 10px;
+}
+
+button {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background-color: #007bff;
+  color: rgb(23, 2, 2);
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
-  font-weight: bold;
-  color: #000;
 }
 
-.orderHeader:hover {
-  background-color: #e0e0e0;
-}
-
-.orderDetails {
-  background-color: #fff;
-  padding: 10px;
-  border-top: 1px solid #ccc;
-  color: #444;
-}
-
-.items, .specials {
-  margin: 10px 0;
-}
-
-.items p, .specials p {
-  margin: 0;
-  padding: 2px 0;
-}
-
-.items ul, .specials ul {
-  list-style-type: disc;
-  padding-left: 20px;
-  margin: 5px 0;
-}
-
-.items ul li, .specials ul li {
-  margin: 5px 0;
+button:hover {
+  background-color: #0056b3;
 }

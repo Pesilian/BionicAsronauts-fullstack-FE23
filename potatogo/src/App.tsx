@@ -1,9 +1,8 @@
 import React from 'react';
-import { Amplify } from 'aws-amplify'; // Explicit import for Amplify (tree-shaking friendly)
-import awsExports from './aws-exports'; // Use a descriptive name for the configuration
+import { Amplify } from 'aws-amplify';
 import AdminPage from './pages/admin/adminPage';
 import './App.css';
-import awsmobile  from './aws-exports'; // Use a descriptive name for the configuration
+import awsmobile  from './aws-exports';
 import amplifyconfig from './amplifyconfiguration.json';
 Amplify.configure(amplifyconfig);
 // Configure Amplify

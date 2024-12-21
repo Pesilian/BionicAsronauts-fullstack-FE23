@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { fetchOrders } from '../../api/ordersApi';
 import { Order } from '../../types/orderTypes';
 import { parseOrder } from '../../utils/parseOrder';
@@ -15,7 +15,7 @@ const OrderList: React.FC<OrderListProps> = ({ orderStatus }) => {
   const [error, setError] = useState<string | null>(null);
 
   
-  const loadOrders = async () => {
+  const loadOrders = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetchOrders({ orderStatus });
@@ -27,12 +27,13 @@ const OrderList: React.FC<OrderListProps> = ({ orderStatus }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [orderStatus]); // Re-create the function only when orderStatus changes
 
-  
+  // UseEffect with stable loadOrders reference
   useEffect(() => {
     loadOrders();
-  }, [orderStatus]);
+  }, [orderStatus, loadOrders]);
+  
 
   if (loading) return <p>Loading orders...</p>;
   if (error) return <p className={styles.error}>{error}</p>;

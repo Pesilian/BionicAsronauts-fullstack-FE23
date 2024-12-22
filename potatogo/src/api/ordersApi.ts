@@ -47,33 +47,44 @@ export const fetchOrders = async (params: FetchOrdersParams): Promise<FetchOrder
 
 
 // Update an order
-export const updateOrders = async (orderId: string, data: UpdateOrderBody): Promise<UpdateOrderResponse> => {
+export const updateOrders = async (
+  orderId: string,
+  data: UpdateOrderBody
+): Promise<UpdateOrderResponse> => {
   try {
+    // Build query string for orderId
+    const queryString = new URLSearchParams({ orderId }).toString();
+
+    // Perform PUT operation
     const restOperation = put({
       apiName: 'potatogoapi',
-      path: `/order`,
+      path: `/order?${queryString}`,
       options: {
         headers: {
           'Content-Type': 'application/json',
           'x-user-role': 'employee',
         },
-        body: JSON.stringify({ ...data, orderId }),
+        body: JSON.stringify({ ...data, orderId }), // Include orderId redundantly
       },
     });
-
     
+
     const { body } = await restOperation.response;
-    const responseBody = (await body.json() as unknown) as { body: UpdateOrderResponse };
 
-    console.log('API Response:', responseBody);
+    const responseBody = (await body.json()) as ApiResponseBody;
+    console.log('ResponseBody:', responseBody);
 
-    
-    return parseUpdateResponse(responseBody.body);
+    return parseUpdateResponse(responseBody);
   } catch (error) {
-    console.error(`Error updating order with ID ${orderId}:`, error);
+    console.error('Error updating order:', error);
     throw error;
   }
 };
+
+
+
+
+
 
 
 

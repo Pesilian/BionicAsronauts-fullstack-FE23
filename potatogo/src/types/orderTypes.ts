@@ -2,12 +2,17 @@ export interface Order {
   orderId: string;
   customerName: string;
   orderStatus: string;
-  orderItems: string[][];
-  specials: string[];
+  orderItems: {
+    name: string;
+    price: number;
+    toppings: string[];
+  }[];
   totalPrice: number;
   createdAt: string;
   modifiedAt: string;
+  orderNote: string; // Newly added field
 }
+
 
 
 

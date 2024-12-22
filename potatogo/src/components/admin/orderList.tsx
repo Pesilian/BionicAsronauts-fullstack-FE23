@@ -6,7 +6,7 @@ import OrderItem from './orderItem';
 import styles from '../../styles/admin/orderList.module.css';
 
 interface OrderListProps {
-  orderStatus: string; // "pending", "in progress", "done"
+  orderStatus: string;
 }
 
 const OrderList: React.FC<OrderListProps> = ({ orderStatus }) => {
@@ -27,9 +27,9 @@ const OrderList: React.FC<OrderListProps> = ({ orderStatus }) => {
     } finally {
       setLoading(false);
     }
-  }, [orderStatus]); // Re-create the function only when orderStatus changes
+  }, [orderStatus]); 
 
-  // UseEffect with stable loadOrders reference
+
   useEffect(() => {
     loadOrders();
   }, [orderStatus, loadOrders]);

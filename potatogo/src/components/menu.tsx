@@ -271,7 +271,7 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
         <h2 ref={el => (categoryRefs.current['Specials'] = el)} className="menu-popup-header">Our specials</h2>
        
 
-        <div className='cartegory-container'>
+        <div className='category-container'>
         {specials.length > 0 ? (
           specials.map((special, index) => (
            
@@ -298,7 +298,7 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
           <p>Loading</p>
         ) : (
           sortedCategories.map(([category, items]) => (
-            <div key={category}  ref={el => (categoryRefs.current[category] = el)} className='cartegory-container'>
+            <div key={category}  ref={el => (categoryRefs.current[category] = el)} className='category-container'>
               <h3 className="menu-popup-itemHeader">{category}</h3>
               {category === 'Potatoes' && items.map((item: MenuItem) => (
   <div className="menu-popup-itemContainer" key={item.menuItem}>

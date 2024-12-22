@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import '../styles/confirmationPopUp.css';
+
 
 interface OrderConfirmationProps {
   orderId: string;
@@ -46,19 +48,19 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ orderId, onClose 
   return (
     <div className="order-confirmation-overlay">
       <div className="order-confirmation-content">
-        <h2>Order Confirmation</h2>
-        <p>Thank you for your order!</p>
+        <h2 className='header'>Order Confirmation</h2>
+        <p className='post-header'>Thank you for your order!</p>
 
         {orderDetails ? (
           <>
-            <p>Order Number: <strong>{orderDetails.orderId}</strong></p>
-            <h3>Your order:</h3>
+            <p>Order Number: {orderDetails.orderId}</p>
+            <h2>Your order:</h2>
             <ul>
-              <li>
-                <div><strong>Customer Name:</strong> {orderDetails.customerName}</div>
-                <div><strong>Order Status:</strong> {orderDetails.orderStatus}</div>
+              <li className='order-list'>
+                <div>Customer Name: {orderDetails.customerName}</div>
+                <div>Order Status:{orderDetails.orderStatus}</div>
 
-                <h4>Order Items:</h4>
+                <h2>Order Items:</h2>
                 {Object.keys(orderDetails).map((key) => {
                   if (key.startsWith('orderItem')) {
                     const items = orderDetails[key]; 
@@ -66,10 +68,9 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ orderId, onClose 
                       <div key={key}>
                         {items?.map((orderItem: any, idx: number) => (
                           <div key={idx}>
-                            <strong>{orderItem.name}:</strong> {orderItem.price} SEK
+                            {orderItem.name}:{orderItem.price} SEK
                             {orderItem.toppings && orderItem.toppings.length > 0 && (
-                              <div>
-                                <strong>Toppings:</strong>
+                              <div>Toppings:
                                 {orderItem.toppings.map((topping: string, toppingIdx: number) => (
                                   <div key={toppingIdx}>{topping}</div>
                                 ))}
@@ -82,8 +83,10 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ orderId, onClose 
                   }
                   return null;
                 })}
-                <div><strong>Total Price:</strong> {orderDetails.totalPrice} SEK</div>
-                <div><strong>Order Note:</strong> {orderDetails.orderNote}</div>
+                <div className='priceCont'>
+                <p>Total Price:</p><div className='totalPrice'>  {orderDetails.totalPrice} SEK</div></div>
+                <div className='noteCont'>
+                <p>Order Note:</p><div className='orderNote'>{orderDetails.orderNote}</div></div>
               </li>
             </ul>
           </>

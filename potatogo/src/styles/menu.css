@@ -75,18 +75,8 @@
   text-align: start;
 }
 
-/* .menu-popup-price {
-  font-family: 'Roboto Serif', serif;
-  font-size: 16px;
-  font-weight: 400;
-  text-align: left;
-  color: black;
-  margin-top: 45px;
-  margin-right: auto; 
 
-} */
-
-.cartegory-container {
+.category-container {
   background-color: beige;
   color: black;
   border: solid beige 20px;

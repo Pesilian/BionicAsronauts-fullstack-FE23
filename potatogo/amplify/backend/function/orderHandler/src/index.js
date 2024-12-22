@@ -18,6 +18,7 @@ exports.handler = async (event) => {
     const customerName = body.customerName || 'Guest';
     const orderNote = body.orderNote || ''; 
     const totalPrice = body.totalPrice || 0; 
+    const paymentMethod = body.paymentMethod;
 
     console.log('Parsed Cart Id:', cartId);
     console.log('Parsed Customer Name:', customerName);
@@ -78,6 +79,7 @@ exports.handler = async (event) => {
       customerName,
       orderNote, 
       totalPrice, 
+      paymentMethod,
       orderStatus: 'pending',
       createdAt: new Date().toISOString(),
     };
@@ -101,6 +103,7 @@ exports.handler = async (event) => {
         customerName: newOrder.customerName,
         orderNote: newOrder.orderNote, 
         totalPrice: newOrder.totalPrice, 
+        paymentMethod: newOrder.paymentMethod,
         orderStatus: newOrder.orderStatus,
         createdAt: newOrder.createdAt,
       }),

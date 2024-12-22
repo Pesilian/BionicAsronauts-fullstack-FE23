@@ -46,3 +46,7 @@
   background-color: #76a879;
   color: #ffffff;
 }
+
+.priceCont {
+  display: flex;
+}

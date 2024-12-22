@@ -33,6 +33,9 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
     totalPrice: number;
   } | null>(null);
 
+  const [paymentMethod, setPaymentMethod] = useState<string>('');
+  const [isPaymentChosen, setIsPaymentChosen] = useState<boolean>(false); 
+
   const fetchData = async () => {
     if (!cartIdState) {
       console.log('No cartId provided');
@@ -72,7 +75,7 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
       const parsedUserDetails = JSON.parse(userDetails);
       setNickname(parsedUserDetails.nickname || 'Guest');
     }
-  }, []);
+  }, []);  
 
   const handleDeleteSubItem = async (
     itemKey: string,
@@ -101,7 +104,7 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
         console.log('Item removed successfully, fetching updated cart...');
         fetchData();
       } else {
-      setError(`Failed to remove item: ${responseData.message}`);
+        setError(`Failed to remove item: ${responseData.message}`);
       }
     } catch (error) {
       setError('Kunde inte ta bort objektet.');
@@ -141,36 +144,52 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
     }
   };
 
+  const handlePaymentMethodChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedPaymentMethod = e.target.value;
+    setPaymentMethod(selectedPaymentMethod);
+    if (selectedPaymentMethod) {
+      setIsPaymentChosen(true);
+    } else {
+      setIsPaymentChosen(false);
+    }
+  };
+
   const handlePlaceOrder = async () => {
-    if (!cartIdState) return;
-  
+    if (!cartIdState || !paymentMethod) return; 
+
     try {
       setIsLoading(true);
       setError(null);
-  
+
       const customerName = cartItems[0]?.customerName || 'Guest';
       const totalPrice = calculateTotalPrice(); 
-  
+
       const response = await axios.post(
         `https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/order`,
-        { cartId: cartIdState, customerName, orderNote, totalPrice } 
+        { 
+          cartId: cartIdState, 
+          customerName, 
+          orderNote, 
+          totalPrice,
+          paymentMethod 
+        }
       );
-  
+
       if (response.status === 200) {
         const responseBody = JSON.parse(response.data.body);
         const orderId = responseBody.orderId;
-  
+
         setOrderConfirmation({
           orderId,
           items: cartItems,
           totalPrice: responseBody.totalPrice, 
         });
-  
+
         await axios.delete(
           `https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/cart`,
           { data: { cartId: cartIdState } }
         );
-  
+
         setCartIdState(null);
         localStorage.removeItem('cartId');
       } else {
@@ -183,7 +202,6 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
       setIsLoading(false);
     }
   };
-  
 
   return (
     <div className="cart-popup-overlay" onClick={handleOverlayClick}>
@@ -241,10 +259,28 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
             ) : (
               <p>No items in cart</p>
             )}
-          
-          <div className="cart-popup-total">
-  <h3>Total Price: {calculateTotalPrice()} SEK</h3>
-</div>
+
+            <div className="cart-popup-total">
+              <h3>Total Price: {calculateTotalPrice()} SEK</h3>
+            </div>
+
+            <form>
+              <div>
+                <label htmlFor="paymentMethod">Payment Method: </label>
+                <select
+                  id="paymentMethod"
+                  value={paymentMethod}
+                  onChange={handlePaymentMethodChange}
+                >
+                  <option value="">Select a method</option>
+                  <option value="payInHouse">Pay at pick up</option>
+                  <option value="creditCard">Credit Card</option>
+                  <option value="paypal">PayPal</option>
+                </select>
+              </div>
+
+              {isPaymentChosen && <p>Payment Chosen: {paymentMethod}</p>}
+            </form>
 
             <div className="cart-popup-input-container">
               <label className="order-note-header" htmlFor="order-note">

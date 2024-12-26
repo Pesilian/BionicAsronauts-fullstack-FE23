@@ -7,33 +7,31 @@ import styles from '../../styles/admin/orderList.module.css';
 
 interface OrderListProps {
   orderStatus: string;
+  highlightedOrderId?: string | null;
+  onStatusUpdate?: (newStatus: string, orderId: string) => void;
 }
 
-const OrderList: React.FC<OrderListProps> = ({ orderStatus }) => {
+const OrderList: React.FC<OrderListProps> = ({ orderStatus, highlightedOrderId, onStatusUpdate }) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  
   const loadOrders = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetchOrders({ orderStatus });
-      const parsedOrders = response.items.map((item: any) => parseOrder(item));
-      setOrders(parsedOrders);
+      setOrders(response.items);
     } catch (err) {
       console.error(err);
       setError('Failed to load orders.');
     } finally {
       setLoading(false);
     }
-  }, [orderStatus]); 
-
+  }, [orderStatus]);
 
   useEffect(() => {
     loadOrders();
   }, [orderStatus, loadOrders]);
-  
 
   if (loading) return <p>Loading orders...</p>;
   if (error) return <p className={styles.error}>{error}</p>;
@@ -46,6 +44,8 @@ const OrderList: React.FC<OrderListProps> = ({ orderStatus }) => {
             key={order.orderId}
             order={order}
             onDelete={loadOrders}
+            isHighlighted={highlightedOrderId === order.orderId}
+            onStatusUpdate={onStatusUpdate}
           />
         ))
       ) : (

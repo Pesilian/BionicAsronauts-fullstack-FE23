@@ -1,20 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Order } from '../../types/orderTypes';
-import { updateOrders } from '../../api/ordersApi'; // Import your update API
+import { updateOrders } from '../../api/ordersApi';
 import ActionButtons from './actionButtons';
 import styles from '../../styles/admin/orderItem.module.css';
 
 interface OrderItemProps {
   order: Order;
   onDelete: () => void;
+  isHighlighted?: boolean;
+  onStatusUpdate?: (newStatus: string, orderId: string) => void;
 }
 
-const OrderItem: React.FC<OrderItemProps> = ({ order, onDelete }) => {
+const OrderItem: React.FC<OrderItemProps> = ({
+  order,
+  onDelete,
+  isHighlighted = false,
+  onStatusUpdate,
+}) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [checkedItems, setCheckedItems] = useState<string[]>([]);
   const [checkedToppings, setCheckedToppings] = useState<string[]>([]);
   const [newStatus, setNewStatus] = useState(order.orderStatus);
-  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (isHighlighted) {
+      setIsExpanded(true);
+    }
+  }, [isHighlighted]);
 
   const toggleCheckbox = (item: string, isTopping: boolean = false) => {
     if (isTopping) {
@@ -32,54 +44,50 @@ const OrderItem: React.FC<OrderItemProps> = ({ order, onDelete }) => {
     }
   };
 
-  const handleRemoveMarkedItems = () => {
-    console.log('Order items to remove:', checkedItems);
-    setCheckedItems([]);
-  };
-
-  const handleRemoveMarkedToppings = () => {
-    console.log('Toppings to remove:', checkedToppings);
-    setCheckedToppings([]);
-  };
-
-  const handleAddToItem = () => {
-    console.log('Add to item functionality triggered');
-  };
-
-  const handleUpdateStatus = async () => {
-    setLoading(true); // Start loading
+  const handleOrderUpdate = async () => {
     try {
-      console.log('Updating status to:', newStatus);
-
-      // Call the updateOrders API
-      const updatedOrder = await updateOrders(order.orderId, {
+      console.log('Preparing to update order:', {
+        orderId: order.orderId,
         orderStatus: newStatus,
-        orderItems: order.orderItems, // Preserve current items
-        totalPrice: order.totalPrice, // Preserve total price
-        orderNote: order.orderNote, // Preserve order note
+        numberedOrderItems: order.numberedOrderItems,
+        totalPrice: order.totalPrice,
+        orderNote: order.orderNote,
+      });
+
+      const updatedOrder = await updateOrders({
+        orderId: order.orderId, // Required for the update
+        orderStatus: newStatus, // Include new status
+        numberedOrderItems: order.numberedOrderItems, // Include current order items
+        totalPrice: order.totalPrice, // Include total price
+        orderNote: order.orderNote, // Include any notes
       });
 
       console.log('Order updated successfully:', updatedOrder);
 
-      // Update the local order status
-      order.orderStatus = newStatus;
-      alert('Order status updated successfully');
+      if (onStatusUpdate) {
+        onStatusUpdate(newStatus, order.orderId); // Notify parent about the update
+      }
+
+      alert('Order updated successfully.');
     } catch (error) {
-      console.error('Failed to update order status:', error);
-      alert('Error updating order status. Please try again.');
-    } finally {
-      setLoading(false); // Stop loading
+      console.error('Failed to update order:', error);
+      alert('Error updating order. Please try again.');
     }
   };
 
-  const handleDelete = () => {
-    if (window.confirm('Are you sure you want to delete this order?')) {
-      onDelete();
-    }
+  // Placeholder functions for marked items and toppings
+  const handleRemoveMarkedItems = () => {
+    console.log('Selected items to remove:', checkedItems);
+  };
+
+  const handleRemoveMarkedToppings = () => {
+    console.log('Selected toppings to remove:', checkedToppings);
   };
 
   return (
-    <div className={styles.orderItem}>
+    <div
+      className={`${styles.orderItem} ${isHighlighted ? styles.highlighted : ''}`}
+    >
       {/* Collapsed View */}
       <div className={styles.orderHeader} onClick={() => setIsExpanded(!isExpanded)}>
         <p><strong>Customer:</strong> {order.customerName}</p>
@@ -94,11 +102,11 @@ const OrderItem: React.FC<OrderItemProps> = ({ order, onDelete }) => {
       {/* Expanded View */}
       {isExpanded && (
         <div className={styles.orderDetails}>
-          {/* Order Items with Toppings and Checkboxes */}
+          {/* Order Items with Checkboxes */}
           <div className={styles.items}>
             <p><strong>Order Items:</strong></p>
             <ul>
-              {order.orderItems.map((item, itemIndex) => (
+              {order.numberedOrderItems.map((item, itemIndex) => (
                 <li key={itemIndex}>
                   <p>
                     <strong>{item.name}</strong> - ${item.price}
@@ -124,9 +132,8 @@ const OrderItem: React.FC<OrderItemProps> = ({ order, onDelete }) => {
                 </li>
               ))}
             </ul>
-            <button onClick={handleRemoveMarkedToppings}>Remove Marked Toppings</button>
-            <button onClick={handleAddToItem}>Add to Item</button>
-            <button onClick={handleRemoveMarkedItems}>Remove Marked Items</button>
+            <button onClick={handleRemoveMarkedToppings}>Log Marked Toppings</button>
+            <button onClick={handleRemoveMarkedItems}>Log Marked Items</button>
           </div>
 
           {/* Order Note */}
@@ -138,7 +145,7 @@ const OrderItem: React.FC<OrderItemProps> = ({ order, onDelete }) => {
 
           {/* Action Buttons */}
           <div className={styles.actionButtons}>
-            <ActionButtons orderId={order.orderId} onDelete={handleDelete} />
+            <ActionButtons orderId={order.orderId} onDelete={onDelete} />
             <select
               value={newStatus}
               onChange={(e) => setNewStatus(e.target.value)}
@@ -148,8 +155,8 @@ const OrderItem: React.FC<OrderItemProps> = ({ order, onDelete }) => {
               <option value="in progress">In Progress</option>
               <option value="done">Done</option>
             </select>
-            <button onClick={handleUpdateStatus} disabled={loading}>
-              {loading ? 'Updating...' : 'Update Status'}
+            <button onClick={handleOrderUpdate}>
+              Update Order
             </button>
           </div>
         </div>

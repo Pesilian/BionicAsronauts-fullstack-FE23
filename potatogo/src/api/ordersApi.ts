@@ -1,17 +1,18 @@
 import { get, put, del } from '@aws-amplify/api';
 import {
-  FetchOrdersParams,
+  FetchOrdersRequestParams,
   FetchOrdersResponse,
-  ApiResponseBody,
-  UpdateOrderBody,
+  FetchOrdersApiResponseBody,
+  UpdateOrdersApiResponseBody,
+  UpdateOrderRequestParams,
   UpdateOrderResponse,
   DeleteOrderResponse,
 } from '../types/apiTypes';
 import { parseOrder } from '../utils/parseOrder';
-import { parseUpdateResponse } from '../utils/parseUpdateResponse';
+// import { parseUpdateResponse } from '../utils/parseUpdateResponse';
 
 // Fetch orders
-export const fetchOrders = async (params: FetchOrdersParams): Promise<FetchOrdersResponse> => {
+export const fetchOrders = async (params: FetchOrdersRequestParams): Promise<FetchOrdersResponse> => {
   try {
     const queryString = new URLSearchParams(
       Object.entries(params).reduce((acc, [key, value]) => {
@@ -30,11 +31,18 @@ export const fetchOrders = async (params: FetchOrdersParams): Promise<FetchOrder
 
     const { body } = await restOperation.response;
 
-    const responseBody = (await body.json()) as ApiResponseBody;
+    const responseBody = (await body.json()) as FetchOrdersApiResponseBody;
     console.log('ResponseBody:', responseBody);
 
+    const parsedItems = (responseBody.body?.items || []).map((item) => {
+      console.log('Parsing item:', item);
+      return parseOrder(item);
+    });
+
+    console.log('Parsed items:', parsedItems);
+
     return {
-      items: (responseBody.body?.items || []).map(parseOrder),
+      items: parsedItems,
       lastEvaluatedKey: responseBody.body?.lastEvaluatedKey || null,
     };
   } catch (error) {
@@ -47,39 +55,50 @@ export const fetchOrders = async (params: FetchOrdersParams): Promise<FetchOrder
 
 
 // Update an order
-export const updateOrders = async (
-  orderId: string,
-  data: UpdateOrderBody
-): Promise<UpdateOrderResponse> => {
-  try {
-    // Build query string for orderId
-    const queryString = new URLSearchParams({ orderId }).toString();
 
-    // Perform PUT operation
+
+// Update an order
+export const updateOrders = async (params: UpdateOrderRequestParams): Promise<UpdateOrderResponse> => {
+  try {
+    // Extract orderId and other fields from params
+    const { orderId, ...data } = params;
+
+    if (!orderId) {
+      throw new Error('Order ID is required.');
+    }
+
+    // Construct the API call
     const restOperation = put({
       apiName: 'potatogoapi',
-      path: `/order?${queryString}`,
+      path: `/order`, // Match the pattern of the get method
       options: {
         headers: {
           'Content-Type': 'application/json',
-          'x-user-role': 'employee',
+          'x-user-role': 'employee', // Ensure the role is sent with the request
         },
-        body: JSON.stringify({ ...data, orderId }), // Include orderId redundantly
+        body: JSON.stringify({ orderId, ...data }),
       },
     });
-    
 
+    // Parse the response
     const { body } = await restOperation.response;
 
-    const responseBody = (await body.json()) as ApiResponseBody;
+    const responseBody = (await body.json()) as UpdateOrdersApiResponseBody;
     console.log('ResponseBody:', responseBody);
 
-    return parseUpdateResponse(responseBody);
+    return {
+      message: responseBody.body?.message || 'Order updated successfully',
+      changes: responseBody.body?.changes || [],
+      statusChange: responseBody.body?.statusChange || null,
+      modifiedAt: responseBody.body?.modifiedAt || '',
+    };
   } catch (error) {
     console.error('Error updating order:', error);
-    throw error;
+    throw new Error('Failed to update the order.');
   }
 };
+
+
 
 
 

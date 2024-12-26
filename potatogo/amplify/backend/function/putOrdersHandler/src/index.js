@@ -2,18 +2,11 @@ const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const {
   DynamoDBDocumentClient,
   UpdateCommand,
-  GetCommand,
+  GetCommand
 } = require('@aws-sdk/lib-dynamodb');
 
 // Initialize DynamoDB client
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
-
-// Define CORS headers
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type, x-user-role',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-};
 
 exports.handler = async (event) => {
   try {
@@ -21,112 +14,111 @@ exports.handler = async (event) => {
     const body = typeof event.body === 'string' ? JSON.parse(event.body) : event.body;
 
     const { orderId, orderStatus, userName, ...updatedFields } = body;
-    const userRole = event.headers['x-user-role']; // Get user role from headers
+    const userRole = event.headers['x-user-role'];
 
-    // Step 1: Validate orderId
+    // Validate orderId
     if (!orderId) {
       return {
         statusCode: 400,
-        headers: corsHeaders,
         body: JSON.stringify({ message: 'Order ID is required' }),
       };
     }
 
-    // Step 2: Fetch current order from DynamoDB
+    // Fetch current order from DynamoDB
     const getParams = {
       TableName: 'Pota-To-Go-orders',
       Key: { orderId },
     };
-
     const currentOrder = await dynamoDB.send(new GetCommand(getParams));
 
-    // Step 3: Handle if the order doesn't exist
     if (!currentOrder.Item) {
       return {
         statusCode: 404,
-        headers: corsHeaders,
         body: JSON.stringify({ message: 'Order not found' }),
       };
     }
 
     const { orderStatus: currentStatus, customerName, ...currentFields } = currentOrder.Item;
 
-    // Step 4: Validate permissions and customer match
+    // Permission validation
     if (userRole !== 'employee') {
-      if (!userName || userName !== customerName) {
+      if (!userName || userName !== customerName || currentStatus !== 'Pending') {
         return {
           statusCode: 403,
-          headers: corsHeaders,
-          body: JSON.stringify({ message: 'Access denied: You can only edit your own orders.' }),
+          body: JSON.stringify({
+            message: 'Access denied: Customers can only modify their own pending orders.',
+          }),
         };
       }
 
       const invalidFields = Object.keys(updatedFields).filter(
-        (key) => !key.startsWith('orderItem') && !key.startsWith('specials')
+        (key) => !key.startsWith('orderItem') && key !== 'orderNote'
       );
 
       if (invalidFields.length > 0) {
         return {
           statusCode: 403,
-          headers: corsHeaders,
           body: JSON.stringify({
-            message: `Access denied: Non-employees can only add or delete items and specials. Invalid fields: ${invalidFields.join(', ')}`,
+            message: `Access denied: Invalid fields for customer: ${invalidFields.join(', ')}`,
           }),
         };
       }
     }
 
-    let updateExpression = 'SET';
+    // Prepare for updates
+    let updateExpression = '';
     const expressionAttributeValues = {};
     const changes = [];
     let statusChange = null;
 
+    // Update order status
     if (userRole === 'employee' && orderStatus && orderStatus !== currentStatus) {
-      updateExpression += ' orderStatus = :orderStatus,';
+      updateExpression += 'SET orderStatus = :orderStatus,';
       expressionAttributeValues[':orderStatus'] = orderStatus;
       statusChange = `Order status changed from "${currentStatus}" to "${orderStatus}"`;
     }
 
+    // Process updated fields
     Object.keys(updatedFields).forEach((key) => {
-      if (key.startsWith('orderItem') || key.startsWith('specials')) {
-        const newValue = updatedFields[key];
-        const currentValue = currentFields[key] || [];
+      const newValue = updatedFields[key];
 
+      if (newValue === null) {
+        // Handle deletions
+        updateExpression += ` REMOVE ${key},`;
+        changes.push(`${key} removed`);
+      } else {
+        // Handle updates or additions
+        const currentValue = currentFields[key] || [];
         const newArray = Array.isArray(newValue) ? newValue : [newValue];
         const currentArray = Array.isArray(currentValue) ? currentValue : [currentValue];
 
-        const added = newArray.filter((item) => !currentArray.includes(item));
-        const removed = currentArray.filter((item) => !newArray.includes(item));
+        const added = newArray.filter(item => !currentArray.includes(item));
+        const removed = currentArray.filter(item => !newArray.includes(item));
 
         if (added.length > 0) {
-          added.forEach((item) => changes.push(`${item} added to ${key}`));
+          added.forEach(item => changes.push(`${item} added to ${key}`));
         }
 
         if (removed.length > 0) {
-          removed.forEach((item) => changes.push(`${item} removed from ${key}`));
+          removed.forEach(item => changes.push(`${item} removed from ${key}`));
         }
 
         if (JSON.stringify(newArray) !== JSON.stringify(currentArray)) {
-          updateExpression += ` ${key} = :${key},`;
+          updateExpression += ` SET ${key} = :${key},`;
           expressionAttributeValues[`:${key}`] = newArray.length === 1 ? newArray[0] : newArray;
         }
       }
     });
 
+    // Add modifiedAt timestamp
     const modifiedAt = new Date().toISOString();
-    updateExpression += ' modifiedAt = :modifiedAt,';
+    updateExpression += ' SET modifiedAt = :modifiedAt,';
     expressionAttributeValues[':modifiedAt'] = modifiedAt;
 
-    updateExpression = updateExpression.slice(0, -1);
+    // Finalize the update expression
+    updateExpression = updateExpression.replace(/,\s*$/, ''); // Remove trailing comma
 
-    if (changes.length === 0 && !statusChange) {
-      return {
-        statusCode: 200,
-        headers: corsHeaders,
-        body: JSON.stringify({ message: 'No changes made' }),
-      };
-    }
-
+    // Execute update
     const updateParams = {
       TableName: 'Pota-To-Go-orders',
       Key: { orderId },
@@ -136,9 +128,9 @@ exports.handler = async (event) => {
 
     await dynamoDB.send(new UpdateCommand(updateParams));
 
+    // Response
     return {
       statusCode: 200,
-      headers: corsHeaders,
       body: JSON.stringify({
         message: `Order ${orderId} updated successfully`,
         changes,
@@ -149,7 +141,6 @@ exports.handler = async (event) => {
   } catch (error) {
     return {
       statusCode: 500,
-      headers: corsHeaders,
       body: JSON.stringify({ message: 'Failed to update order', error: error.message }),
     };
   }

@@ -2,7 +2,8 @@ export interface Order {
   orderId: string;
   customerName: string;
   orderStatus: string;
-  orderItems: {
+  numberedOrderItems: {
+    id: string;
     name: string;
     price: number;
     toppings: string[];
@@ -10,7 +11,7 @@ export interface Order {
   totalPrice: number;
   createdAt: string;
   modifiedAt: string;
-  orderNote: string; // Newly added field
+  orderNote: string;
 }
 
 

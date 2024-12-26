@@ -6,6 +6,12 @@ import styles from '../../../styles/admin/ordersView.module.css';
 
 const OrdersView: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<string>('pending');
+  const [highlightedOrderId, setHighlightedOrderId] = useState<string | null>(null);
+
+  const handleStatusUpdate = (newStatus: string, orderId: string) => {
+    setCurrentTab(newStatus.toLowerCase()); // Switch to the updated tab
+    setHighlightedOrderId(orderId); // Pass the ID to highlight the order
+  };
 
   return (
     <div className={styles.content}>
@@ -16,7 +22,11 @@ const OrdersView: React.FC = () => {
       {currentTab === 'search' ? (
         <OrderSearch />
       ) : (
-        <OrderList orderStatus={currentTab.toLowerCase()} />
+        <OrderList
+          orderStatus={currentTab.toLowerCase()}
+          highlightedOrderId={highlightedOrderId}
+          onStatusUpdate={handleStatusUpdate}
+        />
       )}
     </div>
   );

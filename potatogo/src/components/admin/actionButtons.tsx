@@ -16,8 +16,8 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ orderId, onDelete }) => {
     try {
       setLoading(true);
       await updateOrders({
-        orderId, // Corrected: orderId is now part of the payload
-        orderStatus: 'updated',
+        orderId, 
+        updates: { orderStatus: 'completed' }
       });
       setIsEditing(false);
     } catch (err) {
@@ -30,14 +30,14 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ orderId, onDelete }) => {
   const handleDelete = async () => {
     const confirmed = window.confirm('Are you sure you want to delete this order?');
     if (!confirmed) {
-      return; // Exit if the user cancels
+      return; 
     }
   
     try {
       setLoading(true);
       await deleteOrders(orderId);
       alert(`Order ${orderId} deleted successfully`);
-      onDelete(); // Notify the parent to refresh the order list
+      onDelete();
     } catch (err) {
       setError('Failed to delete order');
       console.error(err);

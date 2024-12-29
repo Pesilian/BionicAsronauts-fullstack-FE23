@@ -26,20 +26,20 @@ export const fetchOrders = async (params: FetchOrdersRequestParams): Promise<Fet
       apiName: 'potatogoapi',
       path: `/order?${queryString}`,
     });
-    console.log(`Fetching orders with query: /order?${queryString}`);
+    // console.log(`Fetching orders with query: /order?${queryString}`);
 
 
     const { body } = await restOperation.response;
 
     const responseBody = (await body.json()) as FetchOrdersApiResponseBody;
-    console.log('ResponseBody:', responseBody);
+    // console.log('ResponseBody:', responseBody);
 
     const parsedItems = (responseBody.body?.items || []).map((item) => {
-      console.log('Parsing item:', item);
+      // console.log('Parsing item:', item);
       return parseOrder(item);
     });
 
-    console.log('Parsed items:', parsedItems);
+    // console.log('Parsed items:', parsedItems);
 
     return {
       items: parsedItems,
@@ -57,38 +57,38 @@ export const fetchOrders = async (params: FetchOrdersRequestParams): Promise<Fet
 // Update an order
 
 
-// Update an order
 export const updateOrders = async (params: UpdateOrderRequestParams): Promise<UpdateOrderResponse> => {
   try {
-    // Extract orderId and other fields from params
-    const { orderId, ...data } = params;
+    const { orderId, updates, remove } = params;
 
-    if (!orderId) {
-      throw new Error('Order ID is required.');
+    if (!orderId || (!updates && !remove)) {
+      throw new Error('Invalid request: orderId, updates, or remove must be provided.');
     }
 
     // Construct the API call
     const restOperation = put({
       apiName: 'potatogoapi',
-      path: `/order`, // Match the pattern of the get method
+      path: `/order`,
       options: {
         headers: {
           'Content-Type': 'application/json',
-          'x-user-role': 'employee', // Ensure the role is sent with the request
+          'x-user-role': 'employee',
         },
-        body: JSON.stringify({ orderId, ...data }),
+        body: JSON.stringify({ orderId, updates, remove }),
       },
     });
 
+    console.log('Updating order:', { orderId, updates, remove });
+
     // Parse the response
     const { body } = await restOperation.response;
-
     const responseBody = (await body.json()) as UpdateOrdersApiResponseBody;
+
     console.log('ResponseBody:', responseBody);
 
     return {
       message: responseBody.body?.message || 'Order updated successfully',
-      changes: responseBody.body?.changes || [],
+      changes: responseBody.body?.changes || {},
       statusChange: responseBody.body?.statusChange || null,
       modifiedAt: responseBody.body?.modifiedAt || '',
     };
@@ -97,6 +97,7 @@ export const updateOrders = async (params: UpdateOrderRequestParams): Promise<Up
     throw new Error('Failed to update the order.');
   }
 };
+
 
 
 

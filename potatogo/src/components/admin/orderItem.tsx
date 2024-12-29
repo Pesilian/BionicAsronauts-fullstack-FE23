@@ -56,10 +56,13 @@ const OrderItem: React.FC<OrderItemProps> = ({
 
       const updatedOrder = await updateOrders({
         orderId: order.orderId, // Required for the update
-        orderStatus: newStatus, // Include new status
-        numberedOrderItems: order.numberedOrderItems, // Include current order items
-        totalPrice: order.totalPrice, // Include total price
-        orderNote: order.orderNote, // Include any notes
+        updates: {
+          orderStatus: newStatus,
+          numberedOrderItems: order.numberedOrderItems,
+          totalPrice: order.totalPrice,
+          orderNote: order.orderNote,
+        },
+        remove: checkedItems, // Remove marked items
       });
 
       console.log('Order updated successfully:', updatedOrder);

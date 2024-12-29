@@ -20,30 +20,31 @@ export interface FetchOrdersResponse {
   lastEvaluatedKey?: string | null;
 }
 
-//UpdateOrders
-
+// UpdateOrderRequestParams: Request payload for the API
 export interface UpdateOrderRequestParams {
   orderId: string;
-  orderStatus?: string;
-  [key: string]: any;
+  updates?: { [key: string]: any }; // Fields to update
+  remove?: string[]; // Fields to remove
 }
 
-
+// UpdateOrderResponse: Response payload from the Lambda
 export interface UpdateOrderResponse {
   message: string;
-  changes?: string[];
+  changes?: Record<string, any>;
   statusChange?: string | null;
   modifiedAt?: string;
 }
 
+// UpdateOrdersApiResponseBody: Raw API response body
 export interface UpdateOrdersApiResponseBody {
   body?: {
     message: string;
-    changes?: string[];
+    changes?: Record<string, any>;
     statusChange?: string | null;
     modifiedAt?: string;
   };
 }
+
 
 
 

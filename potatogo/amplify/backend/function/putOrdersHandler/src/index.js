@@ -116,80 +116,92 @@ exports.handler = async (event) => {
 function applyUpdates(order, updates, changeLog) {
   console.log("Starting applyUpdates with:", updates);
   for (const [key, value] of Object.entries(updates)) {
-    if (key === "remove") continue;
-
-    if (value === "" && key === "orderNote") {
-      // Set empty string instead of null for orderNote
-      if (order[key] !== "") {
-        changeLog.updated[key] = { from: order[key], to: "" };
-      }
-      order[key] = "";
-    } else if (value === null) {
-      // Remove key
-      if (order[key] !== undefined) {
-        changeLog.removed[key] = order[key];
-      }
-      delete order[key];
-    } else if (Array.isArray(value) && Array.isArray(order[key])) {
-      // Update array
-      const [mergedArray, arrayChanges] = mergeArrays(order[key], value);
-      order[key] = mergedArray;
-      if (arrayChanges.added.length > 0 || arrayChanges.removed.length > 0 || arrayChanges.updated.length > 0) {
-        changeLog.updated[key] = arrayChanges;
-      }
-    } else if (typeof value === "object" && typeof order[key] === "object") {
-      // Recursive update for nested objects
-      const nestedChanges = {};
-      order[key] = applyUpdates(order[key], value, nestedChanges);
-      if (Object.keys(nestedChanges.added).length > 0 || Object.keys(nestedChanges.removed).length > 0 || Object.keys(nestedChanges.updated).length > 0) {
-        changeLog.updated[key] = nestedChanges;
+    if (key.startsWith("orderItem")) {
+      // Handle orderItemX updates
+      if (!order[key]) {
+        // Add new orderItemX
+        order[key] = value;
+        changeLog.added[key] = value;
+      } else {
+        // Update existing orderItemX
+        const originalItem = { ...order[key] }; // Clone for changelog
+        for (const attr in value) {
+          if (attr === "toppings" && typeof value[attr] === "object") {
+            // Handle toppings separately
+            const [mergedArray, arrayChanges] = mergeToppings(order[key][attr], value[attr]);
+            order[key][attr] = mergedArray;
+            if (arrayChanges.added.length || arrayChanges.removed.length) {
+              changeLog.updated[`${key}.${attr}`] = arrayChanges;
+            }
+          } else if (value[attr] === null) {
+            // Remove attribute if null
+            if (order[key][attr] !== undefined) {
+              delete order[key][attr];
+              changeLog.removed[`${key}.${attr}`] = originalItem[attr];
+            }
+          } else {
+            // Add or update attribute
+            if (order[key][attr] !== value[attr]) {
+              changeLog.updated[`${key}.${attr}`] = {
+                from: order[key][attr],
+                to: value[attr],
+              };
+              order[key][attr] = value[attr];
+            }
+          }
+        }
       }
     } else {
-      // Add or update key
-      if (order[key] === undefined) {
-        changeLog.added[key] = value;
-      } else if (order[key] !== value) {
-        changeLog.updated[key] = { from: order[key], to: value };
+      // Handle other top-level updates
+      if (value === null) {
+        // Remove key
+        if (order[key] !== undefined) {
+          changeLog.removed[key] = order[key];
+          delete order[key];
+        }
+      } else {
+        // Add or update key
+        if (order[key] === undefined) {
+          changeLog.added[key] = value;
+        } else if (order[key] !== value) {
+          changeLog.updated[key] = { from: order[key], to: value };
+        }
+        order[key] = value;
       }
-      order[key] = value;
     }
   }
   console.log("Completed applyUpdates. Updated order:", order);
   return order;
 }
 
-// Function to handle arrays
-function mergeArrays(currentArray, updatesArray) {
-  console.log("Starting mergeArrays with currentArray:", currentArray, "and updatesArray:", updatesArray);
-  const updatedArray = [...currentArray];
-  const arrayChanges = { added: [], removed: [], updated: [] };
+// Function to handle toppings
+function mergeToppings(currentArray = [], updateObject) {
+  console.log("Starting mergeToppings with currentArray:", currentArray, "and updateObject:", updateObject);
 
-  updatesArray.forEach((item) => {
-    if (item.remove) {
-      // Remove item
-      const index = updatedArray.findIndex((i) => i.id === item.id);
+  const updatedArray = Array.isArray(currentArray) ? [...currentArray] : [];
+  const arrayChanges = { added: [], removed: [] };
+
+  // Handle removals
+  if (updateObject.remove) {
+    updateObject.remove.forEach((item) => {
+      const index = updatedArray.indexOf(item);
       if (index !== -1) {
-        arrayChanges.removed.push(updatedArray[index]);
         updatedArray.splice(index, 1);
+        arrayChanges.removed.push(item);
       }
-    } else {
-      // Add or update item
-      const index = updatedArray.findIndex((i) => i.id === item.id);
-      if (index !== -1) {
-        const originalItem = updatedArray[index];
-        updatedArray[index] = { ...updatedArray[index], ...item };
-        arrayChanges.updated.push({
-          id: item.id,
-          from: originalItem,
-          to: updatedArray[index],
-        });
-      } else {
-        updatedArray.push(item);
+    });
+  }
+
+  // Handle additions
+  if (updateObject.add) {
+    updateObject.add.forEach((item) => {
+      if (!updatedArray.includes(item)) {
+        updatedArray.push(item); // Avoid duplicates
         arrayChanges.added.push(item);
       }
-    }
-  });
+    });
+  }
 
-  console.log("Completed mergeArrays. Resulting array:", updatedArray, "with changes:", arrayChanges);
+  console.log("Completed mergeToppings. Resulting array:", updatedArray, "with changes:", arrayChanges);
   return [updatedArray, arrayChanges];
 }

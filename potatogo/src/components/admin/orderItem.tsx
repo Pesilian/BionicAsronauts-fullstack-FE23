@@ -46,38 +46,42 @@ const OrderItem: React.FC<OrderItemProps> = ({
 
   const handleOrderUpdate = async () => {
     try {
-      console.log('Preparing to update order:', {
-        orderId: order.orderId,
-        orderStatus: newStatus,
-        numberedOrderItems: order.numberedOrderItems,
-        totalPrice: order.totalPrice,
-        orderNote: order.orderNote,
+      // Map numberedOrderItems to backend-compatible keys and remove `id`
+      const orderItemsMapped: Record<string, { name: string; price: number; toppings: string[] }> = {};
+      order.numberedOrderItems.forEach((item, index) => {
+        const { id, ...rest } = item; // Exclude `id` here
+        orderItemsMapped[`orderItem${index + 1}`] = rest;
       });
-
-      const updatedOrder = await updateOrders({
-        orderId: order.orderId, // Required for the update
+  
+      const payload = {
+        orderId: order.orderId,
         updates: {
           orderStatus: newStatus,
-          numberedOrderItems: order.numberedOrderItems,
+          ...orderItemsMapped,
           totalPrice: order.totalPrice,
           orderNote: order.orderNote,
         },
-        remove: checkedItems, // Remove marked items
-      });
-
+        remove: checkedItems,
+      };
+  
+      console.log('Prepared payload:', payload);
+  
+      const updatedOrder = await updateOrders(payload);
+  
       console.log('Order updated successfully:', updatedOrder);
-
+  
       if (onStatusUpdate) {
-        onStatusUpdate(newStatus, order.orderId); // Notify parent about the update
+        onStatusUpdate(newStatus, order.orderId);
       }
-
+  
       alert('Order updated successfully.');
     } catch (error) {
       console.error('Failed to update order:', error);
       alert('Error updating order. Please try again.');
     }
   };
-
+  
+  
   // Placeholder functions for marked items and toppings
   const handleRemoveMarkedItems = () => {
     console.log('Selected items to remove:', checkedItems);

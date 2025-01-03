@@ -97,13 +97,16 @@ const OrderItem: React.FC<OrderItemProps> = ({
     >
       {/* Collapsed View */}
       <div className={styles.orderHeader} onClick={() => setIsExpanded(!isExpanded)}>
-        <p><strong>Customer:</strong> {order.customerName}</p>
-        <p>
-          <strong>Order ID:</strong>{' '}
-          <span className={styles.truncated} title={order.orderId}>
-            {order.orderId.length > 5 ? `${order.orderId.slice(0, 5)}...` : order.orderId}
-          </span>
-        </p>
+        <span title={order.orderId}>
+          {order.orderId.length > 5 ? `${order.orderId.slice(0, 5)}...` : order.orderId}
+        </span>
+        <span>{order.customerName}</span>
+        <span title={new Date(order.createdAt).toLocaleString()}>
+          @: {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        </span>
+        <span title={order.modifiedAt ? new Date(order.modifiedAt).toLocaleString() : ''}>
+          @: {order.modifiedAt ? new Date(order.modifiedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}
+        </span>
       </div>
 
       {/* Expanded View */}

@@ -28,3 +28,11 @@ button {
 button:hover {
   background-color: #0056b3;
 }
+
+.orderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+}

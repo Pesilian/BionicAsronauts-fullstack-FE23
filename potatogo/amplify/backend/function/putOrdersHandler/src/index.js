@@ -12,14 +12,16 @@ const dynamoDB = DynamoDBDocumentClient.from(client);
 // Lambda handler
 exports.handler = async (event) => {
   try {
-    console.log("Event received:", event);
+    console.log("Event received:", JSON.stringify(event, null, 2));
 
-    const { orderId, updates, remove } = JSON.parse(event.body);
-    console.log("Parsed input:", { orderId, updates, remove });
+    // Parse event.body or fallback to direct access
+    const requestBody = event.body
+      ? (typeof event.body === 'string' ? JSON.parse(event.body) : event.body)
+      : {};
 
-    const tableName = "Pota-To-Go-orders"; 
+    console.log("Parsed requestBody:", requestBody);
 
-    if (!orderId || (!updates && !remove)) {
+    if (!requestBody.orderId || (!requestBody.updates && !Array.isArray(requestBody.remove))) {
       console.error("Validation failed: Missing orderId, updates, or remove.");
       return {
         statusCode: 400,
@@ -30,6 +32,9 @@ exports.handler = async (event) => {
         body: JSON.stringify({ message: "Missing orderId, updates, or remove keys." }),
       };
     }
+
+    const { orderId, updates, remove } = requestBody;
+    const tableName = "Pota-To-Go-orders";
 
     // Fetch current order
     const currentOrder = await dynamoDB.send(
@@ -117,37 +122,31 @@ function applyUpdates(order, updates, changeLog) {
   console.log("Starting applyUpdates with:", updates);
   for (const [key, value] of Object.entries(updates)) {
     if (key.startsWith("orderItem")) {
-      // Handle orderItemX updates
-      if (!order[key]) {
-        // Add new orderItemX
-        order[key] = value;
-        changeLog.added[key] = value;
-      } else {
-        // Update existing orderItemX
-        const originalItem = { ...order[key] }; // Clone for changelog
-        for (const attr in value) {
-          if (attr === "toppings" && typeof value[attr] === "object") {
-            // Handle toppings separately
-            const [mergedArray, arrayChanges] = mergeToppings(order[key][attr], value[attr]);
-            order[key][attr] = mergedArray;
-            if (arrayChanges.added.length || arrayChanges.removed.length) {
-              changeLog.updated[`${key}.${attr}`] = arrayChanges;
-            }
-          } else if (value[attr] === null) {
-            // Remove attribute if null
-            if (order[key][attr] !== undefined) {
-              delete order[key][attr];
-              changeLog.removed[`${key}.${attr}`] = originalItem[attr];
-            }
-          } else {
-            // Add or update attribute
-            if (order[key][attr] !== value[attr]) {
-              changeLog.updated[`${key}.${attr}`] = {
-                from: order[key][attr],
-                to: value[attr],
-              };
-              order[key][attr] = value[attr];
-            }
+      if (!order[key] || Array.isArray(order[key])) {
+        // Ensure orderItemX is always a map structure
+        order[key] = { name: "", price: 0, toppings: [] };
+      }
+
+      const originalItem = { ...order[key] }; // Clone for changelog
+      for (const attr in value) {
+        if (attr === "toppings" && typeof value[attr] === "object") {
+          // Handle toppings separately
+          const [mergedArray, arrayChanges] = mergeToppings(order[key][attr], value[attr]);
+          order[key][attr] = mergedArray;
+          if (arrayChanges.added.length || arrayChanges.removed.length) {
+            changeLog.updated[`${key}.${attr}`] = arrayChanges;
+          }
+        } else if (value[attr] === null) {
+          // Remove attribute if null
+          if (order[key][attr] !== undefined) {
+            delete order[key][attr];
+            changeLog.removed[`${key}.${attr}`] = originalItem[attr];
+          }
+        } else {
+          // Add or update attribute
+          if (order[key][attr] !== value[attr]) {
+            changeLog.updated[`${key}.${attr}`] = { from: order[key][attr], to: value[attr] };
+            order[key][attr] = value[attr];
           }
         }
       }

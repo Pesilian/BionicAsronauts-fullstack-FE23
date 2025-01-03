@@ -32,14 +32,14 @@ export const fetchOrders = async (params: FetchOrdersRequestParams): Promise<Fet
     const { body } = await restOperation.response;
 
     const responseBody = (await body.json()) as FetchOrdersApiResponseBody;
-    // console.log('ResponseBody:', responseBody);
+    console.log('ResponseBody:', responseBody);
 
     const parsedItems = (responseBody.body?.items || []).map((item) => {
       // console.log('Parsing item:', item);
       return parseOrder(item);
     });
 
-    // console.log('Parsed items:', parsedItems);
+    console.log('Parsed items:', parsedItems);
 
     return {
       items: parsedItems,
@@ -72,7 +72,7 @@ export const updateOrders = async (params: UpdateOrderRequestParams): Promise<Up
       options: {
         headers: {
           'Content-Type': 'application/json',
-          'x-user-role': 'employee',
+          // 'x-user-role': 'employee',
         },
         body: JSON.stringify({ orderId, updates, remove }),
       },

@@ -7,7 +7,7 @@ const {
 
 const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-exports.handler = async event => {
+exports.handler = async (event) => {
   console.log('Full event:', JSON.stringify(event, null, 2));
 
   try {
@@ -48,15 +48,29 @@ exports.handler = async event => {
     }
 
     const orderItems = Object.keys(cart)
-      .filter(key => key.startsWith('cartItem'))
+      .filter((key) => key.startsWith('cartItem'))
       .reduce((acc, key) => {
         const orderKey = key.replace('cart', 'order');
-        acc[orderKey] = cart[key];
+        const item = cart[key];
+
+        // Ensure `orderItemX` is a map with proper structure
+        acc[orderKey] = Array.isArray(item)
+          ? {
+              name: item[0]?.name || 'Unknown Item',
+              price: item[0]?.price || 0,
+              toppings: item[0]?.toppings || [],
+            }
+          : {
+              name: item?.name || 'Unknown Item',
+              price: item?.price || 0,
+              toppings: item?.toppings || [],
+            };
+
         return acc;
       }, {});
 
     const specials = Object.keys(cart)
-      .filter(key => key.startsWith('specials'))
+      .filter((key) => key.startsWith('specials'))
       .reduce((acc, key) => {
         acc[key] = cart[key];
         return acc;

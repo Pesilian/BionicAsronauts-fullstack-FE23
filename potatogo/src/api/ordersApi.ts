@@ -142,3 +142,53 @@ export const deleteOrders = async (orderId: string): Promise<DeleteOrderResponse
 };
 
 
+
+//Menu interfaces and Api calls
+interface MenuItem {
+  menuItem: string;
+  category: string;
+  price?: number | null;
+}
+
+interface FetchMenuApiResponseBody {
+  body?: {
+    message?: string;
+    menuItems?: Record<string, MenuItem[]>;
+  };
+}
+
+interface FetchMenuResponse {
+  Menu: Record<string, MenuItem[]>;
+}
+
+
+export const fetchMenu = async (): Promise<FetchMenuResponse> => {
+  try {
+    const restOperation = get({
+      apiName: 'potatogoapi',
+      path: '/menu',
+    });
+
+    const { body } = await restOperation.response;
+
+    const responseBody = (await body.json()) as FetchMenuApiResponseBody;
+
+    const parsedResponseBody = typeof responseBody.body === "string"
+      ? JSON.parse(responseBody.body)
+      : responseBody.body;
+
+    const menuItems = parsedResponseBody?.menuItems;
+
+    if (!menuItems || Object.keys(menuItems).length === 0) {
+      console.error('No menu items found:', parsedResponseBody);
+      throw new Error(parsedResponseBody?.message || 'No menu items found.');
+    }
+
+    return {
+      Menu: menuItems,
+    };
+  } catch (error) {
+    console.error('Error fetching menu:', error);
+    throw new Error('Failed to fetch menu. Please try again later.');
+  }
+};

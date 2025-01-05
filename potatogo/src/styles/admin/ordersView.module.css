@@ -1,16 +1,7 @@
-.container {
-    display: flex;
-  }
+@import './reset.module.css';
   
   .content {
-    flex: 1;
-    margin-left: 200px; 
+    width: 100%;
     padding: 1rem;
+    margin: 1rem;
   }
-  
-  .ordersPlaceholder {
-    margin-top: 2rem;
-    font-size: 1.2rem;
-    color: #555;
-  }
-  

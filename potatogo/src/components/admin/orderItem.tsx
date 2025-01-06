@@ -36,6 +36,8 @@ const OrderItem: React.FC<OrderItemProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [snapshot, setSnapshot] = useState<Order | null>(null);
+
 
 
 
@@ -321,7 +323,17 @@ const OrderItem: React.FC<OrderItemProps> = ({
               <>
                 <button
                   className={styles.cancel}
-                  onClick={() => setIsEditing(false)}
+                  onClick={() => {
+                    if (snapshot) {
+                      Object.assign(order, snapshot);
+                      setEditedOrderNote(snapshot.orderNote || '');
+                      setCheckedItems([]);
+                      setCheckedToppings({});
+                      setNewStatus(snapshot.orderStatus);
+                      setToppingsUpdates({});
+                    }
+                    setIsEditing(false);
+                  }}
                   disabled={loading}
                 >
                   Cancel Changes
@@ -378,7 +390,10 @@ const OrderItem: React.FC<OrderItemProps> = ({
               <>
                 <button
                   className={styles.editButton}
-                  onClick={() => setIsEditing(true)}
+                  onClick={() => {
+                    setSnapshot({ ...order });
+                    setIsEditing(true);
+                  }}
                   disabled={loading}
                 >
                   Edit Order
@@ -397,7 +412,6 @@ const OrderItem: React.FC<OrderItemProps> = ({
                   onClick={async () => {
                     setLoading(true);
                     try {
-                      // Update the status only
                       await handleOrderUpdate();
                     } catch (err) {
                       setError('Failed to update status');
@@ -424,9 +438,7 @@ const OrderItem: React.FC<OrderItemProps> = ({
         />
       )}
     </div>
-  );
-  
-  
+  );  
 };
 
 export default OrderItem;

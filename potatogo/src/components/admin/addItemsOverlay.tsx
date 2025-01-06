@@ -56,7 +56,7 @@ const AddItemsOverlay: React.FC<AddItemsOverlayProps> = ({ menu, onAddItems, onC
             </ul>
           </div>
         ))}
-        <div className={styles.actions}>
+        <div className={styles.actionButtons}>
           <button onClick={handleAddItems} className={styles.addButton}>
             Add Items
           </button>

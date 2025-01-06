@@ -33,6 +33,8 @@ const OrderItem: React.FC<OrderItemProps> = ({
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [currentItemId, setCurrentItemId] = useState<string | null>(null);
   const [toppingsUpdates, setToppingsUpdates] = useState<Record<string, { add: string[]; remove: string[] }>>({});
+  const [editedOrderNote, setEditedOrderNote] = useState(order.orderNote || '');
+
 
   useEffect(() => {
     if (isHighlighted) {
@@ -70,6 +72,11 @@ const OrderItem: React.FC<OrderItemProps> = ({
       console.error('Error fetching menu:', error);
     }
   };
+
+  const handleOrderNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setEditedOrderNote(e.target.value);
+  };
+  
 
   const handleAddItems = (selectedItems: MenuItem[]) => {
     const newToppings = selectedItems.map((item) => item.menuItem);
@@ -126,9 +133,10 @@ const OrderItem: React.FC<OrderItemProps> = ({
         updates.orderStatus = newStatus;
       }
 
-      if (order.orderNote) {
-        updates.orderNote = order.orderNote;
+      if (editedOrderNote !== order.orderNote) {
+        updates.orderNote = editedOrderNote;
       }
+      
 
       const payload = {
         orderId: order.orderId,
@@ -253,11 +261,12 @@ const OrderItem: React.FC<OrderItemProps> = ({
             </div>
           </div>
           <div className={styles.orderNote}>
-            <textarea
-              value={order.orderNote || ''}
-              readOnly
-              placeholder="No notes added."
-            />
+              <textarea
+                value={editedOrderNote}
+                onChange={handleOrderNoteChange}
+                placeholder="Add a note to the order"
+                className={styles.editableTextarea}
+              />
           </div>
           <div className={styles.actionButtonsRow}>
             <ActionButtons orderId={order.orderId} onDelete={onDelete} />

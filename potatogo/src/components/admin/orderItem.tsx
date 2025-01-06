@@ -62,16 +62,38 @@ const OrderItem: React.FC<OrderItemProps> = ({
     }
   };
 
-  const openOverlay = async (itemId: string) => {
+  const openOverlay = async (itemId: string | null) => {
+    console.log('Button clicked, itemId:', itemId);
+  
     try {
       const { Menu } = await fetchMenu();
       setMenu(Menu);
+  
+      // Set currentItemId directly to the input
       setCurrentItemId(itemId);
+  
       setIsOverlayOpen(true);
+      console.log('isOverlayOpen set to true');
+      console.log('Fetched menu:', Menu);
     } catch (error) {
       console.error('Error fetching menu:', error);
     }
   };
+  
+  const generateNextOrderItemId = () => {
+    const existingIds = order.numberedOrderItems.map((item) => item.id);
+    let maxId = 0;
+  
+    existingIds.forEach((id) => {
+      const match = id.match(/orderItem(\d+)/);
+      if (match) {
+        maxId = Math.max(maxId, parseInt(match[1], 10));
+      }
+    });
+  
+    return `orderItem${maxId + 1}`;
+  };
+  
 
   const handleOrderNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setEditedOrderNote(e.target.value);
@@ -80,9 +102,17 @@ const OrderItem: React.FC<OrderItemProps> = ({
 
   const handleAddItems = (selectedItems: MenuItem[]) => {
     const newToppings = selectedItems.map((item) => item.menuItem);
-
+  
+    let currentKey = currentItemId || ''; 
+    if (!currentKey) {
+      currentKey = generateNextOrderItemId();
+  
+      // Add a new item placeholder locally
+      order.numberedOrderItems.push({ id: currentKey, name: 'New Dish', price: 0, toppings: [] });//logic front or backend needed for price
+    }
+  
     const updatedOrderItems = order.numberedOrderItems.map((item) => {
-      if (item.id === currentItemId) {
+      if (item.id === currentKey) {
         return {
           ...item,
           toppings: [...item.toppings, ...newToppings],
@@ -90,9 +120,7 @@ const OrderItem: React.FC<OrderItemProps> = ({
       }
       return item;
     });
-
-    const currentKey = currentItemId || '';
-
+  
     setToppingsUpdates((prev) => {
       const current = prev[currentKey] || { add: [], remove: [] };
       return {
@@ -103,10 +131,12 @@ const OrderItem: React.FC<OrderItemProps> = ({
         },
       };
     });
-
+  
     order.numberedOrderItems = updatedOrderItems;
     setIsOverlayOpen(false);
   };
+  
+  
 
   const handleOrderUpdate = async () => {
     try {
@@ -258,6 +288,13 @@ const OrderItem: React.FC<OrderItemProps> = ({
                   <button onClick={handleRemoveMarkedToppings}>Log Marked Toppings</button>
                 </div>
               ))}
+                <div
+                  className={`${styles.itemCard} ${styles.addNewCard}`}
+                  onClick={() => openOverlay(null)}
+                >
+                  <p>Add New Dish or Drink</p>
+                  <button className={styles.addNewButton}>+</button>
+                </div>
             </div>
           </div>
           <div className={styles.orderNote}>

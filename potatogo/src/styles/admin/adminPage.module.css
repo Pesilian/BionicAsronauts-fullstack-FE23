@@ -1,13 +1,24 @@
+/* Container Styles */
+@import './reset.module.css';
+
 .container {
-    display: flex;
-    height: 100vh;
-  }
-  
-  .content {
-    flex: 1;
-    margin-left: 200px; 
-    padding: 1rem;
-    background-color: #f9f9f9;
-    overflow-y: auto;
-  }
-  
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: row;
+  background-color: #fafafa;
+}
+
+/* Content Area */
+.content {
+  display: flex;
+  width: 100%;
+  /* flex: 1; */
+  /* margin-left: auto; */
+  padding: 1rem;
+  background-color: #ffffff;
+  /* border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
+  overflow-y: auto;
+}

@@ -1,7 +1,14 @@
+/* Content Wrapper */
 @import './reset.module.css';
-  
-  .content {
-    width: 100%;
-    padding: 1rem;
-    margin: 1rem;
-  }
+
+.content {
+  display:flex;
+  flex-direction: column;
+  /* margin-left: auto; */
+  width: 100%;
+  padding: 0.6rem;
+  background-color: #fafafa;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}

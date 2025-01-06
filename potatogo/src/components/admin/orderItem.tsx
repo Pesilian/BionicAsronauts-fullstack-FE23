@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Order } from '../../types/orderTypes';
 import { updateOrders } from '../../api/ordersApi';
-import ActionButtons from './actionButtons';
 import styles from '../../styles/admin/orderItem.module.css';
 import { fetchMenu } from '../../api/ordersApi';
 import AddItemsOverlay from './addItemsOverlay';
@@ -34,6 +33,10 @@ const OrderItem: React.FC<OrderItemProps> = ({
   const [currentItemId, setCurrentItemId] = useState<string | null>(null);
   const [toppingsUpdates, setToppingsUpdates] = useState<Record<string, { add: string[]; remove: string[] }>>({});
   const [editedOrderNote, setEditedOrderNote] = useState(order.orderNote || '');
+  const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
 
 
   useEffect(() => {
@@ -69,7 +72,6 @@ const OrderItem: React.FC<OrderItemProps> = ({
       const { Menu } = await fetchMenu();
       setMenu(Menu);
   
-      // Set currentItemId directly to the input
       setCurrentItemId(itemId);
   
       setIsOverlayOpen(true);
@@ -98,7 +100,6 @@ const OrderItem: React.FC<OrderItemProps> = ({
   const handleOrderNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setEditedOrderNote(e.target.value);
   };
-  
 
   const handleAddItems = (selectedItems: MenuItem[]) => {
     const newToppings = selectedItems.map((item) => item.menuItem);
@@ -106,8 +107,6 @@ const OrderItem: React.FC<OrderItemProps> = ({
     let currentKey = currentItemId || ''; 
     if (!currentKey) {
       currentKey = generateNextOrderItemId();
-  
-      // Add a new item placeholder locally
       order.numberedOrderItems.push({ id: currentKey, name: 'New Dish', price: 0, toppings: [] });//logic front or backend needed for price
     }
   
@@ -134,9 +133,7 @@ const OrderItem: React.FC<OrderItemProps> = ({
   
     order.numberedOrderItems = updatedOrderItems;
     setIsOverlayOpen(false);
-  };
-  
-  
+  };  
 
   const handleOrderUpdate = async () => {
     try {
@@ -165,8 +162,7 @@ const OrderItem: React.FC<OrderItemProps> = ({
 
       if (editedOrderNote !== order.orderNote) {
         updates.orderNote = editedOrderNote;
-      }
-      
+      }      
 
       const payload = {
         orderId: order.orderId,
@@ -250,82 +246,176 @@ const OrderItem: React.FC<OrderItemProps> = ({
           @: {order.modifiedAt ? new Date(order.modifiedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}
         </span>
       </div>
-
+  
       {isExpanded && (
         <div className={styles.orderDetails}>
           <div className={styles.items}>
             <div className={styles.cardContainer}>
               {order.numberedOrderItems.map((item, index) => (
                 <div key={index} className={styles.itemCard}>
-                  <p>
-                    <strong>{item.name}</strong> - ${item.price}
-                  </p>
-                  <input
-                    className={styles.itemCheckbox}
-                    type="checkbox"
-                    checked={checkedItems.includes(item.id)}
-                    onChange={() => toggleCheckbox(item.id)}
-                  />
+                  <div className={styles.itemHeader}>
+                    <p>
+                      <strong>{item.name}</strong> - ${item.price}
+                    </p>
+                    {isEditing && (
+                      <input
+                        className={styles.itemCheckbox}
+                        type="checkbox"
+                        checked={checkedItems.includes(item.id)}
+                        onChange={() => toggleCheckbox(item.id)}
+                      />
+                    )}
+                  </div>
                   <ul title="Toppings:" className={styles.toppings}>
                     {item.toppings.map((topping, idx) => (
                       <li key={idx} className={styles.topping}>
-                        <input
-                          className={styles.toppingCheckbox}
-                          type="checkbox"
-                          checked={(checkedToppings[item.id] || []).includes(topping)}
-                          onChange={() => toggleCheckbox(topping, true, item.id)}
-                        />
+                        {isEditing && (
+                          <input
+                            className={styles.toppingCheckbox}
+                            type="checkbox"
+                            checked={(checkedToppings[item.id] || []).includes(topping)}
+                            onChange={() => toggleCheckbox(topping, true, item.id)}
+                          />
+                        )}
                         <span>{topping}</span>
                       </li>
                     ))}
                   </ul>
-                  <button
-                    onClick={() => openOverlay(item.id)}
-                    className={styles.addToppingButton}
-                  >
-                    Add More
-                  </button>
-                  <button onClick={handleRemoveMarkedToppings}>Log Marked Toppings</button>
+                  {isEditing && (
+                    <div className={styles.cardButtonsContainer}>
+                      <button
+                        onClick={() => openOverlay(item.id)}
+                        className={styles.addToppingButton}
+                      >
+                        Add to item
+                      </button>
+                      <button onClick={handleRemoveMarkedToppings}>
+                        Remove checked items
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
+              {isEditing && (
                 <div
                   className={`${styles.itemCard} ${styles.addNewCard}`}
                   onClick={() => openOverlay(null)}
                 >
                   <p>Add New Dish or Drink</p>
-                  <button className={styles.addNewButton}>+</button>
                 </div>
+              )}
             </div>
           </div>
           <div className={styles.orderNote}>
-              <textarea
-                value={editedOrderNote}
-                onChange={handleOrderNoteChange}
-                placeholder="Add a note to the order"
-                className={styles.editableTextarea}
-              />
+            <textarea
+              value={editedOrderNote}
+              onChange={handleOrderNoteChange}
+              placeholder="Add a note to the order"
+              className={styles.editableTextarea}
+              readOnly={!isEditing}
+            />
           </div>
           <div className={styles.actionButtonsRow}>
-            <ActionButtons orderId={order.orderId} onDelete={onDelete} />
-            <select
-              value={newStatus}
-              onChange={(e) => setNewStatus(e.target.value)}
-              className={styles.statusDropdown}
-            >
-              <option value="pending">Pending</option>
-              <option value="in progress">In Progress</option>
-              <option value="done">Done</option>
-            </select>
-            <button
-              onClick={handleOrderUpdate}
-              className={styles.updateOrderButton}
-            >
-              Update Order
-            </button>
+            {error && <p className={styles.error}>{error}</p>}
+            {isEditing ? (
+              <>
+                <button
+                  className={styles.cancel}
+                  onClick={() => setIsEditing(false)}
+                  disabled={loading}
+                >
+                  Cancel Changes
+                </button>
+                <button
+                  className={styles.deleteButton}
+                  onClick={async () => {
+                    if (!window.confirm('Are you sure you want to delete this order?')) return;
+  
+                    setLoading(true);
+                    try {
+                      await onDelete();
+                    } catch (err) {
+                      setError('Failed to delete order');
+                      console.error(err);
+                    } finally {
+                      setLoading(false);
+                    }
+                  }}
+                  disabled={loading}
+                >
+                  {loading ? 'Deleting...' : 'Delete'}
+                  Order
+                </button>
+                <select
+                  value={newStatus}
+                  onChange={(e) => setNewStatus(e.target.value)}
+                  className={styles.statusDropdown}
+                >
+                  <option value="pending">Pending</option>
+                  <option value="in progress">In Progress</option>
+                  <option value="done">Done</option>
+                </select>
+                <button
+                  className={styles.saveButton}
+                  onClick={async () => {
+                    setLoading(true);
+                    try {
+                      await handleOrderUpdate();
+                      setIsEditing(false);
+                    } catch (err) {
+                      setError('Failed to update order');
+                      console.error(err);
+                    } finally {
+                      setLoading(false);
+                    }
+                  }}
+                  disabled={loading}
+                >
+                  Save Changes
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  className={styles.editButton}
+                  onClick={() => setIsEditing(true)}
+                  disabled={loading}
+                >
+                  Edit Order
+                </button>
+                <select
+                  value={newStatus}
+                  onChange={(e) => setNewStatus(e.target.value)}
+                  className={styles.statusDropdown}
+                >
+                  <option value="pending">Pending</option>
+                  <option value="in progress">In Progress</option>
+                  <option value="done">Done</option>
+                </select>
+                <button
+                  className={styles.updateStatusButton}
+                  onClick={async () => {
+                    setLoading(true);
+                    try {
+                      // Update the status only
+                      await handleOrderUpdate();
+                    } catch (err) {
+                      setError('Failed to update status');
+                      console.error(err);
+                    } finally {
+                      setLoading(false);
+                    }
+                  }}
+                  disabled={loading}
+                >
+                  Update Status
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}
-
+  
       {isOverlayOpen && (
         <AddItemsOverlay
           menu={menu}
@@ -335,6 +425,8 @@ const OrderItem: React.FC<OrderItemProps> = ({
       )}
     </div>
   );
+  
+  
 };
 
 export default OrderItem;

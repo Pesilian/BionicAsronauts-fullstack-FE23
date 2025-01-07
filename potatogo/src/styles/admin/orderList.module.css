@@ -1,0 +1,45 @@
+/* Order List Container */
+@import './reset.module.css';
+
+.orderList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #fafafa;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  /* width: 100%; */
+}
+
+/* Error Message */
+.error {
+  color: red;
+  font-weight: bold;
+}
+
+/* Order List Header */
+.orderListHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1rem;
+  padding: 0.5rem;
+  background-color: #f9f9f9;
+  border-bottom: 2px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Clickable Sorting */
+.clickable {
+  cursor: pointer;
+  color: #51753d;
+  transition: color 0.3s ease;
+}
+
+.clickable:hover {
+  color: #3c5a2b;
+}

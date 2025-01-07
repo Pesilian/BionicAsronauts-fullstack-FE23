@@ -1,0 +1,104 @@
+@import './reset.module.css';
+
+/* Stocks View Container */
+.stocksView {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  background-color: #f8f8f8;
+}
+
+/* Stock List Container */
+.stockList {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 800px;
+  gap: 1rem;
+}
+
+/* Stock Category */
+.stockCategory {
+  border: 1px solid #302d2d;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stockCategory:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Stock Category Title */
+.stockCategory h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1.4rem;
+  color: #333;
+  border-bottom: 1px solid #888c72;
+  padding-bottom: 0.3rem;
+}
+
+/* Stock Items List */
+.stockItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: #fefefe;
+  border: 1px solid #888c72;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  transition: background-color 0.3s ease;
+}
+
+.stockItem:last-child {
+  margin-bottom: 0;
+}
+
+.stockItem:hover {
+  background-color: #f1f1f1;
+}
+
+/* Stock Item Details */
+.stockItem p {
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+/* Price and Quantity */
+.stockItem span {
+  font-size: 0.9rem;
+  color: #666;
+  font-style: italic;
+}
+
+/* Error Message */
+.error {
+  color: #b00020;
+  font-size: 1rem;
+  margin: 1rem 0;
+  text-align: center;
+}
+
+/* Add New Stock Item */
+.addStockCard {
+  border: 2px dashed #888c72;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  color: #666;
+  font-size: 1.2rem;
+  background-color: #fafafa;
+  cursor: pointer;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.addStockCard:hover {
+  border-color: #51753d;
+  background-color: #f1f1f1;
+}

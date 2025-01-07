@@ -1,156 +1,206 @@
+// Import AWS SDK v3 modules
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const {
   DynamoDBDocumentClient,
-  UpdateCommand,
-  GetCommand
+  GetCommand,
+  PutCommand,
 } = require('@aws-sdk/lib-dynamodb');
 
-// Initialize DynamoDB client
-const dynamoDB = DynamoDBDocumentClient.from(new DynamoDBClient({}));
+const client = new DynamoDBClient({});
+const dynamoDB = DynamoDBDocumentClient.from(client);
 
+// Lambda handler
 exports.handler = async (event) => {
   try {
-    // Parse the incoming request body
-    const body = typeof event.body === 'string' ? JSON.parse(event.body) : event.body;
+    console.log("Event received:", JSON.stringify(event, null, 2));
 
-    const { orderId, orderStatus, userName, ...updatedFields } = body; // Extract userName and other fields
-    const userRole = event.headers['x-user-role']; // Get user role from headers
+    // Parse event.body or fallback to direct access
+    const requestBody = event.body
+      ? (typeof event.body === 'string' ? JSON.parse(event.body) : event.body)
+      : {};
 
-    // Step 1: Validate orderId
-    if (!orderId) {
+    console.log("Parsed requestBody:", requestBody);
+
+    if (!requestBody.orderId || (!requestBody.updates && !Array.isArray(requestBody.remove))) {
+      console.error("Validation failed: Missing orderId, updates, or remove.");
       return {
         statusCode: 400,
-        body: JSON.stringify({ message: 'Order ID is required' }),
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify({ message: "Missing orderId, updates, or remove keys." }),
       };
     }
 
-    // Step 2: Fetch current order from DynamoDB
-    const getParams = {
-      TableName: 'Pota-To-Go-orders',
-      Key: { orderId },
-    };
+    const { orderId, updates, remove } = requestBody;
+    const tableName = "Pota-To-Go-orders";
 
-    const currentOrder = await dynamoDB.send(new GetCommand(getParams));
+    // Fetch current order
+    const currentOrder = await dynamoDB.send(
+      new GetCommand({
+        TableName: tableName,
+        Key: { orderId },
+      })
+    );
+    console.log("Fetched order from DynamoDB:", currentOrder);
 
-    // Step 3: Handle if the order doesn't exist
     if (!currentOrder.Item) {
+      console.error("Order not found for orderId:", orderId);
       return {
         statusCode: 404,
-        body: JSON.stringify({ message: 'Order not found' }),
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify({ message: "Order not found." }),
       };
     }
 
-    // Extract current fields
-    const { orderStatus: currentStatus, customerName, ...currentFields } = currentOrder.Item;
+    // Track changes
+    const changeLog = { added: {}, removed: {}, updated: {} };
 
-    // Step 4: Validate permissions and customer match
-    if (userRole !== 'employee') {
-      if (!userName || userName !== customerName) {
-        return {
-          statusCode: 403,
-          body: JSON.stringify({ message: 'Access denied: You can only edit your own orders.' }),
-        };
-      }
-
-      // Restrict non-employee users to only add or delete items and specials
-      const invalidFields = Object.keys(updatedFields).filter(
-        (key) => !key.startsWith('orderItem') && !key.startsWith('specials')
-      );
-
-      if (invalidFields.length > 0) {
-        return {
-          statusCode: 403,
-          body: JSON.stringify({
-            message: `Access denied: Non-employees can only add or delete items and specials. Invalid fields: ${invalidFields.join(', ')}`,
-          }),
-        };
-      }
+    // Apply updates to the current order
+    if (updates) {
+      console.log("Applying updates:", updates);
+      applyUpdates(currentOrder.Item, updates, changeLog);
+      console.log("Order after updates:", currentOrder.Item);
     }
 
-    // Step 5: Prepare for updates
-    let updateExpression = 'SET';
-    const expressionAttributeValues = {};
-    const changes = [];
-    let statusChange = null;
-
-    // Step 6: Update order status (only for employees)
-    if (userRole === 'employee' && orderStatus && orderStatus !== currentStatus) {
-      updateExpression += ' orderStatus = :orderStatus,';
-      expressionAttributeValues[':orderStatus'] = orderStatus;
-      statusChange = `Order status changed from "${currentStatus}" to "${orderStatus}"`;
+    // Handle removal of fields
+    if (Array.isArray(remove)) {
+      console.log("Handling removals:", remove);
+      remove.forEach((key) => {
+        if (currentOrder.Item[key] !== undefined) {
+          changeLog.removed[key] = currentOrder.Item[key];
+          delete currentOrder.Item[key];
+        }
+      });
+      console.log("Order after removals:", currentOrder.Item);
     }
 
-    // Step 7: Handle updates for each orderItemX and specialsX dynamically
-    Object.keys(updatedFields).forEach((key) => {
-      if (key.startsWith('orderItem') || key.startsWith('specials')) {
-        const newValue = updatedFields[key];
-        const currentValue = currentFields[key] || [];
-
-        // Treat specialsX as arrays for consistency
-        const newArray = Array.isArray(newValue) ? newValue : [newValue];
-        const currentArray = Array.isArray(currentValue) ? currentValue : [currentValue];
-
-        // Determine added and removed items with context
-        const added = newArray.filter(item => !currentArray.includes(item));
-        const removed = currentArray.filter(item => !newArray.includes(item));
-
-        if (added.length > 0) {
-          added.forEach(item => changes.push(`${item} added to ${key}`));
-        }
-
-        if (removed.length > 0) {
-          removed.forEach(item => changes.push(`${item} removed from ${key}`));
-        }
-
-        // Check for differences
-        if (JSON.stringify(newArray) !== JSON.stringify(currentArray)) {
-          updateExpression += ` ${key} = :${key},`;
-          expressionAttributeValues[`:${key}`] = newArray.length === 1 ? newArray[0] : newArray;
-        }
-      }
-    });
-
-    // Add a modifiedAt timestamp
+    // Add modifiedAt timestamp
     const modifiedAt = new Date().toISOString();
-    updateExpression += ' modifiedAt = :modifiedAt,';
-    expressionAttributeValues[':modifiedAt'] = modifiedAt;
+    currentOrder.Item.modifiedAt = modifiedAt;
 
-    // Finalize the update expression
-    updateExpression = updateExpression.slice(0, -1); // Remove trailing comma
+    // Save updated order back to DynamoDB
+    console.log("Saving updated order to DynamoDB:", currentOrder.Item);
+    await dynamoDB.send(
+      new PutCommand({
+        TableName: tableName,
+        Item: currentOrder.Item,
+      })
+    );
 
-    // If no changes, return early
-    if (changes.length === 0 && !statusChange) {
-      return {
-        statusCode: 200,
-        body: JSON.stringify({ message: 'No changes made' }),
-      };
-    }
-
-    // Step 8: Update in DynamoDB
-    const updateParams = {
-      TableName: 'Pota-To-Go-orders',
-      Key: { orderId },
-      UpdateExpression: updateExpression,
-      ExpressionAttributeValues: expressionAttributeValues,
-    };
-
-    await dynamoDB.send(new UpdateCommand(updateParams));
-
-    // Step 9: Return success response
     return {
       statusCode: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
       body: JSON.stringify({
-        message: `Order ${orderId} updated successfully`,
-        changes,
-        statusChange,
+        message: "Order updated successfully.",
+        changes: changeLog,
         modifiedAt,
       }),
     };
   } catch (error) {
-    // Handle errors
+    console.error("Error during Lambda execution:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: 'Failed to update order', error: error.message }),
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
+      body: JSON.stringify({ message: "Internal Server Error." }),
     };
   }
 };
+
+// Function to apply updates
+function applyUpdates(order, updates, changeLog) {
+  console.log("Starting applyUpdates with:", updates);
+  for (const [key, value] of Object.entries(updates)) {
+    if (key.startsWith("orderItem")) {
+      if (!order[key] || Array.isArray(order[key])) {
+        // Ensure orderItemX is always a map structure
+        order[key] = { name: "", price: 0, toppings: [] };
+      }
+
+      const originalItem = { ...order[key] }; // Clone for changelog
+      for (const attr in value) {
+        if (attr === "toppings" && typeof value[attr] === "object") {
+          // Handle toppings separately
+          const [mergedArray, arrayChanges] = mergeToppings(order[key][attr], value[attr]);
+          order[key][attr] = mergedArray;
+          if (arrayChanges.added.length || arrayChanges.removed.length) {
+            changeLog.updated[`${key}.${attr}`] = arrayChanges;
+          }
+        } else if (value[attr] === null) {
+          // Remove attribute if null
+          if (order[key][attr] !== undefined) {
+            delete order[key][attr];
+            changeLog.removed[`${key}.${attr}`] = originalItem[attr];
+          }
+        } else {
+          // Add or update attribute
+          if (order[key][attr] !== value[attr]) {
+            changeLog.updated[`${key}.${attr}`] = { from: order[key][attr], to: value[attr] };
+            order[key][attr] = value[attr];
+          }
+        }
+      }
+    } else {
+      // Handle other top-level updates
+      if (value === null) {
+        // Remove key
+        if (order[key] !== undefined) {
+          changeLog.removed[key] = order[key];
+          delete order[key];
+        }
+      } else {
+        // Add or update key
+        if (order[key] === undefined) {
+          changeLog.added[key] = value;
+        } else if (order[key] !== value) {
+          changeLog.updated[key] = { from: order[key], to: value };
+        }
+        order[key] = value;
+      }
+    }
+  }
+  console.log("Completed applyUpdates. Updated order:", order);
+  return order;
+}
+
+// Function to handle toppings
+function mergeToppings(currentArray = [], updateObject) {
+  console.log("Starting mergeToppings with currentArray:", currentArray, "and updateObject:", updateObject);
+
+  const updatedArray = Array.isArray(currentArray) ? [...currentArray] : [];
+  const arrayChanges = { added: [], removed: [] };
+
+  // Handle removals
+  if (updateObject.remove) {
+    updateObject.remove.forEach((item) => {
+      const index = updatedArray.indexOf(item);
+      if (index !== -1) {
+        updatedArray.splice(index, 1);
+        arrayChanges.removed.push(item);
+      }
+    });
+  }
+
+  // Handle additions
+  if (updateObject.add) {
+    updateObject.add.forEach((item) => {
+      if (!updatedArray.includes(item)) {
+        updatedArray.push(item); // Avoid duplicates
+        arrayChanges.added.push(item);
+      }
+    });
+  }
+
+  console.log("Completed mergeToppings. Resulting array:", updatedArray, "with changes:", arrayChanges);
+  return [updatedArray, arrayChanges];
+}

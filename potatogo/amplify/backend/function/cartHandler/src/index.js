@@ -52,23 +52,15 @@ exports.addToCart = async event => {
 
     console.log('Menu Items:', menuItems);
 
-  
     if (menuItems.cartItems) {
       const newItemKey = `cartItem${currentItemsCount + 1}`;
-      updatedCart[newItemKey] = menuItems.cartItems.map(item => ({
-        name: item.name,    
-        price: item.price,  
-      }));
+      updatedCart[newItemKey] = menuItems.cartItems;
     }
 
-    
     if (menuItems.Specials) {
       console.log('Adding Specials:', menuItems.Specials);
       const newSpecialsKey = `specials${currentSpecialsCount + 1}`;
-      updatedCart[newSpecialsKey] = menuItems.Specials.map(special => ({
-        name: special.name,   
-        price: special.price, 
-      }));
+      updatedCart[newSpecialsKey] = menuItems.Specials;
     }
 
     updatedCart.updatedAt = new Date().toISOString();

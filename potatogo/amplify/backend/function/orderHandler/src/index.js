@@ -16,14 +16,9 @@ exports.handler = async (event) => {
 
     const cartId = body.cartId;
     const customerName = body.customerName || 'Guest';
-    const orderNote = body.orderNote || ''; 
-    const totalPrice = body.totalPrice || 0; 
-    const paymentMethod = body.paymentMethod;
 
     console.log('Parsed Cart Id:', cartId);
     console.log('Parsed Customer Name:', customerName);
-    console.log('Parsed Order Note:', orderNote);
-    console.log('Parsed Total Price:', totalPrice);
 
     if (!cartId) {
       console.error('Missing cartId in body');
@@ -40,7 +35,6 @@ exports.handler = async (event) => {
       TableName: 'Pota-To-Go-cart',
       Key: { cartId },
     };
-
     const cartData = await dynamoDB.send(new GetCommand(getCartParams));
     const cart = cartData.Item;
 
@@ -57,7 +51,21 @@ exports.handler = async (event) => {
       .filter((key) => key.startsWith('cartItem'))
       .reduce((acc, key) => {
         const orderKey = key.replace('cart', 'order');
-        acc[orderKey] = cart[key];
+        const item = cart[key];
+
+        // Ensure `orderItemX` is a map with proper structure
+        acc[orderKey] = Array.isArray(item)
+          ? {
+              name: item[0]?.name || 'Unknown Item',
+              price: item[0]?.price || 0,
+              toppings: item[0]?.toppings || [],
+            }
+          : {
+              name: item?.name || 'Unknown Item',
+              price: item?.price || 0,
+              toppings: item?.toppings || [],
+            };
+
         return acc;
       }, {});
 
@@ -77,9 +85,6 @@ exports.handler = async (event) => {
       ...orderItems,
       orderId: generateOrderId(),
       customerName,
-      orderNote, 
-      totalPrice, 
-      paymentMethod,
       orderStatus: 'pending',
       createdAt: new Date().toISOString(),
     };
@@ -101,9 +106,6 @@ exports.handler = async (event) => {
         message: 'Order created successfully',
         orderId: newOrder.orderId,
         customerName: newOrder.customerName,
-        orderNote: newOrder.orderNote, 
-        totalPrice: newOrder.totalPrice, 
-        paymentMethod: newOrder.paymentMethod,
         orderStatus: newOrder.orderStatus,
         createdAt: newOrder.createdAt,
       }),

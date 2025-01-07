@@ -1,21 +1,28 @@
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Amplify } from 'aws-amplify';
-import AdminPage from './pages/admin/adminPage';
-import './App.css';
-import awsmobile  from './aws-exports';
+import awsmobile from './aws-exports';
 import amplifyconfig from './amplifyconfiguration.json';
-Amplify.configure(amplifyconfig);
-// Configure Amplify
-Amplify.configure(awsmobile);
+import './App.css';
 
+import AdminPage from './pages/admin/adminPage';
+
+Amplify.configure(amplifyconfig);
+Amplify.configure(awsmobile);
 
 const App: React.FC = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <AdminPage />
-      </header>
-    </div>
+    <Router>
+      <div className="App">
+        <header className="App-header">
+          <Routes>
+            {/* Redirect admin base path to Orders */}
+            <Route path="/admin/*" element={<AdminPage />} />
+            <Route path="/" element={<Navigate to="/admin" />} />
+          </Routes>
+        </header>
+      </div>
+    </Router>
   );
 };
 

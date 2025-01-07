@@ -79,7 +79,7 @@ exports.handler = async event => {
       ExclusiveStartKey: lastEvaluatedKey
         ? JSON.parse(lastEvaluatedKey)
         : undefined,
-      Limit: 10,
+      Limit: 50,
     };
 
     console.log('Scan Parameters:', scanParams);

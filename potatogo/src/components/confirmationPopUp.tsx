@@ -25,6 +25,21 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ orderId, onClose 
         const parsedData = response.data.body;
         
         const order = parsedData.items[0]; 
+        const orderDetails = order;
+        console.log(Object.keys(orderDetails));
+        Object.keys(orderDetails).map((key) => {
+          const items = orderDetails[key];
+          console.log("items in order:", items);
+          if (key.startsWith('orderItem')) {
+            if (Array.isArray(items)) {
+              items.forEach((item: any) => {
+                console.log("item in items:", item);
+              });
+            } else if (items && typeof items === 'object') {
+              console.log("item in items:", items);
+            }
+          }
+        });
         console.log('Parsed Order:', order);
         setOrderDetails(order); 
         setIsLoading(false);
@@ -63,21 +78,21 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ orderId, onClose 
                 <h2>Order Items:</h2>
                 {Object.keys(orderDetails).map((key) => {
                   if (key.startsWith('orderItem')) {
-                    const items = orderDetails[key]; 
+                    const item = orderDetails[key]; 
                     return (
                       <div key={key}>
-                        {items?.map((orderItem: any, idx: number) => (
-                          <div key={idx}>
-                            {orderItem.name}:{orderItem.price} SEK
-                            {orderItem.toppings && orderItem.toppings.length > 0 && (
+                        {
+                          <div>
+                            {item.name}:{item.price} SEK
+                            {item.toppings && item.toppings.length > 0 && (
                               <div>Toppings:
-                                {orderItem.toppings.map((topping: string, toppingIdx: number) => (
+                                {item.toppings.map((topping: string, toppingIdx: number) => (
                                   <div key={toppingIdx}>{topping}</div>
                                 ))}
                               </div>
                             )}
                           </div>
-                        ))}
+                        }
                       </div>
                     );
                   }

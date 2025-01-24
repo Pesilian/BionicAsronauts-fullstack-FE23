@@ -3,18 +3,14 @@ import axios from 'axios';
 import '../styles/menu.css';
 import CartPopup from './cart';
 import cart from '../assets/cart.svg';
+import { Special } from '../types/cartTypes';
+import { isSpecial, selectedItemsIntoMenuItem } from '../utils/parseOrder';
 
 
 interface MenuItem {
   menuItem: string;
   category: string;
   price: number
-}
-
-interface Special {
-  specialsName: string;
-  ingridients: string;
-  price: number;
 }
 
 interface MenuPopupProps {
@@ -86,8 +82,6 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
           'https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/menu'
         );
 
-        console.log(menuResponse)
-
         const menuData = JSON.parse(menuResponse.data.body);
         if (menuData && menuData.menuItems) {
           setMenuItems(menuData.menuItems);
@@ -97,7 +91,6 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
           'https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/specials'
         );
 
-        console.log(specialsResponse)
      
 
         const specialsData = JSON.parse(specialsResponse.data.body);
@@ -145,21 +138,22 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
     try {
       let currentCartId = cartId;
   
-      if (!currentCartId) {
-        const newCartResponse = await axios.post(
-          'https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/cart',
-          {}
-        );
+      /* This request always fails, so why do we do it? */
+      // if (!currentCartId) {
+      //   const newCartResponse = await axios.post(
+      //     'https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/cart',
+      //     {}
+      //   );
   
-        const newCartData = JSON.parse(newCartResponse.data.body);
-        currentCartId = newCartData.cartId;
-        setCartId(currentCartId);
+      //   const newCartData = JSON.parse(newCartResponse.data.body);
+      //   currentCartId = newCartData.cartId;
+      //   setCartId(currentCartId);
   
-        if (onCartIdChange && currentCartId) {
-          onCartIdChange(currentCartId);
-          localStorage.setItem('cartId', currentCartId);
-        }
-      }
+      //   if (onCartIdChange && currentCartId) {
+      //     onCartIdChange(currentCartId);
+      //     localStorage.setItem('cartId', currentCartId);
+      //   }
+      // }
   
       const userDetails = localStorage.getItem('user');
       const customerName = userDetails
@@ -170,47 +164,16 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
         cartId: currentCartId,
         customerName: customerName,
       };
-  
-      let mainItem: any = {}; 
-      let toppings: string[] = []; 
-  
-     
-      selectedItems.forEach(item => {
-        if (isSpecial(item)) {
-         
-          mainItem = {
-            name: item.specialsName,
-            price: item.price || 0,
-          };
-        } else {
-          if (item.price) {
-            
-            mainItem = {
-              name: item.menuItem,
-              price: item.price || 0,
-            };
-          } else {
-           
-            toppings.push(item.menuItem);
-          }
-        }
-      });
-  
-     
-      if (toppings.length > 0) {
-        mainItem.toppings = toppings;
-      }
-  
+
+      const mainItem = selectedItemsIntoMenuItem(selectedItems);
       payload.menuItems = { mainItem }; 
   
-      console.log('Payload to be sent:', JSON.stringify(payload, null, 2));
   
       const response = await axios.post(
         'https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/cart',
         payload
       );
   
-      console.log('Lyckades skicka:', response.data);
   
       const responseData = JSON.parse(response.data.body);
       const updatedCartId = responseData.cartId;
@@ -224,11 +187,6 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
     } catch (error) {
       console.error('Kunde inte lägga till i kundvagnen:', error);
     }
-  };
-  
-
-  const isSpecial = (item: MenuItem | Special): item is Special => {
-    return (item as Special).specialsName !== undefined;
   };
 
   const handleOverlayClick = (e: React.MouseEvent) => {

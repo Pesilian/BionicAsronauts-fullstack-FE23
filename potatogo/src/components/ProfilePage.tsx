@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/ProfilePage.css';
+import CartPopup from './cart';
+import { SubItem } from '../types/cartTypes';
+import { numberedOrderItemsIntoCartItems, numberedOrderItemsIntoMenuSelectedItems, selectedItemsIntoMenuItem } from '../utils/parseOrder';
+import axios from 'axios';
+import { Order } from '../types/orderTypes';
 
 const ProfilePage: React.FC = () => {
   const [profileData, setProfileData] = useState<any>(null);
   const [orders, setOrders] = useState<any[]>([]); // State for orders
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [showCartPopup, setShowCartPopup] = useState<boolean>(false);
+  const [cartId, setCartId] = useState<string | null>(null);
   const navigate = useNavigate();
 
   // Fetch profile and orders when the page loads
@@ -23,10 +30,10 @@ const ProfilePage: React.FC = () => {
       fetch('https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/order')
         .then(response => response.json())
         .then(data => {
-          console.log('Fetched orders:', data); // Log the fetched orders
+          // console.log('Fetched orders:', data); // Log the fetched orders
 
           // Ensure body is correctly parsed (check if the body is a string and needs parsing)
-          let parsedData = data.body ? JSON.parse(data.body) : data;
+          let parsedData = data.body;
 
           if (
             parsedData &&
@@ -34,9 +41,13 @@ const ProfilePage: React.FC = () => {
             Array.isArray(parsedData.items)
           ) {
             // Filter orders based on customerName (nickname)
+            /* Why does the API return all orders, and not just the customers order? */
             const userOrders = parsedData.items.filter(
-              (order: any) => order.customerName === nickname
-            );
+              (order: Order) => order.customerName === nickname
+            ).sort((a: Order, b: Order) => {
+              return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+            });
+
             setOrders(userOrders); // Set orders based on customerName
           } else {
             console.error(
@@ -55,6 +66,55 @@ const ProfilePage: React.FC = () => {
     localStorage.removeItem('user');
     setIsLoggedIn(false);
     navigate('/');
+  };
+
+  const generateCartId = () => {
+    return `${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
+  };
+
+  const handleOrderAgain = async (order: any) => {
+    try {
+      // console.log(order);
+      // const cartItems = numberedOrderItemsIntoCartItems(order);
+      const selectedItems = numberedOrderItemsIntoMenuSelectedItems(order);
+      const mainItem = selectedItemsIntoMenuItem(selectedItems);
+      // console.log(orderItems);
+      const newCart = {
+        customerName: profileData.nickname,
+        menuItems: {
+          mainItem,
+        },
+      };
+
+      const response = await fetch('https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/cart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newCart),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create cart');
+      }
+
+      const data = await response.json();
+      const bodyObject = JSON.parse(data.body);
+      // console.log(bodyObject);
+  
+      const updatedCartId = bodyObject.cartId;
+  
+      if (updatedCartId) {
+        setCartId(updatedCartId);
+        localStorage.setItem('cartId', updatedCartId);
+      }
+
+      setCartId(updatedCartId);
+      // console.log("show cart popup");
+      setShowCartPopup(true);
+    } catch (error) {
+      console.error('Error creating new cart:', error);
+    }
   };
 
   if (!profileData) {
@@ -168,16 +228,22 @@ const ProfilePage: React.FC = () => {
                   <p>{order.orderStatus}</p>
                   <div className="order-details">
                     <p>Order #{order.orderId}</p>
-                    <p>Order date: {order.updatedAt}</p>
+                    <p>Order date: {order.createdAt}</p>
+                    { order.updatedAt && <p>Order updated: {order.updatedAt}</p> }
                   </div>
                   <button>Receipt</button>
-                  <button>Order Again</button>
+                  <button onClick={() => handleOrderAgain(order)}>Cancel Order</button>
+                  <button onClick={() => handleOrderAgain(order)}>Order Again</button>
                 </div>
               </div>
             ))
           )}
         </div>
       </div>
+
+      {showCartPopup && (
+        <CartPopup onClose={() => setShowCartPopup(false)} cartId={cartId} />
+      )}
     </div>
   );
 };

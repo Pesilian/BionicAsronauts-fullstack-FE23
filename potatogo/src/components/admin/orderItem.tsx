@@ -4,12 +4,7 @@ import { updateOrders } from '../../api/ordersApi';
 import styles from '../../styles/admin/orderItem.module.css';
 import { fetchMenu } from '../../api/ordersApi';
 import AddItemsOverlay from './addItemsOverlay';
-
-interface MenuItem {
-  menuItem: string;
-  category: string;
-  price?: number | null;
-}
+import { MenuItem } from '../../types/cartTypes';
 
 interface OrderItemProps {
   order: Order;
@@ -68,7 +63,6 @@ const OrderItem: React.FC<OrderItemProps> = ({
   };
 
   const openOverlay = async (itemId: string | null) => {
-    console.log('Button clicked, itemId:', itemId);
   
     try {
       const { Menu } = await fetchMenu();
@@ -77,8 +71,6 @@ const OrderItem: React.FC<OrderItemProps> = ({
       setCurrentItemId(itemId);
   
       setIsOverlayOpen(true);
-      console.log('isOverlayOpen set to true');
-      console.log('Fetched menu:', Menu);
     } catch (error) {
       console.error('Error fetching menu:', error);
     }
@@ -173,7 +165,6 @@ const OrderItem: React.FC<OrderItemProps> = ({
       };
 
       const updatedOrder = await updateOrders(payload);
-      console.log('Updated order:', updatedOrder);
 
       if (onStatusUpdate) {
         onStatusUpdate(newStatus, order.orderId);

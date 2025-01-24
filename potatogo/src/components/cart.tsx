@@ -44,7 +44,6 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
 
     setIsLoading(true);
     setError(null);
-
     try {
       const response = await axios.get(
         `https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/cart`,

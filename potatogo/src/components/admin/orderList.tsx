@@ -41,10 +41,10 @@ const OrderList: React.FC<OrderListProps> = ({ orderStatus, highlightedOrderId, 
 
   const handleSort = (field: 'createdAt' | 'modifiedAt') => {
     if (sortField === field) {
-      setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc')); // Toggle order
+      setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'));
     } else {
-      setSortField(field); // Change field
-      setSortOrder('desc'); // Default to descending
+      setSortField(field);
+      setSortOrder('desc'); 
     }
   };
 

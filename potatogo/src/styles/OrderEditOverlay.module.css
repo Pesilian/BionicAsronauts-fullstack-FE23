@@ -1,0 +1,149 @@
+@import './admin/reset.module.css';
+
+/* Overlay Styles */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal Styling */
+.modal {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  width: 90%;
+  display: flex;
+    flex-direction: column;
+
+  max-width: 800px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+/* Modal Header */
+.modal h2 {
+  margin-top: 0;
+  text-align: center;
+  color: #51753d;
+}
+
+/* Items List */
+.items {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Item Card */
+.itemCard {
+  min-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.8rem;
+  border: 1px solid #302d2d;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+}
+
+/* Item Header */
+.itemCard p {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.itemHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+/* Toppings List */
+.toppings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.topping {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Button Row */
+.actionButtonsRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* Buttons */
+button {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  background-color: #51753d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #415c2b;
+}
+
+/* Remove Checked Items Button */
+.removeButton {
+  background-color: #d9534f;
+}
+
+.removeButton:hover {
+  background-color: #c9302c;
+}
+
+/* Add New Item Button */
+.addNewCard {
+  width: 100%;
+  border: 2px dashed #aaa;
+  border-radius: 6px;
+  padding: 1rem;
+  text-align: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.addNewCard:hover {
+  border-color: #51753d;
+}
+
+/* Editable Order Note */
+.orderNote {
+  width: 100%;
+  border: 1px solid #aaa;
+  border-radius: 6px;
+  padding: 0.8rem;
+  font-size: 1rem;
+  color: #333;
+  resize: none;
+}
+
+.orderNote:focus {
+  outline: none;
+  border-color: black;
+}

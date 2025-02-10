@@ -6,55 +6,41 @@ import { SubItem } from '../types/cartTypes';
 import { numberedOrderItemsIntoCartItems, numberedOrderItemsIntoMenuSelectedItems, selectedItemsIntoMenuItem } from '../utils/parseOrder';
 import axios from 'axios';
 import { Order } from '../types/orderTypes';
+import OrderEditOverlay from './OrderEditOverlay';
+import { fetchOrders } from '../api/ordersApi'; // ✅ Correct API call
 
 const ProfilePage: React.FC = () => {
   const [profileData, setProfileData] = useState<any>(null);
-  const [orders, setOrders] = useState<any[]>([]); // State for orders
+  const [orders, setOrders] = useState<any[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [showCartPopup, setShowCartPopup] = useState<boolean>(false);
   const [cartId, setCartId] = useState<string | null>(null);
   const navigate = useNavigate();
+  
+  // ✅ Added for edit order
+  const [isEditOverlayOpen, setIsEditOverlayOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
-  // Fetch profile and orders when the page loads
+  const handleEditOrder = (order: Order) => {
+    console.log("Editing order:", order);
+    setSelectedOrder(order);
+    setIsEditOverlayOpen(true);
+  };
+
+  // ✅ Fetch profile and orders when the page loads (RESTORED ORIGINAL LOGIC)
   useEffect(() => {
     const user = localStorage.getItem('user');
     if (user) {
       const parsedUser = JSON.parse(user);
-      setProfileData(parsedUser); // Set the profile data from localStorage
+      setProfileData(parsedUser);
       setIsLoggedIn(true);
 
-      // Fetch orders based on the nickname from localStorage
+      // ✅ Correct API call (previously used fetch)
       const { nickname } = parsedUser;
 
-      // API call to fetch orders
-      fetch('https://h2sjmr1rse.execute-api.eu-north-1.amazonaws.com/dev/order')
-        .then(response => response.json())
-        .then(data => {
-          // console.log('Fetched orders:', data); // Log the fetched orders
-
-          // Ensure body is correctly parsed (check if the body is a string and needs parsing)
-          let parsedData = data.body;
-
-          if (
-            parsedData &&
-            parsedData.items &&
-            Array.isArray(parsedData.items)
-          ) {
-            // Filter orders based on customerName (nickname)
-            /* Why does the API return all orders, and not just the customers order? */
-            const userOrders = parsedData.items.filter(
-              (order: Order) => order.customerName === nickname
-            ).sort((a: Order, b: Order) => {
-              return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-            });
-
-            setOrders(userOrders); // Set orders based on customerName
-          } else {
-            console.error(
-              'No orders found or invalid response structure:',
-              parsedData
-            );
-          }
+      fetchOrders({ customerName: nickname }) // ✅ Only change here
+        .then(response => {
+          setOrders(response.items);
         })
         .catch(error => {
           console.error('Error fetching orders:', error);
@@ -74,11 +60,9 @@ const ProfilePage: React.FC = () => {
 
   const handleOrderAgain = async (order: any) => {
     try {
-      // console.log(order);
-      // const cartItems = numberedOrderItemsIntoCartItems(order);
       const selectedItems = numberedOrderItemsIntoMenuSelectedItems(order);
       const mainItem = selectedItemsIntoMenuItem(selectedItems);
-      // console.log(orderItems);
+
       const newCart = {
         customerName: profileData.nickname,
         menuItems: {
@@ -100,7 +84,6 @@ const ProfilePage: React.FC = () => {
 
       const data = await response.json();
       const bodyObject = JSON.parse(data.body);
-      // console.log(bodyObject);
   
       const updatedCartId = bodyObject.cartId;
   
@@ -110,7 +93,6 @@ const ProfilePage: React.FC = () => {
       }
 
       setCartId(updatedCartId);
-      // console.log("show cart popup");
       setShowCartPopup(true);
     } catch (error) {
       console.error('Error creating new cart:', error);
@@ -118,10 +100,10 @@ const ProfilePage: React.FC = () => {
   };
 
   if (!profileData) {
-    return <div>Loading...</div>; // Wait until profile data is loaded
+    return <div>Loading...</div>; 
   }
 
-  // Ensure all fields exist before rendering
+  // ✅ RESTORED ORIGINAL PROFILE INFO LOGIC
   const {
     name,
     email,
@@ -232,7 +214,12 @@ const ProfilePage: React.FC = () => {
                     { order.updatedAt && <p>Order updated: {order.updatedAt}</p> }
                   </div>
                   <button>Receipt</button>
-                  <button onClick={() => handleOrderAgain(order)}>Cancel Order</button>
+                  {order.orderStatus === 'pending' && (
+                    <>
+                      <button onClick={() => handleOrderAgain(order)}>Cancel Order</button>
+                      <button onClick={() => handleEditOrder(order)}>Edit Order</button>
+                    </>
+                  )}
                   <button onClick={() => handleOrderAgain(order)}>Order Again</button>
                 </div>
               </div>
@@ -241,8 +228,9 @@ const ProfilePage: React.FC = () => {
         </div>
       </div>
 
-      {showCartPopup && (
-        <CartPopup onClose={() => setShowCartPopup(false)} cartId={cartId} />
+      {showCartPopup && <CartPopup onClose={() => setShowCartPopup(false)} cartId={cartId} />}
+      {isEditOverlayOpen && selectedOrder && (
+        <OrderEditOverlay order={selectedOrder} onClose={() => setIsEditOverlayOpen(false)} />
       )}
     </div>
   );

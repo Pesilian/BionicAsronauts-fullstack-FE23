@@ -1,4 +1,4 @@
-.cart-popup-overlay {
+.cartPopupOverlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -13,7 +13,7 @@
   overflow: hidden;
 }
 
-.cart-popup-content {
+.cartPopupContent {
   background-color: #8fbd92;
   font-family: 'Roboto Serif', serif;
   color: #ffffff;
@@ -25,8 +25,7 @@
   overflow-y: auto;
 }
 
-
-.cart-item {
+.cartItem {
   background-color: beige;
   color: black;
   border: solid beige 20px;
@@ -34,22 +33,21 @@
   margin: 20px;
 }
 
-.remove-cartItem {
- 
+.removeCartItem {
   border: none;
   background-color: #8fbd92;
 }
 
-.remove-cartItem:hover {
+.removeCartItem:hover {
   background-color: #8fbd92;
   color: grey;
 }
 
-.order-note-header {
+.orderNoteHeader {
   font-weight: 200;
 }
 
-.order-note {
+.orderNote {
   border: none;
   width: 80%;
   max-width: 600px;
@@ -60,6 +58,6 @@
   margin: 20px;
 }
 
-.place-orderBtn {
+.placeOrderBtn {
   margin-top: 20px;
 }

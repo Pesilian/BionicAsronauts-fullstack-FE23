@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../styles/ProfilePage.css';
+import styles from '../styles/ProfilePage.module.css';
 import CartPopup from './cart';
 import { SubItem } from '../types/cartTypes';
 import { numberedOrderItemsIntoCartItems, numberedOrderItemsIntoMenuSelectedItems, selectedItemsIntoMenuItem } from '../utils/parseOrder';
 import axios from 'axios';
 import { Order } from '../types/orderTypes';
 import OrderEditOverlay from './OrderEditOverlay';
-import { fetchOrders } from '../api/ordersApi'; // ✅ Correct API call
+import { fetchOrders } from '../api/ordersApi';
 
 const ProfilePage: React.FC = () => {
   const [profileData, setProfileData] = useState<any>(null);
@@ -17,7 +17,7 @@ const ProfilePage: React.FC = () => {
   const [cartId, setCartId] = useState<string | null>(null);
   const navigate = useNavigate();
   
-  // ✅ Added for edit order
+  //Added for edit order
   const [isEditOverlayOpen, setIsEditOverlayOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
@@ -27,7 +27,7 @@ const ProfilePage: React.FC = () => {
     setIsEditOverlayOpen(true);
   };
 
-  // ✅ Fetch profile and orders when the page loads (RESTORED ORIGINAL LOGIC)
+  // Fetch profile and orders when the page loads
   useEffect(() => {
     const user = localStorage.getItem('user');
     if (user) {
@@ -35,10 +35,10 @@ const ProfilePage: React.FC = () => {
       setProfileData(parsedUser);
       setIsLoggedIn(true);
 
-      // ✅ Correct API call (previously used fetch)
+      // Correct API call (previously used fetch)
       const { nickname } = parsedUser;
 
-      fetchOrders({ customerName: nickname }) // ✅ Only change here
+      fetchOrders({ customerName: nickname })
         .then(response => {
           setOrders(response.items);
         })
@@ -103,7 +103,6 @@ const ProfilePage: React.FC = () => {
     return <div>Loading...</div>; 
   }
 
-  // ✅ RESTORED ORIGINAL PROFILE INFO LOGIC
   const {
     name,
     email,
@@ -118,63 +117,63 @@ const ProfilePage: React.FC = () => {
   } = profileData || {};
 
   return (
-    <div className="profile-page">
-      <header className="header">
-        <div className="header-left">
-          <h1 className="main-title">POTA-TO-GO</h1>
-          <p className="subtitle">Fast Food, Done the Potato Way</p>
+    <div className={styles.profilePage}>
+      <header className={styles.header}>
+        <div className={styles.headerLeft}>
+          <h1 className={styles.mainTitle}>POTA-TO-GO</h1>
+          <p className={styles.subtitle}>Fast Food, Done the Potato Way</p>
         </div>
-        <div className="header-right">
-          <p className="nav-item">Contact</p>
-          <p className="nav-item">{profileData.nickname}</p>
-          <button onClick={handleLogout} className="logout-button">
+        <div className={styles.headerRight}>
+          <p className={styles.navItem}>Contact</p>
+          <p className={styles.navItem}>{profileData.nickname}</p>
+          <button onClick={handleLogout} className={styles.logoutButton}>
             Log out
           </button>
         </div>
       </header>
 
-      <div className="profile-container">
-        <div className="profile-card-container">
-          <div className="profile-section">
+      <div className={styles.profileContainer}>
+        <div className={styles.profileCardContainer}>
+          <div className={styles.profileSection}>
             <h2>Profile</h2>
-            <div className="form-group">
+            <div className={styles.formGroup}>
               <label>Name</label>
               <input type="text" value={name || 'N/A'} readOnly />
             </div>
-            <div className="form-group">
+            <div className={styles.formGroup}>
               <label>Email</label>
               <input type="email" value={email || 'N/A'} readOnly />
             </div>
-            <div className="form-group">
+            <div className={styles.formGroup}>
               <label>Phone Number</label>
               <input type="text" value={phone || 'N/A'} readOnly />
             </div>
-            <div className="form-group">
+            <div className={styles.formGroup}>
               <label>Address</label>
               <input type="text" value={address || 'N/A'} readOnly />
             </div>
             <button>Edit Profile</button>
-            <div className="delete-account">
-              <button className="delete-button">Delete Account</button>
+            <div className={styles.deleteAccount}>
+              <button className={styles.deleteButton}>Delete Account</button>
             </div>
           </div>
 
-          <div className="card-section">
+          <div className={styles.cardSection}>
             <h2>Card Information</h2>
-            <div className="form-group">
+            <div className={styles.formGroup}>
               <label>Card name</label>
               <input type="text" value={cardName || 'N/A'} readOnly />
             </div>
-            <div className="form-group">
+            <div className={styles.formGroup}>
               <label>First name</label>
               <input type="text" value={surname || 'N/A'} readOnly />
             </div>
-            <div className="form-group">
+            <div className={styles.formGroup}>
               <label>Card number</label>
               <input type="text" value={cardNumber || 'N/A'} readOnly />
             </div>
-            <div className="card-expiry">
-              <div className="form-group">
+            <div className={styles.cardExpiry}>
+              <div className={styles.formGroup}>
                 <label>Month</label>
                 <select value={cardExpiryMonth || 'N/A'} disabled>
                   <option>Select</option>
@@ -182,7 +181,7 @@ const ProfilePage: React.FC = () => {
                   <option>02</option>
                 </select>
               </div>
-              <div className="form-group">
+              <div className={styles.formGroup}>
                 <label>Year</label>
                 <select value={cardExpiryYear || 'N/A'} disabled>
                   <option>Select</option>
@@ -190,7 +189,7 @@ const ProfilePage: React.FC = () => {
                   <option>2025</option>
                 </select>
               </div>
-              <div className="form-group">
+              <div className={styles.formGroup}>
                 <label>CVC</label>
                 <input type="text" value={cvc || 'N/A'} readOnly />
               </div>
@@ -199,16 +198,16 @@ const ProfilePage: React.FC = () => {
           </div>
         </div>
 
-        <div className="orders-section">
+        <div className={styles.ordersSection}>
           <h2>My Orders</h2>
           {orders.length === 0 ? (
             <p>No orders found.</p>
           ) : (
             orders.map((order, index) => (
-              <div key={index} className="order-item">
-                <div className="order-status">
+              <div key={index} className={styles.orderItem}>
+                <div className={styles.orderStatus}>
                   <p>{order.orderStatus}</p>
-                  <div className="order-details">
+                  <div className={styles.orderDetails}>
                     <p>Order #{order.orderId}</p>
                     <p>Order date: {order.createdAt}</p>
                     { order.updatedAt && <p>Order updated: {order.updatedAt}</p> }

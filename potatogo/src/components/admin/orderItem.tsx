@@ -5,6 +5,7 @@ import styles from '../../styles/admin/orderItem.module.css';
 import { fetchMenu } from '../../api/ordersApi';
 import AddItemsOverlay from './addItemsOverlay';
 import { MenuItem } from '../../types/cartTypes';
+import { deleteOrders } from '../../api/ordersApi';
 
 interface OrderItemProps {
   order: Order;
@@ -225,6 +226,28 @@ const OrderItem: React.FC<OrderItemProps> = ({
     order.numberedOrderItems = updatedOrderItems;
   };
 
+  const handleDeleteOrder = async () => {
+    if (!window.confirm('Are you sure you want to delete this order?')) return;
+  
+    setLoading(true);
+    try {
+      console.log("Deleting order:", order.orderId);
+  
+      await deleteOrders(order.orderId);  // ✅ Calls API
+      console.log("Order deleted successfully!");
+  
+      onDelete(); // ⚠️ Does `onDelete` exist when OrderItem is used?
+    } catch (error) {
+      console.error('Error deleting order:', error);
+      setError('Failed to delete order');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  
+  
+
   return (
     <div className={`${styles.orderItem} ${isHighlighted ? styles.highlighted : ''}`}>
       <div className={styles.orderHeader} onClick={() => setIsExpanded(!isExpanded)}>
@@ -330,25 +353,13 @@ const OrderItem: React.FC<OrderItemProps> = ({
                   Cancel Changes
                 </button>
                 <button
-                  className={styles.deleteButton}
-                  onClick={async () => {
-                    if (!window.confirm('Are you sure you want to delete this order?')) return;
-  
-                    setLoading(true);
-                    try {
-                      await onDelete();
-                    } catch (err) {
-                      setError('Failed to delete order');
-                      console.error(err);
-                    } finally {
-                      setLoading(false);
-                    }
-                  }}
-                  disabled={loading}
-                >
-                  {loading ? 'Deleting...' : 'Delete'}
-                  Order
-                </button>
+                    className={styles.deleteButton}
+                    onClick={handleDeleteOrder}  // ✅ Now calls the function inside `OrderItem`
+                    disabled={loading}
+                  >
+                    {loading ? 'Deleting...' : 'Delete Order'}
+                  </button>
+
                 <select
                   value={newStatus}
                   onChange={(e) => setNewStatus(e.target.value)}

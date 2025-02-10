@@ -1,4 +1,4 @@
-.menu-popup-overlay {
+.menuPopupOverlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -14,7 +14,7 @@
   padding-top: 20px;
 }
 
-.category-navigation {
+.categoryNavigation {
   background-color: #8fbd92;
   position: sticky; 
   top: 0;
@@ -24,7 +24,7 @@
   display: flex;
 }
 
-.category-select {
+.categorySelect {
   background-color: #8fbd92;
   font-family: 'Roboto Serif', serif; 
   color: #ffffff; 
@@ -36,18 +36,17 @@
   cursor: pointer; 
 }
 
-
-.cart-btn {
+.cartBtn {
   width: 40px;
   padding: 10px;
 }
 
-.category-select option {
+.categorySelect option {
   background-color: #8fbd92; 
   color: #ffffff; 
 }
 
-.menu-popup-content {
+.menuPopupContent {
   background-color: #8fbd92;
   font-family: 'Roboto Serif', serif;
   color: #ffffff;
@@ -57,26 +56,23 @@
   max-width: 800px;
   max-height: 80vh;
   overflow-y: auto;
- 
 }
 
-.menu-popup-header {
+.menuPopupHeader {
   color: #ffffff;
   font-weight: 300;
   font-size: 50px;
   font-family: 'Monoton', cursive;
-
 }
 
-.menu-popup-itemHeader {
+.menuPopupItemHeader {
   font-size: 30px;
   font-weight: 100;
   color: darkgray;
   text-align: start;
 }
 
-
-.category-container {
+.categoryContainer {
   background-color: beige;
   color: black;
   border: solid beige 20px;
@@ -84,18 +80,17 @@
   margin: 20px;
 }
 
-.menu-popup-itemContainer {
+.menuPopupItemContainer {
   display: flex;
   gap: 20px;
   justify-content: center;
 }
 
-.menu-popup-item {
+.menuPopupItem {
   color: black;
 }
 
-
-.menu-popup-checkbox {
+.menuPopupCheckbox {
   appearance: none; 
   width: 25px;
   height: 25px;
@@ -108,15 +103,13 @@
   margin-left: auto; 
 }
 
-.menu-popup-checkbox:checked {
+.menuPopupCheckbox:checked {
   border-color: #4caf50;
   background-color: #4caf50;
   position: relative;
-
-
 }
 
-.menu-popup-checkbox:checked::after {
+.menuPopupCheckbox:checked::after {
   content: "";
   width: 6px;
   height: 12px;
@@ -128,7 +121,7 @@
   transform: rotate(45deg);
 }
 
-.show-cartBtn {
+.showCartBtn {
   width: 250px;
   background-color: #8fbd92;
   color: #ffffff;

@@ -1,4 +1,4 @@
-.order-confirmation-overlay {
+.orderConfirmationOverlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -10,7 +10,7 @@
   align-items: center;
 }
 
-.order-confirmation-content {
+.orderConfirmationContent {
   background-color: #8fbd92;
   color: #ffffff;
   padding: 20px;
@@ -19,21 +19,21 @@
   text-align: center;
 }
 
-.order-confirmation-content h2,
-.order-confirmation-content p {
+.orderConfirmationContent h2,
+.orderConfirmationContent p {
   margin: 10px 0;
 }
 
-.order-confirmation-content ul {
+.orderConfirmationContent ul {
   list-style-type: none;
   padding: 0;
 }
 
-.order-confirmation-content ul li {
+.orderConfirmationContent ul li {
   margin: 5px 0;
 }
 
-.close-confirmationBtn {
+.closeConfirmationBtn {
   background-color: #ffffff;
   color: #8fbd92;
   border: none;
@@ -42,7 +42,7 @@
   border-radius: 5px;
 }
 
-.close-confirmationBtn:hover {
+.closeConfirmationBtn:hover {
   background-color: #76a879;
   color: #ffffff;
 }

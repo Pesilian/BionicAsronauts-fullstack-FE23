@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import '../styles/cart.css';
+import styles from '../styles/cart.module.css';
 import OrderConfirmation from './confirmationPopUp';
 
 interface SubItem {
@@ -203,8 +203,8 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
   };
 
   return (
-    <div className="cart-popup-overlay" onClick={handleOverlayClick}>
-      <div className="cart-popup-content" onClick={(e) => e.stopPropagation()}>
+    <div className={styles.cartPopupOverlay} onClick={handleOverlayClick}>
+      <div className={styles.cartPopupContent} onClick={(e) => e.stopPropagation()}>
         {orderConfirmation ? (
           <OrderConfirmation
             orderId={orderConfirmation.orderId}
@@ -216,8 +216,8 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
               <p>Loading...</p>
             ) : cartItems.length > 0 ? (
               cartItems.map((item, index) => (
-                <div className="cart-popup-itemContainer" key={index}>
-                  <p className="customer">Customer: {nickname}</p>
+                <div className={styles.cartPopupItemContainer} key={index}>
+                  <p className={styles.customer}>Customer: {nickname}</p>
 
                   {Object.keys(item).map((key) => {
                     if (
@@ -234,11 +234,11 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
                       return (
                         <div key={key}>
                           {value.map((subItem, subIdx) => (
-                            <div key={subIdx} className="cart-item">
+                            <div key={subIdx} className={styles.cartItem}>
                               <p>{(subItem as SubItem).name}</p>
                               <p>Price: {(subItem as SubItem).price} SEK</p>
                               <button
-                                className="remove-cartItem"
+                                className={styles.removeCartItem}
                                 onClick={() =>
                                   handleDeleteSubItem(item.cartId, key)
                                 }
@@ -259,7 +259,7 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
               <p>No items in cart</p>
             )}
 
-            <div className="cart-popup-total">
+            <div className={styles.cartPopupTotal}>
               <h3>Total Price: {calculateTotalPrice()} SEK</h3>
             </div>
 
@@ -281,12 +281,12 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
               {isPaymentChosen && <p>Payment Chosen: {paymentMethod}</p>}
             </form>
 
-            <div className="cart-popup-input-container">
-              <label className="order-note-header" htmlFor="order-note">
+            <div className={styles.cartPopupInputContainer}>
+              <label className={styles.orderNoteHeader} htmlFor="order-note">
                 Leave a message to the kitchen:
               </label>
               <textarea
-                className="order-note"
+                className={styles.orderNote}
                 value={orderNote}
                 onChange={(e) => setOrderNote(e.target.value)}
                 placeholder="Leave a special note for your order..."
@@ -295,8 +295,8 @@ const CartPopup: React.FC<CartPopupProps> = ({ onClose, cartId }) => {
 
             {error && <p>{error}</p>}
 
-            <div className="cart-popup-actions">
-              <button className="place-orderBtn" onClick={handlePlaceOrder}>
+            <div className={styles.cartPopupActions}>
+              <button className={styles.placeOrderBtn} onClick={handlePlaceOrder}>
                 Place Order
               </button>
             </div>

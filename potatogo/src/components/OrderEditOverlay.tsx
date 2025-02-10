@@ -26,23 +26,26 @@ const OrderEditOverlay: React.FC<OrderEditOverlayProps> = ({ order, onClose }) =
     }
   }, [order, snapshot]);
 
-  // Toggle checkboxes for removing items/toppings
-  const toggleCheckbox = (itemId: string, isTopping: boolean = false, parentItemId?: string) => {
+  const toggleCheckbox = (item: string, isTopping: boolean = false, parentItemId?: string) => {
     if (isTopping && parentItemId) {
-      setCheckedToppings((prev) => ({
-        ...prev,
-        [parentItemId]: prev[parentItemId]?.includes(itemId)
-          ? prev[parentItemId].filter((t) => t !== itemId)
-          : [...(prev[parentItemId] || []), itemId],
-      }));
+      setCheckedToppings((prev) => {
+        const currentToppings = prev[parentItemId] || [];
+        return {
+          ...prev,
+          [parentItemId]: currentToppings.includes(item)
+            ? currentToppings.filter((topping) => topping !== item)
+            : [...currentToppings, item],
+        };
+      });
     } else {
       setCheckedItems((prev) =>
-        prev.includes(itemId) ? prev.filter((id) => id !== itemId) : [...prev, itemId]
+        prev.includes(item)
+          ? prev.filter((checkedItem) => checkedItem !== item)
+          : [...prev, item]
       );
     }
   };
 
-  // Open overlay for adding items
   const openOverlay = async (itemId: string | null) => {
     try {
       const { Menu } = await fetchMenu();
@@ -54,7 +57,6 @@ const OrderEditOverlay: React.FC<OrderEditOverlayProps> = ({ order, onClose }) =
     }
   };
 
-  // Generate a new item ID
   const generateNextOrderItemId = () => {
     const existingIds = order.numberedOrderItems.map((item) => item.id);
     let maxId = 0;
@@ -69,60 +71,45 @@ const OrderEditOverlay: React.FC<OrderEditOverlayProps> = ({ order, onClose }) =
     return `orderItem${maxId + 1}`;
   };
 
-  // Handle adding new items/toppings
   const handleAddItems = (selectedItems: MenuItem[]) => {
-    let updatedOrderItems = [...order.numberedOrderItems];
+    const newToppings = selectedItems.map((item) => item.menuItem);
 
-    selectedItems.forEach((newItem) => {
-      let itemExists = false;
+    let currentKey = currentItemId || '';
+    if (!currentKey) {
+      currentKey = generateNextOrderItemId();
+      order.numberedOrderItems.push({ id: currentKey, name: 'New Dish', price: 0, toppings: [] });
+    }
 
-      updatedOrderItems = updatedOrderItems.map((item) => {
-        if (item.id === currentItemId) {
-          itemExists = true;
-          return {
-            ...item,
-            toppings: [...new Set([...item.toppings, newItem.menuItem])],
-          };
-        }
-        return item;
-      });
-
-      if (!itemExists) {
-        updatedOrderItems.push({
-          id: generateNextOrderItemId(),
-          name: newItem.menuItem,
-          price: newItem.price || 0,
-          toppings: [],
-        });
+    const updatedOrderItems = order.numberedOrderItems.map((item) => {
+      if (item.id === currentKey) {
+        return {
+          ...item,
+          toppings: [...item.toppings, ...newToppings],
+        };
       }
+      return item;
+    });
+
+    setToppingsUpdates((prev) => {
+      const current = prev[currentKey] || { add: [], remove: [] };
+      return {
+        ...prev,
+        [currentKey]: {
+          add: [...current.add, ...newToppings],
+          remove: current.remove,
+        },
+      };
     });
 
     order.numberedOrderItems = updatedOrderItems;
     setIsOverlayOpen(false);
   };
 
-  // Remove selected items/toppings
-  const handleRemoveMarkedItems = () => {
-    const updatedOrderItems = order.numberedOrderItems.filter((item) => {
-      if (checkedItems.includes(item.id)) return false;
-      if (checkedToppings[item.id]) {
-        item.toppings = item.toppings.filter((t) => !checkedToppings[item.id].includes(t));
-      }
-      return true;
-    });
-
-    setCheckedItems([]);
-    setCheckedToppings({});
-    order.numberedOrderItems = updatedOrderItems;
-  };
-
-  // Save order changes
   const handleSaveChanges = async () => {
     try {
       const updates: Record<string, any> = {};
-      const remove: string[] = checkedItems;
-  
-      // Ensure toppings are updated in the same structure as OrderItem
+      const remove: string[] = [];
+
       Object.keys(toppingsUpdates).forEach((key) => {
         const { add, remove: removeToppings } = toppingsUpdates[key];
         if (add.length > 0 || removeToppings.length > 0) {
@@ -134,33 +121,75 @@ const OrderEditOverlay: React.FC<OrderEditOverlayProps> = ({ order, onClose }) =
           };
         }
       });
-  
-      // Include order note if changed
+
+      checkedItems.forEach((itemId) => {
+        remove.push(itemId);
+      });
+
       if (editedOrderNote !== order.orderNote) {
         updates.orderNote = editedOrderNote;
       }
-  
-      console.log("Submitting order update:", { orderId: order.orderId, updates, remove });
-  
-      await updateOrders({ orderId: order.orderId, updates, remove });
-  
+
+      const payload = {
+        orderId: order.orderId,
+        updates,
+        remove,
+      };
+
+      console.log('Submitting order update:', payload);
+
+      await updateOrders(payload);
+
       alert('Order updated successfully.');
       onClose();
     } catch (error) {
-      console.error('Error updating order:', error);
-      alert('Failed to update order. Please try again.');
+      console.error('Failed to update order:', error);
+      alert('Error updating order. Please try again.');
     }
   };
-  
 
-  // Cancel changes and revert to original state
-  const handleCancelChanges = () => {
-    if (snapshot) {
-      Object.assign(order, snapshot);
-    }
-    setCheckedItems([]);
+  const handleRemoveMarkedToppings = () => {
+    const updatedOrderItems = order.numberedOrderItems.filter((item) => {
+      if (checkedItems.includes(item.id)) {
+        setToppingsUpdates((prev) => {
+          const updated = { ...prev };
+          delete updated[item.id];
+          return updated;
+        });
+        return false;
+      }
+
+      if (checkedToppings[item.id]?.length) {
+        const removedToppings = checkedToppings[item.id];
+
+        setToppingsUpdates((prev) => {
+          const current = prev[item.id] || { add: [], remove: [] };
+          const filteredAdd = current.add.filter(
+            (topping) => !removedToppings.includes(topping)
+          );
+          const updatedRemove = [...current.remove, ...removedToppings].filter(
+            (topping) => !current.add.includes(topping)
+          );
+
+          return {
+            ...prev,
+            [item.id]: {
+              add: filteredAdd,
+              remove: updatedRemove,
+            },
+          };
+        });
+
+        item.toppings = item.toppings.filter(
+          (topping) => !removedToppings.includes(topping)
+        );
+      }
+
+      return true;
+    });
+
     setCheckedToppings({});
-    onClose();
+    order.numberedOrderItems = updatedOrderItems;
   };
 
   return (
@@ -171,7 +200,9 @@ const OrderEditOverlay: React.FC<OrderEditOverlayProps> = ({ order, onClose }) =
           {order.numberedOrderItems.map((item) => (
             <div key={item.id} className={styles.itemCard}>
               <div className={styles.itemHeader}>
-                <p><strong>{item.name}</strong> - ${item.price}</p>
+                <p>
+                  <strong>{item.name}</strong> - ${item.price}
+                </p>
                 <input
                   type="checkbox"
                   checked={checkedItems.includes(item.id)}
@@ -191,17 +222,23 @@ const OrderEditOverlay: React.FC<OrderEditOverlayProps> = ({ order, onClose }) =
                 ))}
               </ul>
               <div className={styles.cardButtonsContainer}>
-                <button onClick={() => openOverlay(item.id)}>Add Toppings</button>
+                <button onClick={() => openOverlay(item.id)}>Add to item</button>
+                <button onClick={handleRemoveMarkedToppings}>Remove checked items</button>
               </div>
             </div>
           ))}
         </div>
-        <button onClick={handleRemoveMarkedItems} className={styles.removeButton}>Remove Checked Items</button>
-        <button onClick={() => openOverlay(null)} className={styles.addNewCard}>+ Add from Menu</button>
-        <textarea className={styles.orderNote} value={editedOrderNote} onChange={(e) => setEditedOrderNote(e.target.value)} />
+        <button onClick={() => openOverlay(null)} className={styles.addNewCard}>
+          + Add from Menu
+        </button>
+        <textarea
+          className={styles.orderNote}
+          value={editedOrderNote}
+          onChange={(e) => setEditedOrderNote(e.target.value)}
+        />
         <div className={styles.actionButtonsRow}>
           <button onClick={handleSaveChanges}>Save Changes</button>
-          <button onClick={handleCancelChanges}>Cancel Changes</button>
+          <button onClick={onClose}>Cancel</button>
         </div>
       </div>
       {isOverlayOpen && <AddItemsOverlay menu={menu} onAddItems={handleAddItems} onClose={() => setIsOverlayOpen(false)} />}

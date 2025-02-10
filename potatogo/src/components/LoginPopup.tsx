@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../styles/LoginPopup.css';
+import styles from '../styles/LoginPopup.module.css';
 
 interface LoginPopupProps {
   onClose: () => void;
@@ -16,14 +16,14 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ onClose, onLogin }) => {
   };
 
   return (
-    <div className="login-popup">
-      <div className="login-popup-content">
-        <button className="close-btn" onClick={onClose}>
-        ×
+    <div className={styles.loginPopup}>
+      <div className={styles.loginPopupContent}>
+        <button className={styles.closeBtn} onClick={onClose}>
+          ×
         </button>
         <h2>Log In</h2>
         <form onSubmit={handleSubmit}>
-          <div className="input-group">
+          <div className={styles.inputGroup}>
             <label htmlFor="username">Username</label>
             <input
               type="text"
@@ -33,7 +33,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ onClose, onLogin }) => {
               required
             />
           </div>
-          <div className="input-group">
+          <div className={styles.inputGroup}>
             <label htmlFor="password">Password</label>
             <input
               type="password"
@@ -43,7 +43,7 @@ const LoginPopup: React.FC<LoginPopupProps> = ({ onClose, onLogin }) => {
               required
             />
           </div>
-          <button type="submit" className="login-btn">
+          <button type="submit" className={styles.loginBtn}>
             Log In
           </button>
         </form>

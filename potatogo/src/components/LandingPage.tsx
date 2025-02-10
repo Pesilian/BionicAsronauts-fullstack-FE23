@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../styles/LandingPage.css';
+import styles from '../styles/LandingPage.module.css';
 import LoginPopup from './LoginPopup';
 import lppotato from '../assets/lppotato.svg';
 import howto1 from '../assets/howto1.svg';
@@ -122,56 +122,56 @@ const LandingPage: React.FC = () => {
   };
 
   return (
-    <div className="landing-page">
-      <header className="header">
-        <div className="header-left">
-          <h1 className="main-title">POTA-TO-GO</h1>
-          <p className="subtitle">Fast Food, Done the Potato Way</p>
+    <div className={styles.landingPage}>
+      <header className={styles.header}>
+        <div className={styles.headerLeft}>
+          <h1 className={styles.mainTitle}>POTA-TO-GO</h1>
+          <p className={styles.subtitle}>Fast Food, Done the Potato Way</p>
         </div>
-        <div className="header-right">
-          <p className="nav-item" onClick={() => setShowContactPopup(true)}>
+        <div className={styles.headerRight}>
+          <p className={styles.navItem} onClick={() => setShowContactPopup(true)}>
             Contact
           </p>
           {isLoggedIn ? (
             <>
-              <p className="nav-item" onClick={handleProfileNavigation}>
+              <p className={styles.navItem} onClick={handleProfileNavigation}>
                 {nickname}
               </p>
-              <button onClick={handleLogout} className="nav-item">
+              <button onClick={handleLogout} className={styles.navItem}>
                 Log Out
               </button>
             </>
           ) : (
-            <p className="nav-item" onClick={() => setIsLoginPopupOpen(true)}>
+            <p className={styles.navItem} onClick={() => setIsLoginPopupOpen(true)}>
               Log in
             </p>
           )}
           <img
             src={cart}
             alt="Cart"
-            className="cart-btn"
+            className={styles.cartBtn}
             onClick={handleShowCartPopup}
           />
         </div>
       </header>
-      <section className="content-section">
-        <div className="text-content">
-          <p className="main-text">
+      <section className={styles.contentSection}>
+        <div className={styles.textContent}>
+          <p className={styles.mainText}>
             Crispy potatoes, <br />
             creamy toppings, <br />
             savory sides, <br />
             great vibes.
           </p>
-          <p className="secondary-text">
+          <p className={styles.secondaryText}>
             From spuds to smiles, our menu is crafted
             <br />
             to satisfy your cravings with every delicious bite.
             <br />
             Let’s turn your day into a potato-powered adventure!
           </p>
-          <p className="order-text">Order your potato</p>
+          <p className={styles.orderText}>Order your potato</p>
         </div>
-        <div className="image-content">
+        <div className={styles.imageContent}>
           <img src={lppotato} alt="Potato" />
         </div>
       </section>
@@ -195,55 +195,55 @@ const LandingPage: React.FC = () => {
         <MenuPopup onClose={handleClosePopup} onCartIdChange={updateCartId} />
       )}
 
-      <section className="howto-section">
-        <div className="howto-title">
+      <section className={styles.howtoSection}>
+        <div className={styles.howtoTitle}>
           <p>The Potato Process</p>
         </div>
-        <div className="howto-images">
-          <div className="howto-image">
+        <div className={styles.howtoImages}>
+          <div className={styles.howtoImage}>
             <img src={howto1} alt="How to 1" />
           </div>
-          <div className="howto-image">
+          <div className={styles.howtoImage}>
             <img src={howto2} alt="How to 2" />
           </div>
-          <div className="howto-image">
+          <div className={styles.howtoImage}>
             <img src={howto3} alt="How to 3" />
           </div>
         </div>
-        <button className="customize-button" onClick={handleShowMenuPopup}>
+        <button className={styles.customizeButton} onClick={handleShowMenuPopup}>
           Start customizing Your Baked Bliss
         </button>
       </section>
-      <section className="about-us-section">
-        <p className="about-us-title">About Us</p>
-        <p className="about-us-description">
+      <section className={styles.aboutUsSection}>
+        <p className={styles.aboutUsTitle}>About Us</p>
+        <p className={styles.aboutUsDescription}>
           At POTA-TO-GO, we’re more than just a fast-food brand—we’re a
           community fueled by a love for great food and even better company. Our
           mission is to deliver an unforgettable dining experience, one potato
           at a time.
         </p>
-        <div className="about-us-details">
-          <div className="detail">
-            <h3 className="detail-title">Our Story</h3>
-            <p className="detail-text">
+        <div className={styles.aboutUsDetails}>
+          <div className={styles.detail}>
+            <h3 className={styles.detailTitle}>Our Story</h3>
+            <p className={styles.detailText}>
               Our journey began with a simple idea: to redefine fast food by
               celebrating the humble potato. From our first crispy creation to
               the vibrant menu we offer today, every bite tells a story of
               passion, creativity, and a love for great flavors.
             </p>
           </div>
-          <div className="detail">
-            <h3 className="detail-title">Our Vision</h3>
-            <p className="detail-text">
+          <div className={styles.detail}>
+            <h3 className={styles.detailTitle}>Our Vision</h3>
+            <p className={styles.detailText}>
               We envision a world where fast food is not just quick, but also
               wholesome and delightful. At POTA-TO-GO, we strive to bring people
               together over meals that are as fun to customize as they are
               delicious to enjoy.
             </p>
           </div>
-          <div className="detail">
-            <h3 className="detail-title">Ingredients & Quality</h3>
-            <p className="detail-text">
+          <div className={styles.detail}>
+            <h3 className={styles.detailTitle}>Ingredients & Quality</h3>
+            <p className={styles.detailText}>
               Every dish starts with the freshest ingredients, carefully sourced
               and thoughtfully prepared. We believe in delivering quality you
               can taste, from our creamy toppings to the perfectly crisp
@@ -252,18 +252,18 @@ const LandingPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="about-us-images">
-          <img src={chef} alt="Chef" className="about-us-image" />
-          <img src={sousteam} alt="Sous Team" className="about-us-image" />
-          <img src={potatoes} alt="Potatoes" className="about-us-image" />
+        <div className={styles.aboutUsImages}>
+          <img src={chef} alt="Chef" className={styles.aboutUsImage} />
+          <img src={sousteam} alt="Sous Team" className={styles.aboutUsImage} />
+          <img src={potatoes} alt="Potatoes" className={styles.aboutUsImage} />
         </div>
       </section>
-      <footer className="footer">
-        <div className="footer-line"></div>
-        <div className="footer-content">
-          <h1 className="footer-logo">POTA-TO-GO</h1>
-          <p className="footer-title">OPENING HOURS</p>
-          <p className="footer-hours">
+      <footer className={styles.footer}>
+        <div className={styles.footerLine}></div>
+        <div className={styles.footerContent}>
+          <h1 className={styles.footerLogo}>POTA-TO-GO</h1>
+          <p className={styles.footerTitle}>OPENING HOURS</p>
+          <p className={styles.footerHours}>
             Monday - Friday: 11:00 AM - 10:00 PM <br />
             Saturday - Sunday: 12:00 PM - 11:00 PM
           </p>
@@ -272,5 +272,4 @@ const LandingPage: React.FC = () => {
     </div>
   );
 };
-
 export default LandingPage;

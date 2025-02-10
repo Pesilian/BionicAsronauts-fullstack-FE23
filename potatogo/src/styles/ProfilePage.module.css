@@ -1,5 +1,5 @@
 /* Profile Page Styles */
-.profile-page {
+.profilePage {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -13,49 +13,49 @@
   color: #000000;
 }
 
-.profile-container {
+.profileContainer {
   display: flex;
   width: 90%;
   margin-top: 20px;
 }
 
-.profile-card-container {
+.profileCardContainer {
   display: flex;
   flex-direction: column;
   flex: 0.4;
   gap: 20px;
 }
 
-.orders-section {
+.ordersSection {
   flex: 0.6;
   padding: 20px;
   border-radius: 10px;
 }
 
-.orders-section h2 {
+.ordersSection h2 {
   font-family: "Inter", sans-serif;
   font-size: 20px;
   font-weight: 600;
   margin-bottom: 20px;
 }
 
-.order-item {
+.orderItem {
   border-radius: 10px;
   padding: 20px;
   margin-bottom: 15px;
 }
 
-.order-status {
+.orderStatus {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.order-details {
+.orderDetails {
   font-size: 14px;
 }
 
-.logout-button {
+.logoutButton {
   width: 100%;
   padding: 12px;
   border: none;
@@ -68,8 +68,8 @@
 
 
 /* Profile and Card Sections */
-.profile-section,
-.card-section {
+.profileSection,
+.cardSection {
   border-radius: 10px;
   padding: 20px;
   margin-bottom: 20px;
@@ -82,7 +82,7 @@ h2 {
   margin-bottom: 10px;
 }
 
-.form-group {
+.formGroup {
   margin-bottom: 10px;
 }
 
@@ -113,17 +113,17 @@ button {
 }
 
 
-.card-expiry {
+.cardExpiry {
   display: flex;
   justify-content: space-between;
 }
 
-.delete-account {
+.deleteAccount {
   display: flex;
   justify-content: center;
 }
 
-.delete-button {
+.deleteButton {
   width: 100%;
   padding: 12px;
   border: none;

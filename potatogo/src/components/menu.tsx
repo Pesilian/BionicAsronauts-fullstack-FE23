@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import '../styles/menu.css';
+import styles from '../styles/menu.module.css';
 import CartPopup from './cart';
 import cart from '../assets/cart.svg';
 import { Special } from '../types/cartTypes';
@@ -198,11 +198,11 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
 
 
   return (
-    <div className="menu-popup-overlay" onClick={handleOverlayClick}>
-      <div className="menu-popup-content" onClick={e => e.stopPropagation()}>
-      <div className="category-navigation">
-      <select
-       className="category-select"
+    <div className={styles.menuPopupOverlay} onClick={handleOverlayClick}>
+      <div className={styles.menuPopupContent} onClick={e => e.stopPropagation()}>
+        <div className={styles.categoryNavigation}>
+          <select
+            className={styles.categorySelect}
             onChange={e => handleScrollToCategory(e.target.value)}
             defaultValue=""
           >
@@ -216,74 +216,67 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
             ))}
           </select>
           {showCartPopup && (
-        <CartPopup onClose={handleClosePopup} cartId={cartId} />
-      )}
-       <img
+            <CartPopup onClose={handleClosePopup} cartId={cartId} />
+          )}
+          <img
             src={cart}
             alt="Cart"
-            className="cart-btn"
+            className={styles.cartBtn}
             onClick={handleShowCartPopup}
           />
-
         </div>
-        <h2 ref={el => (categoryRefs.current['Specials'] = el)} className="menu-popup-header">Our specials</h2>
-       
+        <h2 ref={el => (categoryRefs.current['Specials'] = el)} className={styles.menuPopupHeader}>Our specials</h2>
 
-        <div className='category-container'>
-        {specials.length > 0 ? (
-          specials.map((special, index) => (
-           
-            <div className="menu-popup-itemContainer" key={index}>
-              
-              <p className="menu-popup-item">{special.specialsName} <span className="menu-popup-price">{special.price} kr</span></p>
-              <input
-                className="menu-popup-checkbox"
-                type="checkbox"
-                checked={selectedItems.includes(special)}
-                onChange={e => handleCheckboxChange(special, e.target.checked)}
-              />
-            </div>
-            
-          ))
-        ) : (
-          <p>No specials available</p>
-        )}
-</div>
-        <h2 className="menu-popup-header">Or choose your own creation:</h2>
-
+        <div className={styles.categoryContainer}>
+          {specials.length > 0 ? (
+            specials.map((special, index) => (
+              <div className={styles.menuPopupItemContainer} key={index}>
+                <p className={styles.menuPopupItem}>{special.specialsName} <span className={styles.menuPopupPrice}>{special.price} kr</span></p>
+                <input
+                  className={styles.menuPopupCheckbox}
+                  type="checkbox"
+                  checked={selectedItems.includes(special)}
+                  onChange={e => handleCheckboxChange(special, e.target.checked)}
+                />
+              </div>
+            ))
+          ) : (
+            <p>No specials available</p>
+          )}
+        </div>
+        <h2 className={styles.menuPopupHeader}>Or choose your own creation:</h2>
 
         {isLoading ? (
           <p>Loading</p>
         ) : (
           sortedCategories.map(([category, items]) => (
-            <div key={category}  ref={el => (categoryRefs.current[category] = el)} className='category-container'>
-              <h3 className="menu-popup-itemHeader">{category}</h3>
+            <div key={category} ref={el => (categoryRefs.current[category] = el)} className={styles.categoryContainer}>
+              <h3 className={styles.menuPopupItemHeader}>{category}</h3>
               {category === 'Potatoes' && items.map((item: MenuItem) => (
-  <div className="menu-popup-itemContainer" key={item.menuItem}>
-    <p className="menu-popup-item">
-      {item.menuItem} - <span className="menu-popup-price">{item.price} kr</span>
-    </p>
-    <input
-      className="menu-popup-checkbox"
-      type="checkbox"
-      checked={selectedItems.includes(item)}
-      onChange={e => handleCheckboxChange(item, e.target.checked)}
-    />
-  </div>
-))}
+                <div className={styles.menuPopupItemContainer} key={item.menuItem}>
+                  <p className={styles.menuPopupItem}>
+                    {item.menuItem} - <span className={styles.menuPopupPrice}>{item.price} kr</span>
+                  </p>
+                  <input
+                    className={styles.menuPopupCheckbox}
+                    type="checkbox"
+                    checked={selectedItems.includes(item)}
+                    onChange={e => handleCheckboxChange(item, e.target.checked)}
+                  />
+                </div>
+              ))}
 
-{category !== 'Potatoes' && items.map((item: MenuItem) => (
-  <div className="menu-popup-itemContainer" key={item.menuItem}>
-    <p className="menu-popup-item">{item.menuItem}</p>
-    <input
-      className="menu-popup-checkbox"
-      type="checkbox"
-      checked={selectedItems.includes(item)}
-      onChange={e => handleCheckboxChange(item, e.target.checked)}
-    />
-  </div>
-))}
-
+              {category !== 'Potatoes' && items.map((item: MenuItem) => (
+                <div className={styles.menuPopupItemContainer} key={item.menuItem}>
+                  <p className={styles.menuPopupItem}>{item.menuItem}</p>
+                  <input
+                    className={styles.menuPopupCheckbox}
+                    type="checkbox"
+                    checked={selectedItems.includes(item)}
+                    onChange={e => handleCheckboxChange(item, e.target.checked)}
+                  />
+                </div>
+              ))}
             </div>
           ))
         )}
@@ -291,12 +284,11 @@ const MenuPopup: React.FC<MenuPopupProps> = ({ onClose, onCartIdChange }) => {
         {error && <p style={{ color: 'red' }}>{error}</p>}
       </div>
 
-      <button className="addToCartBtn" onClick={handleAddAllToCart}>
+      <button className={styles.addToCartBtn} onClick={handleAddAllToCart}>
         Add to cart
       </button>
-
-      
     </div>
   );
 };
+
 export default MenuPopup;

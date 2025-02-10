@@ -14,10 +14,6 @@ export interface Order {
   orderNote: string;
 }
 
-
-
-
-
 export interface fetchedOrders {
   items: Order[];
   lastEvaluatedKey: string | null;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../styles/contactPopUp.css';
+import styles from '../styles/contactPopUp.module.css';
 
 interface ContactPopupProps {
   onClose: () => void;
@@ -27,14 +27,14 @@ const ContactPopup: React.FC<ContactPopupProps> = ({ onClose }) => {
   };
 
   return (
-    <div className="contact-popup-overlay" onClick={handleOverlayClick}>
-      <div className="contact-popup-content">
-        <button className="close-button" onClick={onClose}>
+    <div className={styles.contactPopupOverlay} onClick={handleOverlayClick}>
+      <div className={styles.contactPopupContent}>
+        <button className={styles.closeButton} onClick={onClose}>
           &times;
         </button>
         <h2>Contact us!</h2>
         <p>Do you have any questions or suggestions, please contact us!</p>
-        <div className="contact-details">
+        <div className={styles.contactDetails}>
           <p>
             <strong>Phone:</strong> 123-456-789
           </p>
@@ -45,15 +45,15 @@ const ContactPopup: React.FC<ContactPopupProps> = ({ onClose }) => {
             <strong>Adress:</strong> Streetst. 12, 123 45 City
           </p>
         </div>
-        <div className="message-form">
+        <div className={styles.messageForm}>
           <textarea
             placeholder="Write message here"
             value={message}
             onChange={e => setMessage(e.target.value)}
           ></textarea>
-          {error && <p className="error-message">{error}</p>}
-          {success && <p className="success-message">Message sent</p>}
-          <button className="send-button" onClick={handleSendMessage}>
+          {error && <p className={styles.errorMessage}>{error}</p>}
+          {success && <p className={styles.successMessage}>Message sent</p>}
+          <button className={styles.sendButton} onClick={handleSendMessage}>
             Send
           </button>
         </div>

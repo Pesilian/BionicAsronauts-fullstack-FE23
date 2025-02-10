@@ -1,0 +1,277 @@
+/* GENERAL LAYOUT */
+.landingPage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100vw;
+  min-height: 150vh; /* Gör sidan längre än 100vh */
+  margin: 0;
+  padding: 0;
+  background-color: #f4f3e5;
+  font-family: 'Roboto Serif', serif;
+  color: #000000;
+}
+
+/* HEADER SECTION */
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  padding: 40px 0;
+}
+
+.headerLeft {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.mainTitle {
+  font-family: 'Monoton', cursive;
+  font-size: 96px;
+  font-weight: 400;
+  margin: 0;
+  line-height: 0.9;
+}
+
+.subTitle {
+  font-family: 'Roboto Serif', serif;
+  font-size: 20px;
+  font-weight: 400;
+  margin: 0;
+  line-height: 1;
+}
+
+.headerRight {
+  position: absolute;
+  right: 160px;
+  display: flex;
+  top: 70px;
+  gap: 90px;
+  align-items: center;
+}
+
+.navItem {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.navItem:hover {
+  color: #555;
+}
+
+.cartBtn {
+  width: 40px;
+  padding: 10px;
+}
+
+/* CONTENT SECTION */
+.contentSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 90%;
+  margin: 40px auto;
+}
+
+.mainText {
+  font-family: 'Roboto Serif', serif;
+  font-size: 70px;
+  font-weight: 800;
+  line-height: 70px;
+  text-align: left;
+  text-underline-position: from-font;
+  text-decoration-skip-ink: none;
+  margin-bottom: 20px;
+  margin-left: 140px;
+}
+
+.secondaryText {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 29px;
+  text-align: left;
+  margin-left: 140px;
+}
+
+.orderText {
+  font-family: 'Roboto Serif', serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  letter-spacing: -0.019em;
+  text-align: left;
+  text-decoration-line: underline;
+  color: #000000;
+  margin-top: 70px;
+  margin-left: 140px;
+}
+
+/* HOW-TO SECTION */
+.howtoSection {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 120px;
+}
+
+.howtoTitle p {
+  font-style: italic;
+  line-height: 70px;
+  margin-bottom: 60px;
+}
+
+.howtoImages {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 100px;
+  margin-bottom: 60px;
+}
+
+/* CUSTOMIZE BUTTON */
+.customizeButton {
+  background-color: #8fbd92;
+  color: #ffffff;
+  font-family: 'Roboto Serif', serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 24px;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 60px;
+}
+
+.customizeButton:hover {
+  background-color: #7ea883;
+}
+
+/* ABOUT US SECTION */
+.aboutUsSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 150px;
+  padding: 20px;
+}
+
+.aboutUsTitle {
+  font-family: 'Poppins', sans-serif;
+  font-size: 30px;
+  font-weight: 600;
+  text-align: center;
+  color: #000000;
+  margin-bottom: 0px;
+}
+
+.aboutUsDescription {
+  font-family: 'Poppins', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  text-align: center;
+  color: #000000;
+  max-width: 600px;
+  line-height: 24px;
+  margin-bottom: 40px;
+}
+
+/* DETAILS SECTION */
+.aboutUsDetails {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 90px;
+  max-width: 1200px;
+}
+
+.detail {
+  flex: 1;
+  max-width: 300px;
+}
+
+.detailTitle {
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 10px;
+}
+
+.detailText {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #000000;
+  line-height: 22px;
+}
+
+/* ABOUT US IMAGES */
+.aboutUsImages {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 90px;
+  margin-top: 30px;
+  margin-bottom: 40px;
+}
+
+.aboutUsImage {
+  width: 300px;
+  height: auto;
+}
+
+/* FOOTER SECTION */
+.footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 50px;
+  padding: 20px 0;
+  background-color: #f4f3e5;
+}
+
+.footerLine {
+  width: 400%;
+  height: 2px;
+  background-color: #fa6b4b;
+  margin-bottom: 20px;
+}
+
+.footerContent {
+  text-align: center;
+}
+
+.footerLogo {
+  font-family: 'Monoton', cursive;
+  font-size: 36px;
+  font-weight: 100;
+  color: #000;
+  margin: 0;
+}
+
+.footerTitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #000;
+  margin: 10px 0;
+}
+
+.footerHours {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #333;
+  line-height: 24px;
+}
+

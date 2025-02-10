@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import '../styles/confirmationPopUp.css';
-
+import styles from '../styles/confirmationPopUp.module.css';
 
 interface OrderConfirmationProps {
   orderId: string;
@@ -21,9 +20,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ orderId, onClose 
         );
         console.log('API Response:', response.data);  
 
-        
         const parsedData = response.data.body;
-        
         const order = parsedData.items[0]; 
         const orderDetails = order;
         console.log(Object.keys(orderDetails));
@@ -61,17 +58,17 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ orderId, onClose 
   }
 
   return (
-    <div className="order-confirmation-overlay">
-      <div className="order-confirmation-content">
-        <h2 className='header'>Order Confirmation</h2>
-        <p className='post-header'>Thank you for your order!</p>
+    <div className={styles.orderConfirmationOverlay}>
+      <div className={styles.orderConfirmationContent}>
+        <h2 className={styles.header}>Order Confirmation</h2>
+        <p className={styles.postHeader}>Thank you for your order!</p>
 
         {orderDetails ? (
           <>
             <p>Order Number: {orderDetails.orderId}</p>
             <h2>Your order:</h2>
             <ul>
-              <li className='order-list'>
+              <li className={styles.orderList}>
                 <div>Customer Name: {orderDetails.customerName}</div>
                 <div>Order Status:{orderDetails.orderStatus}</div>
 
@@ -98,10 +95,12 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ orderId, onClose 
                   }
                   return null;
                 })}
-                <div className='priceCont'>
-                <p>Total Price:</p><div className='totalPrice'>  {orderDetails.totalPrice} SEK</div></div>
-                <div className='noteCont'>
-                <p>Order Note:</p><div className='orderNote'>{orderDetails.orderNote}</div></div>
+                <div className={styles.priceCont}>
+                  <p>Total Price:</p><div className={styles.totalPrice}>  {orderDetails.totalPrice} SEK</div>
+                </div>
+                <div className={styles.noteCont}>
+                  <p>Order Note:</p><div className={styles.orderNote}>{orderDetails.orderNote}</div>
+                </div>
               </li>
             </ul>
           </>
@@ -109,7 +108,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ orderId, onClose 
           <p>No order details found.</p>
         )}
 
-        <button onClick={onClose} className="close-confirmationBtn">
+        <button onClick={onClose} className={styles.closeConfirmationBtn}>
           Close
         </button>
       </div>

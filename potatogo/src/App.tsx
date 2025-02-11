@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Amplify } from 'aws-amplify';
 import awsmobile from './aws-exports';
 import amplifyconfig from './amplifyconfiguration.json';
-import LandingPage from "./components/LandingPage";
-import ProfilePage from "./components/ProfilePage";
+import LandingPage from "./pages/LandingPage";
+import ProfilePage from "./pages/ProfilePage";
 import AdminPage from './pages/admin/adminPage';
 import "./App.css";
 

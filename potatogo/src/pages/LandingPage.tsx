@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from '../styles/LandingPage.module.css';
-import LoginPopup from './LoginPopup';
+import LoginPopup from '../components/LoginPopup';
 import lppotato from '../assets/lppotato.svg';
 import howto1 from '../assets/howto1.svg';
 import howto2 from '../assets/howto2.svg';
@@ -10,9 +10,9 @@ import chef from '../assets/chef.svg';
 import cart from '../assets/cart.svg';
 import sousteam from '../assets/sousteam.svg';
 import potatoes from '../assets/potatoes.svg';
-import MenuPopup from './menu';
-import CartPopup from './cart';
-import ContactPopup from './contactPopUp';
+import MenuPopup from '../components/menu';
+import CartPopup from '../components/cart';
+import ContactPopup from '../components/contactPopUp';
 
 const LandingPage: React.FC = () => {
   const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false);

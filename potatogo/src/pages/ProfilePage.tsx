@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from '../styles/ProfilePage.module.css';
-import CartPopup from './cart';
+import CartPopup from '../components/cart';
 import { SubItem } from '../types/cartTypes';
 import { numberedOrderItemsIntoCartItems, numberedOrderItemsIntoMenuSelectedItems, selectedItemsIntoMenuItem } from '../utils/parseOrder';
 import axios from 'axios';
 import { Order } from '../types/orderTypes';
-import OrderEditOverlay from './OrderEditOverlay';
+import OrderEditOverlay from '../components/OrderEditOverlay';
 import { fetchOrders } from '../api/ordersApi';
 
 const ProfilePage: React.FC = () => {

@@ -1,5 +1,33 @@
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+/* Global variables */
+:root {
+  /* Primary Colors */
+  --primary-color: #3498db;  
+  --secondary-color: #e74c3c; 
+  --tertiary-color: #f1c40f;
+
+  /* Complementary Colors */
+  --complementary-1: #2ecc71;
+  --complementary-2: #9b59b6;
+
+  /* Neutral Colors */
+  --black: #1a1a1a;
+  --white: #f8f8f8;
+
+  /* Font Sizes using clamp() */
+  --font-xsmall: clamp(10px, 1.2vw, 12px);
+  --font-small: clamp(12px, 1.9vw, 14px);
+  --font-medium: clamp(1rem, 3.1vw, 3.1rem);
+  --font-large: clamp(3.1rem, 5vw, 8rem);
+}
+
 body {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;

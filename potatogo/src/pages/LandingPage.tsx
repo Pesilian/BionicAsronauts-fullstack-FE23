@@ -171,7 +171,7 @@ const LandingPage: React.FC = () => {
           </p>
           <p className={styles.orderText}>Order your potato</p>
         </div>
-        <div className={styles.imageContent}>
+        <div className={styles.contentImage}>
           <img src={lppotato} alt="Potato" />
         </div>
       </section>

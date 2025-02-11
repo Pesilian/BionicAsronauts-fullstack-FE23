@@ -6,7 +6,6 @@ import amplifyconfig from './amplifyconfiguration.json';
 import LandingPage from "./pages/LandingPage";
 import ProfilePage from "./pages/ProfilePage";
 import AdminPage from './pages/admin/adminPage';
-import "./App.css";
 
 Amplify.configure(amplifyconfig);
 Amplify.configure(awsmobile);

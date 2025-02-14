@@ -7,7 +7,7 @@ import howto1 from '../assets/howto1.svg';
 import howto2 from '../assets/howto2.svg';
 import howto3 from '../assets/howto3.svg';
 import chef from '../assets/chef.svg';
-import cart from '../assets/cart.svg';
+import { ReactComponent as CartIcon } from "../assets/cart.svg";
 import sousteam from '../assets/sousteam.svg';
 import potatoes from '../assets/potatoes.svg';
 import MenuPopup from '../components/menu';
@@ -126,7 +126,7 @@ const LandingPage: React.FC = () => {
       <header className={styles.header}>
         <div className={styles.headerLeft}>
           <h1 className={styles.mainTitle}>POTA-TO-GO</h1>
-          <p className={styles.subtitle}>Fast Food, Done the Potato Way</p>
+          <p className={styles.subTitle}>Fast Food, Done the Potato Way</p>
         </div>
         <div className={styles.headerRight}>
           <p className={styles.navItem} onClick={() => setShowContactPopup(true)}>
@@ -137,43 +137,43 @@ const LandingPage: React.FC = () => {
               <p className={styles.navItem} onClick={handleProfileNavigation}>
                 {nickname}
               </p>
-              <button onClick={handleLogout} className={styles.navItem}>
+              <p onClick={handleLogout} className={styles.navItem}>
                 Log Out
-              </button>
+              </p>
             </>
           ) : (
             <p className={styles.navItem} onClick={() => setIsLoginPopupOpen(true)}>
               Log in
             </p>
           )}
-          <img
-            src={cart}
-            alt="Cart"
-            className={styles.cartBtn}
-            onClick={handleShowCartPopup}
-          />
+          <p className={styles.navItem} onClick={handleShowCartPopup}>
+            Cart
+            <CartIcon className={styles.cartIcon} />
+          </p>
+
         </div>
       </header>
-      <section className={styles.contentSection}>
-        <div className={styles.textContent}>
+      <section className={styles.heroSection}>
+        <div className={styles.heroContainer}>
+        <img src={lppotato} className={styles.heroImage} alt="Potato" />
+        <div className={styles.heroTextContainer}>
           <p className={styles.mainText}>
-            Crispy potatoes, <br />
-            creamy toppings, <br />
-            savory sides, <br />
-            great vibes.
+          Crispy potatoes,<br />
+          creamy toppings,<br />
+          savory sides,<br />
+          great vibes.
           </p>
+          </div>
           <p className={styles.secondaryText}>
             From spuds to smiles, our menu is crafted
-            <br />
             to satisfy your cravings with every delicious bite.
             <br />
             Let’s turn your day into a potato-powered adventure!
           </p>
-          <p className={styles.orderText}>Order your potato</p>
         </div>
-        <div className={styles.contentImage}>
-          <img src={lppotato} alt="Potato" />
-        </div>
+        {/* <button className={styles.customizeButton} onClick={handleShowMenuPopup}>
+            Start customizing Your Baked Bliss
+         </button> */}
       </section>
 
       {showContactPopup && (
@@ -197,16 +197,16 @@ const LandingPage: React.FC = () => {
 
       <section className={styles.howtoSection}>
         <div className={styles.howtoTitle}>
-          <p>The Potato Process</p>
+          <h3>The Potato Process</h3>
         </div>
-        <div className={styles.howtoImages}>
-          <div className={styles.howtoImage}>
+        <div className={styles.howtoCardsContainer}>
+          <div className={styles.howtoCard}>
             <img src={howto1} alt="How to 1" />
           </div>
-          <div className={styles.howtoImage}>
+          <div className={styles.howtoCard}>
             <img src={howto2} alt="How to 2" />
           </div>
-          <div className={styles.howtoImage}>
+          <div className={styles.howtoCard}>
             <img src={howto3} alt="How to 3" />
           </div>
         </div>
@@ -222,40 +222,37 @@ const LandingPage: React.FC = () => {
           mission is to deliver an unforgettable dining experience, one potato
           at a time.
         </p>
-        <div className={styles.aboutUsDetails}>
-          <div className={styles.detail}>
-            <h3 className={styles.detailTitle}>Our Story</h3>
-            <p className={styles.detailText}>
+        <div className={styles.aboutUsCardsContainer}>
+          <div className={styles.aboutUsCard}>
+            <h3 className={styles.aboutUsCardTitle}>Our Story</h3>
+            <p className={styles.aboutUsCardText}>
               Our journey began with a simple idea: to redefine fast food by
               celebrating the humble potato. From our first crispy creation to
               the vibrant menu we offer today, every bite tells a story of
               passion, creativity, and a love for great flavors.
             </p>
+            <img src={chef} alt="Chef" className={styles.aboutUsImage} />
           </div>
-          <div className={styles.detail}>
-            <h3 className={styles.detailTitle}>Our Vision</h3>
-            <p className={styles.detailText}>
+          <div className={styles.aboutUsCard}>
+            <h3 className={styles.aboutUsCardTitle}>Our Vision</h3>
+            <p className={styles.aboutUsCardText}>
               We envision a world where fast food is not just quick, but also
               wholesome and delightful. At POTA-TO-GO, we strive to bring people
               together over meals that are as fun to customize as they are
               delicious to enjoy.
             </p>
+            <img src={sousteam} alt="Sous Team" className={styles.aboutUsImage} />
           </div>
-          <div className={styles.detail}>
-            <h3 className={styles.detailTitle}>Ingredients & Quality</h3>
-            <p className={styles.detailText}>
+          <div className={styles.aboutUsCard}>
+            <h3 className={styles.aboutUsCardTitle}>Ingredients & Quality</h3>
+            <p className={styles.aboutUsCardText}>
               Every dish starts with the freshest ingredients, carefully sourced
               and thoughtfully prepared. We believe in delivering quality you
               can taste, from our creamy toppings to the perfectly crisp
               potatoes.
             </p>
+            <img src={potatoes} alt="Potatoes" className={styles.aboutUsImage} />
           </div>
-        </div>
-
-        <div className={styles.aboutUsImages}>
-          <img src={chef} alt="Chef" className={styles.aboutUsImage} />
-          <img src={sousteam} alt="Sous Team" className={styles.aboutUsImage} />
-          <img src={potatoes} alt="Potatoes" className={styles.aboutUsImage} />
         </div>
       </section>
       <footer className={styles.footer}>

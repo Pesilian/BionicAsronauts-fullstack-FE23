@@ -5,117 +5,158 @@
   align-items: center;
   justify-content: flex-start;
   width: 100vw;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  background-color: #f4f3e5;
+  background-color: var(--primary-color);
   font-family: "Roboto Serif", serif;
-  color: #000000;
+  color: var(--black);
 }
 
-.profileContainer {
+.header {
   display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 4em;
+  margin-bottom: 1em;
+}
+
+.headerLeft {
+  text-align: center;
+}
+
+.mainTitle {
+  font-family: 'Monoton', cursive;
+  font-size: var(--font-xlarge);
+  font-weight: 400;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.subTitle {
+  font-family: 'Roboto Serif', serif;
+  font-size: var(--font-small);
+  font-weight: 400;
+  margin: 0;
+  border-top: 2px solid var(--tertiary-color);
+  border-bottom: 2px solid var(--tertiary-color);
+}
+
+.headerRight {
+  width: 50%;
+  min-width: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap : 2em;
+  font-size: var(--font-xsmall);
+  font-weight: 400;
+  margin:0;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  color: var(--secondary-color);
+  border-radius: 0.2em;
+  padding: 0.2em;
+  transition: color 0.3s ease;
+}
+
+.navItem:hover {
+  color: var(--complementary-1);
+  border: 2px dashed var(--tertiary-color);
+}
+
+.sectionTitle{
+  font-family: 'Poppins', sans-serif;
+  font-size: var(--font-medium);
+  font-weight: 600;
+  text-align: center;
+  margin: 0;
+}
+/*contains both profile and orders */
+.profileContainer { 
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
   width: 90%;
-  margin-top: 20px;
+  gap: 2em;
 }
 
 .profileCardContainer {
   display: flex;
   flex-direction: column;
-  flex: 0.4;
-  gap: 20px;
 }
+
 
 .ordersSection {
-  flex: 0.6;
-  padding: 20px;
-  border-radius: 10px;
-}
-
-.ordersSection h2 {
+  display: flex;
+  flex-direction: column;
+  width: 40%;
   font-family: "Inter", sans-serif;
-  font-size: 20px;
+  font-size: var(--font-medium);
   font-weight: 600;
-  margin-bottom: 20px;
+  border: 1px solid var(--tertiary-color);
+  border-radius: 0.3em;
+  padding: 1em;
+  gap: 1em;
 }
 
 .orderItem {
-  border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 15px;
+  border-bottom: 2px solid var(--tertiary-color);
+  margin: 0;
 }
 
 .orderStatus {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  font-size: var(--font-small);
+  margin: 0;
+  padding: 0;
 }
 
 .orderDetails {
-  font-size: 14px;
-}
-
-.logoutButton {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  background-color: #ff7043;
-  color: white;
-  font-size: 16px;
-  border-radius: 5px;
-  cursor: pointer;
+  font-size: var(--font-xsmall);
+  margin: 0;
 }
 
 
 /* Profile and Card Sections */
 .profileSection,
 .cardSection {
-  border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 20px;
+  border: 1px solid var(--tertiary-color);
+  border-radius: 0.3em;
+  padding: 1em;
+  margin: 1em;
 }
 
-h2 {
-  font-family: "Inter", sans-serif;
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 10px;
-}
 
 .formGroup {
-  margin-bottom: 10px;
+  margin-bottom: 2em;
 }
 
 label {
   font-weight: 600;
-  margin-bottom: 5px;
+  margin-bottom: 1em;
 }
 
 input,
 select {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 16px;
-}
-
-button {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  background-color: #ff7043;
-  color: white;
-  font-size: 16px;
-  border-radius: 5px;
-  cursor: pointer;
+  padding: 0.6em;
+  margin-bottom: 0.1em;
+  border: 1px solid var(--tertiary-color);
+  border-radius: 0.5em;
+  font-size: var(--font-xsmall);
 }
 
 
 .cardExpiry {
   display: flex;
   justify-content: space-between;
+  gap: 1em;
 }
 
 .deleteAccount {
@@ -123,13 +164,19 @@ button {
   justify-content: center;
 }
 
-.deleteButton {
+.deleteButton, .editButton, .cardButton, .orderButton {
   width: 100%;
-  padding: 12px;
+  padding: 0.3em;
   border: none;
-  background-color: #f44336;
-  color: white;
-  font-size: 16px;
-  border-radius: 5px;
+  margin: 0.2em 0;
+  background-color: var(--secondary-color);
+  color: var(--white);
+  font-size: var(--font-small);
+  border-radius: 0.2em;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.deleteButton:hover, .editButton:hover, .cardButton:hover, .orderButton:hover{
+  background-color: var(--complementary-1);
 }

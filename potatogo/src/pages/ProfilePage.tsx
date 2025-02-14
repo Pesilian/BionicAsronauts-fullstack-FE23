@@ -121,21 +121,21 @@ const ProfilePage: React.FC = () => {
       <header className={styles.header}>
         <div className={styles.headerLeft}>
           <h1 className={styles.mainTitle}>POTA-TO-GO</h1>
-          <p className={styles.subtitle}>Fast Food, Done the Potato Way</p>
+          <p className={styles.subTitle}>Fast Food, Done the Potato Way</p>
         </div>
         <div className={styles.headerRight}>
           <p className={styles.navItem}>Contact</p>
           <p className={styles.navItem}>{profileData.nickname}</p>
-          <button onClick={handleLogout} className={styles.logoutButton}>
-            Log out
-          </button>
+          <p onClick={handleLogout} className={styles.navItem}>
+                Log Out
+          </p>
         </div>
       </header>
 
       <div className={styles.profileContainer}>
         <div className={styles.profileCardContainer}>
           <div className={styles.profileSection}>
-            <h2>Profile</h2>
+            <h2 className={styles.sectionTitle}>Profile </h2>
             <div className={styles.formGroup}>
               <label>Name</label>
               <input type="text" value={name || 'N/A'} readOnly />
@@ -152,7 +152,7 @@ const ProfilePage: React.FC = () => {
               <label>Address</label>
               <input type="text" value={address || 'N/A'} readOnly />
             </div>
-            <button>Edit Profile</button>
+            <button className={styles.editButton}>Edit Profile</button>
             <div className={styles.deleteAccount}>
               <button className={styles.deleteButton}>Delete Account</button>
             </div>
@@ -194,33 +194,31 @@ const ProfilePage: React.FC = () => {
                 <input type="text" value={cvc || 'N/A'} readOnly />
               </div>
             </div>
-            <button>Change Card</button>
+            <button className={styles.cardButton}>Change Card</button>
           </div>
         </div>
 
         <div className={styles.ordersSection}>
-          <h2>My Orders</h2>
+          <h2 className={styles.sectionTitle}>My Orders</h2>
           {orders.length === 0 ? (
             <p>No orders found.</p>
           ) : (
             orders.map((order, index) => (
-              <div key={index} className={styles.orderItem}>
-                <div className={styles.orderStatus}>
-                  <p>{order.orderStatus}</p>
+              <div key={index} className={styles.orderItem}>                
+                  <p className={styles.orderStatus}>{order.orderStatus}</p>
                   <div className={styles.orderDetails}>
                     <p>Order #{order.orderId}</p>
                     <p>Order date: {order.createdAt}</p>
                     { order.updatedAt && <p>Order updated: {order.updatedAt}</p> }
                   </div>
-                  <button>Receipt</button>
+                  <button className={styles.orderButton}>Receipt</button>
                   {order.orderStatus === 'pending' && (
                     <>
-                      <button onClick={() => handleOrderAgain(order)}>Cancel Order</button>
-                      <button onClick={() => handleEditOrder(order)}>Edit Order</button>
+                      <button className={styles.orderButton} onClick={() => handleOrderAgain(order)}>Cancel Order</button>
+                      <button className={styles.orderButton} onClick={() => handleEditOrder(order)}>Edit Order</button>
                     </>
                   )}
-                  <button onClick={() => handleOrderAgain(order)}>Order Again</button>
-                </div>
+                  <button className={styles.orderButton} onClick={() => handleOrderAgain(order)}>Order Again</button>                
               </div>
             ))
           )}

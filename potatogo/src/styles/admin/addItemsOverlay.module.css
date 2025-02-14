@@ -68,7 +68,7 @@
   }
   
   /* Label and Checkbox */
-  label {
+  .label {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -76,7 +76,7 @@
     cursor: pointer;
   }
   
-  input[type="checkbox"] {
+  .input[type="checkbox"] {
     accent-color: #51753d;
     cursor: pointer;
   }

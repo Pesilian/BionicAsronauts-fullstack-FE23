@@ -5,11 +5,21 @@ const USERS_TABLE = "Pota-To-Go-users";
 
 exports.handler = async (event) => {
   try {
-    const { httpMethod, body } = event;
+    const { httpMethod, body, headers: requestHeaders } = event;
 
-    const headers = {
-      "Access-Control-Allow-Origin": "http://localhost:3000",
-      "Access-Control-Allow-Methods": "OPTIONS,POST",
+    // List of allowed origins
+    const allowedOrigins = [
+      "http://localhost:3000",
+      "https://d1qddrr08bfccp.cloudfront.net",
+    ];
+
+    // Get the origin from the request
+    const origin = requestHeaders.origin || "";
+
+    // Set the correct CORS origin dynamically
+    const responseHeaders = {
+      "Access-Control-Allow-Origin": allowedOrigins.includes(origin) ? origin : "https://d1qddrr08bfccp.cloudfront.net",
+      "Access-Control-Allow-Methods": "OPTIONS, POST",
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
       "Access-Control-Allow-Credentials": "true",
     };
@@ -17,7 +27,7 @@ exports.handler = async (event) => {
     if (httpMethod === "OPTIONS") {
       return {
         statusCode: 200,
-        headers,
+        headers: responseHeaders,
         body: JSON.stringify({ message: "CORS preflight successful" }),
       };
     }
@@ -25,7 +35,7 @@ exports.handler = async (event) => {
     if (httpMethod !== "POST") {
       return {
         statusCode: 405,
-        headers,
+        headers: responseHeaders,
         body: JSON.stringify({ error: "Method Not Allowed" }),
       };
     }
@@ -35,7 +45,7 @@ exports.handler = async (event) => {
     if (!nickname || !password) {
       return {
         statusCode: 400,
-        headers,
+        headers: responseHeaders,
         body: JSON.stringify({ error: "Nickname and password are required" }),
       };
     }
@@ -50,7 +60,7 @@ exports.handler = async (event) => {
     if (!Item) {
       return {
         statusCode: 404,
-        headers,
+        headers: responseHeaders,
         body: JSON.stringify({ error: "User not found" }),
       };
     }
@@ -58,7 +68,7 @@ exports.handler = async (event) => {
     if (password !== Item.password) {
       return {
         statusCode: 401,
-        headers,
+        headers: responseHeaders,
         body: JSON.stringify({ error: "Invalid password" }),
       };
     }
@@ -66,7 +76,7 @@ exports.handler = async (event) => {
     // Send full user details upon successful login
     return {
       statusCode: 200,
-      headers,
+      headers: responseHeaders,
       body: JSON.stringify({
         message: "Login successful",
         role: Item.role,
@@ -79,7 +89,7 @@ exports.handler = async (event) => {
   } catch (error) {
     return {
       statusCode: 500,
-      headers,
+      headers: responseHeaders,
       body: JSON.stringify({ error: error.message }),
     };
   }

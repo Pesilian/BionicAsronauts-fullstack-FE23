@@ -103,6 +103,9 @@
       },
       "api": {
         "potatogoapi": {}
+      },
+      "hosting": {
+        "S3AndCloudFront": {}
       }
     }
   }
